@@ -190,6 +190,20 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* ---------- PROBLEMAS ---------- */
 .btn-prob{background:#6d4bd8;color:#fff}
 .btn-acs{background:#0e7490;color:#fff}
+.btn-nivel{background:#d97706;color:#fff}
+#nivelmas{flex-direction:column;align-items:center;padding:70px 16px 30px}
+.resp{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 16px;margin:16px 0 4px;
+  background:var(--panel);border:3px solid var(--line);border-radius:20px;padding:12px 14px;box-shadow:var(--shadow)}
+.resp-lbl{font-weight:800;font-size:clamp(1.05rem,2.4vw,1.35rem)}
+.spinner{display:flex;align-items:center;gap:8px}
+.spin{width:60px;height:60px;border-radius:50%;border:3px solid var(--accent);background:var(--panel2);color:var(--accent);
+  font-size:1.6rem;font-weight:900;display:grid;place-items:center;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.spin:active{transform:scale(.93)}
+.spin:disabled,#nmVal:disabled{opacity:.5}
+#nmVal{width:3.2em;min-height:60px;text-align:center;font-size:clamp(1.8rem,5vw,2.4rem);font-weight:900;border-radius:14px;
+  border:3px solid var(--line);background:#fff;color:#111}
+.resp-tip{text-align:center;color:var(--soft);margin:.3em 0 0;font-size:clamp(.85rem,1.8vw,1rem)}
+.print-only{display:none}
 .pill.acs-pill{background:#0e7490;color:#fff;border-color:#0b5d74}
 .pill[hidden]{display:none}
 #problemas{flex-direction:column;align-items:center;padding:70px 16px 30px}
@@ -267,7 +281,9 @@ button{font:inherit;color:inherit;cursor:pointer}
   @page{margin:2cm}
   .odice .die{width:40px}
   html,body{background:#fff!important}
-  .theme-toggle,.prob-bar,.prob-count,.prob h2,.prob-fb,.fx,.toast,.modal-bg{display:none!important}
+  .theme-toggle,.prob-bar,.prob-count,.prob h2,.prob-fb,.fx,.toast,.modal-bg,.resp,.resp-tip{display:none!important}
+  .print-only{display:block}
+  #nivelmas{padding:0}
   #problemas{padding:0}
   .paper{box-shadow:none;border:0;border-radius:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:12pt;color:#000}
   .popt{background:none!important;border:0!important;padding:0;min-height:0;margin:.3em 0;font-size:12pt}
@@ -304,6 +320,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <button class="btn btn-main" id="btnJuego">🔨 Juego</button>
       <button class="btn btn-prob" id="btnProblemas">📝 Problemas</button>
       <button class="btn btn-acs" id="btnACS">♿ ACS</button>
+      <button class="btn btn-nivel" id="btnNivelMas">⭐ Nivel +</button>
     </div>
     <p class="autoria"><strong>Elaborado por: Alberto Jiménez Ruiz</strong><br>Asesor Regional de Matemática DRE-Cartag-DAP-2026</p>
   </div>
@@ -428,6 +445,32 @@ button{font:inherit;color:inherit;cursor:pointer}
     <p class="prob-count" id="probCount"></p>
     <article class="paper" id="paper"></article>
     <div class="prob-fb" id="probFb" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ============ NIVEL + ============ -->
+<section class="screen" id="nivelmas" aria-labelledby="tNm">
+  <div class="prob">
+    <h2 id="tNm">⭐ Nivel +</h2>
+    <div class="prob-bar">
+      <button class="btn btn-ghost" data-go="inicio">🏠 Volver al inicio</button>
+      <button class="btn btn-alt" id="btnOtroNm">🔄 Otro ítem</button>
+      <button class="btn btn-main" id="btnPdfNm">⬇️ Descargar PDF</button>
+      <button class="btn btn-prob" id="btnPrintNm">🖨️ Imprimir</button>
+    </div>
+    <p class="prob-count" id="nmCount"></p>
+    <article class="paper" id="paperNm"></article>
+    <div class="resp" id="nmResp">
+      <span class="resp-lbl">Tu respuesta:</span>
+      <div class="spinner">
+        <button class="spin" id="nmDown" aria-label="Bajar el número" title="Bajar">▼</button>
+        <input id="nmVal" inputmode="numeric" maxlength="3" value="0" aria-label="Tu respuesta" autocomplete="off">
+        <button class="spin" id="nmUp" aria-label="Subir el número" title="Subir">▲</button>
+      </div>
+      <button class="btn btn-main" id="nmCheck">✔ Revisar</button>
+    </div>
+    <p class="resp-tip" id="nmTip">Usa las flechas ▲ ▼ para subir o bajar el número (mantenlas presionadas para ir más rápido).</p>
+    <div class="prob-fb" id="nmFb" aria-live="polite"></div>
   </div>
 </section>
 
@@ -1223,6 +1266,7 @@ function problemPDF(p){
     }else{ txt(L, LETRAS[i] + ')'); txt(L + 28, String(o)); y -= 28; }
   });
 
+  if(p.abierta){ y -= 18; txt(L, 'Respuesta: ________________________'); }
   const stream = ops.join('\n');
   const objs = [
     '<< /Type /Catalog /Pages 2 0 R >>',
@@ -1246,6 +1290,93 @@ $('#btnPdfProb').addEventListener('click', () => {
   const url = URL.createObjectURL(problemPDF(P.cur));
   const a = document.createElement('a');
   a.href = url; a.download = `Problema de dobles ${P.idx+1}.pdf`;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 2000);
+});
+
+/* ---------- Nivel + : problemas de respuesta abierta ---------- */
+// Cada ítem: bloques (como en Problemas), pregunta, resp (respuesta correcta) y pasos de la explicación.
+const NIVELMAS = [
+  { bloques: [], resp: 16,
+    pregunta: 'Una empresa ofrece tres ofertas: un empaque que contiene 4 macadamias, un segundo empaque que contiene el doble del primero y un tercer empaque que contiene el doble del segundo. ¿Cuántas macadamias tiene el tercer empaque?',
+    pasos: ['Primer empaque: 4 macadamias.', 'Segundo empaque: el doble de 4 → 4 + 4 = 8 macadamias.', 'Tercer empaque: el doble de 8 → 8 + 8 = 16 macadamias.'] },
+  { bloques: [], resp: 68,
+    pregunta: 'Jorge tiene el doble de la edad de Karla, y Karla tiene 13 años menos que David. ¿Cuál es la edad de Jorge si sabemos que David tiene 47 años?',
+    pasos: ['David tiene 47 años.', 'Karla tiene 13 años menos que David: 47 − 13 = 34 años.', 'Jorge tiene el doble de la edad de Karla: 34 + 34 = 68 años.'] },
+  { bloques: [{t:'p', text:'Se lanzan dos dados y se obtiene:'}, {t:'dados', caras:[3,5]}], resp: 16,
+    pregunta: '¿Cuál es el doble del resultado de ese lanzamiento?',
+    pasos: ['Sumamos los puntos de los dados: 3 + 5 = 8.', 'El doble de 8 es 8 + 8 = 16.'] },
+  { bloques: [], resp: 12,
+    pregunta: 'Ana tiene 3 lápices. Luis tiene el doble de lápices que Ana y Sofía tiene el doble de lápices que Luis. ¿Cuántos lápices tiene Sofía?',
+    pasos: ['Ana tiene 3 lápices.', 'Luis tiene el doble de 3 → 3 + 3 = 6 lápices.', 'Sofía tiene el doble de 6 → 6 + 6 = 12 lápices.'] },
+  { bloques: [{t:'p', text:'Se lanzan dos dados y se obtiene:'}, {t:'dados', caras:[4,3]}], resp: 14,
+    pregunta: '¿Cuál es el doble del resultado de ese lanzamiento?',
+    pasos: ['Sumamos los puntos de los dados: 4 + 3 = 7.', 'El doble de 7 es 7 + 7 = 14.'] },
+  { bloques: [], resp: 18,
+    pregunta: 'Tomás tiene 4 años y Pedro tiene 5 años más que Tomás. Marta tiene el doble de la edad de Pedro. ¿Cuántos años tiene Marta?',
+    pasos: ['Tomás tiene 4 años.', 'Pedro tiene 5 años más que Tomás: 4 + 5 = 9 años.', 'Marta tiene el doble de la edad de Pedro: 9 + 9 = 18 años.'] }
+].map(it => ({...it, opciones: [], abierta: true}));
+const NM = {order:[], pos:0, cur:null, idx:0, done:false};
+const NM_MAX = 100;
+function nextNivelMas(){
+  if(NM.pos >= NM.order.length){
+    const last = NM.order[NM.order.length-1];
+    do{ NM.order = NIVELMAS.map((_,i) => i).sort(() => Math.random() - .5); }
+    while(NIVELMAS.length > 1 && NM.order[0] === last);
+    NM.pos = 0;
+  }
+  NM.idx = NM.order[NM.pos++]; NM.cur = NIVELMAS[NM.idx]; NM.done = false;
+  $('#nmCount').textContent = `Ítem ${NM.idx+1} de ${NIVELMAS.length}`;
+  $('#paperNm').innerHTML = NM.cur.bloques.map(bloqueHTML).join('') + `<p>${esc(NM.cur.pregunta)}</p><p class="print-only">Respuesta: ______________________</p>`;
+  $('#nmFb').innerHTML = '';
+  setNm(0);
+  ['#nmUp','#nmDown','#nmVal','#nmCheck'].forEach(q => $(q).disabled = false);
+}
+function setNm(v){ v = Math.max(0, Math.min(NM_MAX, v|0)); $('#nmVal').value = v; }
+const getNm = () => parseInt(String($('#nmVal').value).replace(/\D/g,''), 10) || 0;
+// flechas: un toque sube o baja 1; mantener presionado repite cada vez más rápido
+function holdRepeat(btn, delta){
+  let t1 = null, t2 = null;
+  const stop = () => { clearTimeout(t1); clearInterval(t2); t1 = t2 = null; };
+  btn.addEventListener('pointerdown', e => {
+    if(btn.disabled) return;
+    e.preventDefault(); setNm(getNm() + delta); pop();
+    t1 = setTimeout(() => { t2 = setInterval(() => setNm(getNm() + delta), 90); }, 420);
+  });
+  ['pointerup','pointerleave','pointercancel'].forEach(ev => btn.addEventListener(ev, stop));
+  btn.addEventListener('click', e => { if(e.detail === 0) setNm(getNm() + delta); });   // teclado (Enter/Espacio)
+}
+holdRepeat($('#nmUp'), +1); holdRepeat($('#nmDown'), -1);
+$('#nmVal').addEventListener('input', () => { const v = String($('#nmVal').value).replace(/\D/g,''); $('#nmVal').value = v; });
+$('#nmVal').addEventListener('blur', () => setNm(getNm()));
+$('#nmVal').addEventListener('keydown', e => {
+  if(e.key === 'ArrowUp'){ e.preventDefault(); setNm(getNm() + 1); }
+  if(e.key === 'ArrowDown'){ e.preventDefault(); setNm(getNm() - 1); }
+  if(e.key === 'Enter') checkNivelMas();
+});
+function checkNivelMas(){
+  if(NM.done) return;
+  NM.done = true;
+  const v = getNm(), it = NM.cur;
+  ['#nmUp','#nmDown','#nmVal','#nmCheck'].forEach(q => $(q).disabled = true);
+  if(v === it.resp){
+    chime(); fireworks();
+    $('#nmFb').innerHTML = `<div class="fb-head ok fb-big"><span class="em">${pulgarImg()}</span>¡Correcto! ¡Muy bien! La respuesta es ${it.resp}.</div>`;
+  }else{
+    boing();
+    $('#nmFb').innerHTML = `<div class="fb-head bad"><span class="em">${sorpresaSVG()}</span>Escribiste ${v}, pero la respuesta es ${it.resp}. Veamos paso a paso:</div>
+      <div class="exp good"><ol>${it.pasos.map(t => `<li>${esc(t)}</li>`).join('')}<li class="concl">La respuesta es <b>${it.resp}</b>.</li></ol></div>`;
+  }
+  $('#nmFb').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+$('#nmCheck').addEventListener('click', checkNivelMas);
+$('#btnNivelMas').addEventListener('click', () => { show('nivelmas'); if(!NM.cur) nextNivelMas(); });
+$('#btnOtroNm').addEventListener('click', nextNivelMas);
+$('#btnPrintNm').addEventListener('click', () => window.print());
+$('#btnPdfNm').addEventListener('click', () => {
+  const url = URL.createObjectURL(problemPDF(NM.cur));
+  const a = document.createElement('a');
+  a.href = url; a.download = `Nivel mas ${NM.idx+1}.pdf`;
   document.body.appendChild(a); a.click();
   setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 2000);
 });
