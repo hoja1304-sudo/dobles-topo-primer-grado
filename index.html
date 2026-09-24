@@ -1931,7 +1931,7 @@ function animarBolas(){ if(!B.raf){ B.last = 0; B.raf = requestAnimationFrame(pa
 function pintarHudB(){
   $('#bRonda').textContent = `${Math.min(B.ronda, 10)}/10`; $('#bPuntos').textContent = B.pts;
 }
-function decirBola(){ if(B.estado === 'play') say(`Toca la bola que es la mitad de ${NUMW20[B.orden[B.ronda-1]]}`); }
+function decirBola(){ if(B.estado === 'play') say(`Mitad de ${NUMW20[B.orden[B.ronda-1]]}`); }
 function reiniciarBolas(){
   clearInterval(B.timer); B.timer = null;
   B.estado = 'idle'; B.ronda = 0; B.pts = 0; B.t0 = 0;
@@ -2011,7 +2011,7 @@ $('#btnBolasReiniciar').addEventListener('click', reiniciarBolas);
 $('#btnBolasAudio').addEventListener('click', () => {
   if(!cfg.voz){ cfg.voz = 1; store.set('topoDobleSonido', 1); paintSound(); }
   ctx();
-  if(B.estado === 'play' || B.estado === 'anim') say(`Toca la bola que es la mitad de ${NUMW20[B.orden[B.ronda-1]]}`);
+  if(B.estado === 'play' || B.estado === 'anim') say(`Mitad de ${NUMW20[B.orden[B.ronda-1]]}`);
   else say('Toca la bola que es la mitad del número que aparece. Si aciertas, la bola cae en la cesta.');
 });
 document.addEventListener('keydown', e => {   // teclado: 1 a 9 y 0 = 10
