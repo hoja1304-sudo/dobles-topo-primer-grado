@@ -192,6 +192,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn-acs{background:#0e7490;color:#fff}
 .btn-nivel{background:#d97706;color:#fff}
 .btn-cartas{background:#db2777;color:#fff}
+.btn.audio-off{background:#6b7280;color:#fff}
 .btn-mitad{background:#16a34a;color:#fff}
 .home-card .h1-2{font-size:clamp(1.2rem,3.2vw,1.9rem);line-height:1.25;margin:.1em 0 .4em;color:var(--ink)}
 /* ---------- MITAD ---------- */
@@ -656,7 +657,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   <div class="bolas-wrap">
     <div class="sub-bar">
       <button class="btn btn-ghost" data-go="mitad">⬅ Volver a Mitad</button>
-      <button class="btn btn-alt" id="btnBolasAudio" title="Escuchar la indicación">🔊 Escuchar</button>
+      <button class="btn btn-alt" id="btnBolasAudio" title="Toca para detener el audio">🔊 Audio</button>
       <button class="btn btn-main" id="btnBolasReiniciar">🔄 Reiniciar juego</button>
     </div>
     <h2 id="tMitadJue" class="sr">Juego de la mitad</h2>
@@ -1164,6 +1165,20 @@ function paintSound(){
   b.textContent = cfg.voz ? '🔊' : '🔇';
   b.setAttribute('aria-pressed', !!cfg.voz);
   b.setAttribute('aria-label', cfg.voz ? 'Apagar sonido' : 'Encender sonido');
+  [['#btnBolasAudio','Audio'], ['#btnInstr','Instrucción']].forEach(([q, t]) => {
+    const e = $(q); if(!e) return;
+    e.textContent = `${cfg.voz ? '🔊' : '🔇'} ${t}`;
+    e.setAttribute('aria-pressed', !!cfg.voz);
+    e.title = cfg.voz ? 'Toca para detener el audio' : 'Toca para activar el audio';
+    e.classList.toggle('audio-off', !cfg.voz);
+  });
+}
+// Interruptor de audio: un toque detiene (🔇), otro toque lo vuelve a activar (🔊) y dice «texto»
+function alternarAudio(texto){
+  cfg.voz = cfg.voz ? 0 : 1; store.set('topoDobleSonido', cfg.voz);
+  paintSound();
+  if(!cfg.voz){ stopVoice(); return; }
+  ctx(); if(texto) say(texto);
 }
 $('#btnSonido').addEventListener('click', () => {
   cfg.voz = cfg.voz ? 0 : 1; store.set('topoDobleSonido', cfg.voz);
@@ -2009,10 +2024,8 @@ function finBolas(){
 $('#btnBolasStart').addEventListener('click', empezarBolas);
 $('#btnBolasReiniciar').addEventListener('click', reiniciarBolas);
 $('#btnBolasAudio').addEventListener('click', () => {
-  if(!cfg.voz){ cfg.voz = 1; store.set('topoDobleSonido', 1); paintSound(); }
-  ctx();
-  if(B.estado === 'play' || B.estado === 'anim') say(`Mitad de ${NUMW20[B.orden[B.ronda-1]]}`);
-  else say('Toca la bola que es la mitad del número que aparece. Si aciertas, la bola cae en la cesta.');
+  alternarAudio((B.estado === 'play' || B.estado === 'anim') ? `Mitad de ${NUMW20[B.orden[B.ronda-1]]}`
+    : 'Toca la bola que es la mitad del número que aparece. Si aciertas, la bola cae en la cesta.');
 });
 document.addEventListener('keydown', e => {   // teclado: 1 a 9 y 0 = 10
   if(!$('#mitadJuego').classList.contains('active') || B.estado !== 'play') return;
@@ -2099,9 +2112,12 @@ function finCartas(){
 }
 const INSTR_CARTAS = 'Toca dos cartas para darles vuelta. Busca la pareja formada por un número y su doble. Por ejemplo, el tres y el seis son pareja, porque tres más tres es seis. Si las cartas son pareja, se quedan descubiertas. Si no lo son, se vuelven a esconder. Encuentra las cuatro parejas en el menor tiempo posible.';
 $('#btnInstr').addEventListener('click', () => {
-  if(!cfg.voz){ cfg.voz = 1; store.set('topoDobleSonido', 1); paintSound(); }   // el botón de instrucción activa el sonido
-  ctx(); say(INSTR_CARTAS);
+  // sonando → se detiene (🔇) · detenido → se activa y la lee · activo pero en silencio → la lee
+  let hablando = false; try{ hablando = speechSynthesis.speaking; }catch(e){}
+  if(cfg.voz && !hablando){ ctx(); say(INSTR_CARTAS); return; }
+  alternarAudio(INSTR_CARTAS);
 });
+paintSound();
 $('#btnReiniciar').addEventListener('click', nuevoJuegoCartas);
 $('#btnCartas').addEventListener('click', () => { show('cartas'); nuevoJuegoCartas(); });
 
