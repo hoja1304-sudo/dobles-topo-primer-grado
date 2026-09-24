@@ -943,15 +943,28 @@ const S = {
   escalera3: [[0,0],[1,1],[2,2]],
   escalera4: [[0,0],[1,1],[2,2],[3,3]]
 };
-const esFig = o => !!(o && (o.tri || o.sq));
-const figCount = o => (o.tri || o.sq).length;
-const figNombre = o => { const n = figCount(o); return o.tri ? (n === 1 ? 'triángulo' : 'triángulos') : (n === 1 ? 'cuadrado' : 'cuadrados'); };
+const esFig = o => !!(o && (o.tri || o.sq || o.choc));
+const figCount = o => o.choc ? o.choc.r * o.choc.c : (o.tri || o.sq).length;
+const figNombre = o => { const n = figCount(o); return o.choc ? (n === 1 ? 'chocolate' : 'chocolates') : o.tri ? (n === 1 ? 'triángulo' : 'triángulos') : (n === 1 ? 'cuadrado' : 'cuadrados'); };
 function sqSVG(cells, alto){
   const cols = Math.max(...cells.map(c => c[0])) + 1, rows = Math.max(...cells.map(c => c[1])) + 1;
   const rects = cells.map(([c,r]) => `<rect x="${c+.03}" y="${r+.03}" width=".94" height=".94" fill="#111" stroke="#2f528f" stroke-width=".03"/>`).join('');
   return `<svg class="tri" viewBox="0 0 ${cols} ${rows}" style="height:${(rows*alto*.8).toFixed(1)}px" role="img" aria-label="Figura con ${cells.length} ${cells.length === 1 ? 'cuadrado' : 'cuadrados'}">${rects}</svg>`;
 }
-const figHTML = (o, alto) => o.tri ? figSVG(o.tri, alto) : sqSVG(o.sq, alto);
+// Caja de chocolates vista desde arriba: {r: filas, c: columnas}
+function chocSVG({r, c}, alto){
+  const W = c + .7, H = r + .7;
+  let ch = '';
+  for(let i = 0; i < r; i++) for(let j = 0; j < c; j++){
+    const cx = .35 + j + .5, cy = .35 + i + .5;
+    ch += `<circle cx="${cx}" cy="${cy}" r=".38" fill="#5a2e12" stroke="#3b1d0b" stroke-width=".05"/>`
+        + `<ellipse cx="${cx - .1}" cy="${cy - .12}" rx=".14" ry=".08" fill="#9a5a30" opacity=".8"/>`;
+  }
+  return `<svg class="tri" viewBox="0 0 ${W} ${H}" style="height:${(H*alto*.7).toFixed(1)}px" role="img" aria-label="Caja con ${r*c} chocolates">
+    <rect x=".03" y=".03" width="${W-.06}" height="${H-.06}" rx=".22" fill="#b5652b" stroke="#6e3a14" stroke-width=".06"/>
+    <rect x=".2" y=".2" width="${W-.4}" height="${H-.4}" rx=".12" fill="#f6e3c4"/>${ch}</svg>`;
+}
+const figHTML = (o, alto) => o.choc ? chocSVG(o.choc, alto) : o.tri ? figSVG(o.tri, alto) : sqSVG(o.sq, alto);
 function figSVG(tri, alto){
   const xs = tri.map(t => t[0]), rows = Math.max(...tri.map(t => t[1])) + 1;
   const minX = Math.min(...xs) - .5, maxX = Math.max(...xs) + .5, pad = .08;
@@ -1004,13 +1017,17 @@ const PROBLEMAS = [
   { bloques: [{t:'p', text:'David pintó en una pared la siguiente figura:'}, {t:'fig', sq:S.escalera2}],
     pregunta: 'Luego su hermano Marcos realizó una figura que representa el doble de la de David. ¿Cuál es la figura que dibujó Marcos?',
     opciones: [{sq:S.escalera3}, {sq:S.escalera4}, {sq:S.escalera2}], base: 2,
-    nota: 'La figura de David tiene 2 cuadrados; la de Marcos debe tener el doble: 4 cuadrados (opción B).' }
+    nota: 'La figura de David tiene 2 cuadrados; la de Marcos debe tener el doble: 4 cuadrados (opción B).' },
+  { bloques: [{t:'p', text:'David compró una caja de chocolates como la siguiente:'}, {t:'fig', choc:{r:2, c:4}}],
+    pregunta: 'Si Jorge, amigo de David, compró una caja con el doble de chocolates, ¿cuál de las siguientes cajas fue la que compró?',
+    opciones: [{choc:{r:2, c:5}}, {choc:{r:4, c:4}}, {choc:{r:2, c:2}}], base: 8,
+    nota: 'La caja de David tiene 8 chocolates; la de Jorge debe tener el doble: 16 chocolates (opción B).' }
 ];
 const LETRAS = ['A','B','C','D'];
 const esc = t => String(t).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 const esPar = o => Array.isArray(o);  // par de dados
 const correctaDe = p => p.opciones.findIndex(o => esFig(o) ? figCount(o) === 2*p.base : esPar(o) ? o[0] === o[1] : +o === 2*p.base);
-const optTexto = o => esFig(o) ? `figura con ${figCount(o)} ${figNombre(o)}` : esPar(o) ? `dados con ${o[0]} y ${o[1]}` : String(o);
+const optTexto = o => esFig(o) ? `${o.choc ? 'caja' : 'figura'} con ${figCount(o)} ${figNombre(o)}` : esPar(o) ? `dados con ${o[0]} y ${o[1]}` : String(o);
 const P = {order:[], pos:0, cur:null, idx:0};
 
 // Puntos de un dado en un cuadro de 100 × 100
@@ -1121,8 +1138,16 @@ function problemPDF(p){
     ops.push('0 g');
   };
   const sqSize = (cells, u) => ({w:(Math.max(...cells.map(c => c[0])) + 1)*u, h:(Math.max(...cells.map(c => c[1])) + 1)*u});
-  const anySize = (o, u) => o.tri ? figSize(o.tri, u) : sqSize(o.sq, u*.8);
-  const anyPDF = (o, x0, top, u) => o.tri ? figPDF(o.tri, x0, top, u) : sqPDF(o.sq, x0, top, u*.8);
+  const chocPDF = ({r, c}, x0, top, u) => {
+    const W = (c + .7)*u, H = (r + .7)*u;
+    ops.push(`0.71 0.40 0.17 rg 0.43 0.23 0.08 RG 1 w ${x0} ${top - H} ${W} ${H} re B`);
+    ops.push(`0.96 0.89 0.77 rg ${x0 + .2*u} ${top - H + .2*u} ${W - .4*u} ${H - .4*u} re f`);
+    ops.push('0.35 0.18 0.07 rg');
+    for(let i = 0; i < r; i++) for(let j = 0; j < c; j++) circ(x0 + (.85 + j)*u, top - (.85 + i)*u, .38*u);
+    ops.push('0 g 0 G');
+  };
+  const anySize = (o, u) => o.choc ? {w:(o.choc.c + .7)*u*.7, h:(o.choc.r + .7)*u*.7} : o.tri ? figSize(o.tri, u) : sqSize(o.sq, u*.8);
+  const anyPDF = (o, x0, top, u) => o.choc ? chocPDF(o.choc, x0, top, u*.7) : o.tri ? figPDF(o.tri, x0, top, u) : sqPDF(o.sq, x0, top, u*.8);
   const figSize = (tri, u) => { const xs = tri.map(t => t[0]);
     return {w:(Math.max(...xs) - Math.min(...xs) + 1)*u, h:(Math.max(...tri.map(t => t[1])) + 1)*H3*u}; };
   const circ = (cx, cy, r) => { const k = r*.5523;
