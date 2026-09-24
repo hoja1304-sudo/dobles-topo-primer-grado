@@ -192,6 +192,45 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn-acs{background:#0e7490;color:#fff}
 .btn-nivel{background:#d97706;color:#fff}
 .btn-cartas{background:#db2777;color:#fff}
+.btn-mitad{background:#16a34a;color:#fff}
+.home-card .h1-2{font-size:clamp(1.2rem,3.2vw,1.9rem);line-height:1.25;margin:.1em 0 .4em;color:var(--ink)}
+/* ---------- MITAD ---------- */
+#mitad{align-items:center;justify-content:center;padding:70px 16px 24px}
+.mitad-h{font-size:clamp(1.3rem,3.4vw,2rem);line-height:1.25;margin:.5em 0 .3em}
+.mitad-back{margin-top:18px}
+#mitadTeoria,#mitadPractica,#mitadJuego{flex-direction:column;align-items:center;padding:70px 16px 30px}
+.sub-bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:10px}
+.sub-bar .btn{font-size:clamp(.92rem,2vw,1.1rem);padding:.55em 1em}
+.arial12{font-family:Arial,Helvetica,sans-serif;font-size:12pt;line-height:1.5;text-align:center;margin:0 auto 12px;max-width:640px}
+.uvas-tip{text-align:center;color:var(--soft);margin:-4px 0 10px;font-size:clamp(.85rem,1.8vw,1rem)}
+.uvas-stage{position:relative;width:min(100%,760px);height:560px;margin:0 auto;touch-action:none}
+.uvas-bandeja{position:absolute;left:0;right:0;top:0;height:230px;border-radius:20px;background:var(--panel);border:3px dashed var(--line);box-shadow:var(--shadow)}
+.caja-nombre{position:absolute;top:244px;height:316px;width:calc(50% - 6px);border-radius:20px;border:4px solid #16a34a;background:#f0fdf4;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:6px;cursor:pointer;color:#14532d;box-shadow:var(--shadow)}
+#cajaCarlos{left:0}#cajaNuria{right:0;border-color:#db2777;background:#fdf2f8;color:#831843}
+.caja-nombre .cn{font-weight:900;font-size:clamp(1.05rem,2.6vw,1.4rem)}
+.caja-nombre.destino{outline:4px solid var(--gold);outline-offset:2px}
+.uva{position:absolute;width:clamp(34px,6.4vw,50px);height:auto;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;
+  filter:drop-shadow(0 3px 3px rgba(0,0,0,.25));transition:left .18s,top .18s,transform .12s;z-index:2}
+.uva svg{display:block;width:100%;height:auto}
+.uva:focus-visible{outline:4px solid var(--gold);outline-offset:2px;border-radius:50%}
+.uva.drag{cursor:grabbing;transform:scale(1.15);z-index:6;transition:transform .12s}
+.uva.sel{transform:scale(1.18);filter:drop-shadow(0 0 6px #facc15) drop-shadow(0 3px 3px rgba(0,0,0,.25))}
+.mitad-preg{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:14px}
+.ball.am{background:radial-gradient(circle at 32% 30%,#fff7b0,#facc15 55%,#b45309)}
+.pares{display:flex;flex-wrap:wrap;gap:8px;margin:.5em 0}
+.par{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:5px 7px;border:3px dashed #d97706;border-radius:14px;background:var(--panel)}
+.par .bb{display:flex;gap:4px}
+.par small{font-weight:800;color:#b45309}
+.fila-bolas{display:flex;flex-wrap:wrap;gap:5px;margin:.4em 0}
+#mitadPractica .resp[hidden]{display:none}
+.preg-row{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.preg-row .resp{margin:0;flex-direction:column;justify-content:center;width:clamp(180px,40vw,230px);aspect-ratio:1/1;padding:10px;gap:10px;text-align:center}
+.preg-row .resp-lbl{font-size:clamp(.95rem,2.2vw,1.12rem);line-height:1.25}
+.preg-row .spinner{gap:6px}
+.preg-row .spin{width:46px;height:46px;font-size:1.25rem}
+.preg-row .spinner input{width:58px;height:58px;min-height:0;font-size:1.8rem;padding:0}
+.btn-comprobar{font-size:clamp(1.05rem,2.6vw,1.35rem);padding:.7em 1.6em}
 /* ---------- CARTAS ---------- */
 #cartas{flex-direction:column;align-items:center;padding:70px 16px 30px}
 .cartas-wrap{width:min(760px,100%);text-align:center}
@@ -225,8 +264,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .spin{width:60px;height:60px;border-radius:50%;border:3px solid var(--accent);background:var(--panel2);color:var(--accent);
   font-size:1.6rem;font-weight:900;display:grid;place-items:center;touch-action:manipulation;-webkit-user-select:none;user-select:none}
 .spin:active{transform:scale(.93)}
-.spin:disabled,#nmVal:disabled{opacity:.5}
-#nmVal{width:3.2em;min-height:60px;text-align:center;font-size:clamp(1.8rem,5vw,2.4rem);font-weight:900;border-radius:14px;
+.spin:disabled,#nmVal:disabled,.spinner input:disabled{opacity:.5}
+#nmVal,.spinner input{width:3.2em;min-height:60px;text-align:center;font-size:clamp(1.8rem,5vw,2.4rem);font-weight:900;border-radius:14px;
   border:3px solid var(--line);background:#fff;color:#111}
 .resp-tip{text-align:center;color:var(--soft);margin:.3em 0 0;font-size:clamp(.85rem,1.8vw,1rem)}
 .print-only{display:none}
@@ -309,7 +348,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   html,body{background:#fff!important}
   .theme-toggle,.prob-bar,.prob-count,.prob h2,.prob-fb,.fx,.toast,.modal-bg,.resp,.resp-tip{display:none!important}
   .print-only{display:block}
-  #nivelmas{padding:0}
+  #nivelmas,#mitadPractica{padding:0}
   #problemas{padding:0}
   .paper{box-shadow:none;border:0;border-radius:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:12pt;color:#000}
   .popt{background:none!important;border:0!important;padding:0;min-height:0;margin:.3em 0;font-size:12pt}
@@ -338,8 +377,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 <section class="screen active" id="inicio" aria-labelledby="tituloInicio">
   <div class="home-card">
     <svg class="home-mole" viewBox="0 0 160 170" aria-hidden="true"><use href="#moleArt"/><g class="eyes"><circle cx="60" cy="52" r="7" fill="#1b1b1b"/><circle cx="100" cy="52" r="7" fill="#1b1b1b"/><circle cx="62" cy="49" r="2.4" fill="#fff"/><circle cx="102" cy="49" r="2.4" fill="#fff"/></g></svg>
-    <span class="kicker">Aprendizaje esperado</span>
+    <span class="kicker">Aprendizajes esperados</span>
     <h1 id="tituloInicio">Identificar el doble de un número menor que 10</h1>
+    <h1 class="h1-2">Identificar la mitad de un número par menor o igual a 20</h1>
     <p class="grade">Matemática · Primer año · 🔨 El topo de los dobles</p>
     <div class="home-buttons">
       <button class="btn btn-alt" id="btnTeoria">📘 Teoría</button>
@@ -348,6 +388,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <button class="btn btn-acs" id="btnACS">♿ ACS</button>
       <button class="btn btn-nivel" id="btnNivelMas">⭐ Nivel +</button>
       <button class="btn btn-cartas" id="btnCartas">🃏 Cartas</button>
+      <button class="btn btn-mitad" id="btnMitad">½ Mitad</button>
     </div>
     <p class="autoria"><strong>Elaborado por: Alberto Jiménez Ruiz</strong><br>Asesor Regional de Matemática DRE-Cartag-DAP-2026</p>
   </div>
@@ -498,6 +539,93 @@ button{font:inherit;color:inherit;cursor:pointer}
     </div>
     <p class="resp-tip" id="nmTip">Usa las flechas ▲ ▼ para subir o bajar el número (mantenlas presionadas para ir más rápido).</p>
     <div class="prob-fb" id="nmFb" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ============ MITAD: página principal del aprendizaje ============ -->
+<section class="screen" id="mitad" aria-labelledby="tMitad">
+  <div class="home-card">
+    <span class="kicker">Aprendizaje esperado</span>
+    <h2 id="tMitad" class="mitad-h">Identificar la mitad de un número par menor o igual a 20</h2>
+    <p class="grade">Matemática · Primer año</p>
+    <div class="home-buttons">
+      <button class="btn btn-alt" data-go="mitadTeoria">📘 Teoría</button>
+      <button class="btn btn-prob" data-go="mitadPractica">✏️ Práctica</button>
+      <button class="btn btn-main" data-go="mitadJuego">🎮 Juego</button>
+    </div>
+    <div class="mitad-back"><button class="btn btn-ghost" data-go="inicio">🏠 Regresar al inicio</button></div>
+  </div>
+</section>
+
+<section class="screen" id="mitadTeoria" aria-labelledby="tMitadTeo">
+  <div class="teo">
+    <div class="sub-bar">
+      <button class="btn btn-ghost" data-go="mitad">⬅ Volver a Mitad</button>
+      <button class="btn btn-main" id="btnOtroEj">➡️ Otro ejercicio</button>
+      <button class="btn btn-alt" id="btnUvasReset">🔄 Empezar de nuevo</button>
+    </div>
+    <h2 id="tMitadTeo">Mitad de un número</h2>
+    <p class="arial12">Reparte las siguientes <span class="fruta-pl">uvas</span> entre <b>Carlos</b> y <b>Nuria</b> de tal forma que ambos tengan la misma cantidad.</p>
+    <p class="uvas-tip">Arrastra cada <span class="fruta-sg">uva</span> a un cuadro, o toca una <span class="fruta-sg">uva</span> y luego toca el cuadro.</p>
+    <div class="uvas-stage" id="uvasStage">
+      <div class="uvas-bandeja" id="uvasBandeja" aria-hidden="true"></div>
+      <button class="caja-nombre" id="cajaCarlos" data-caja="carlos" aria-label="Cuadro de Carlos"><span class="cn">Carlos</span></button>
+      <button class="caja-nombre" id="cajaNuria" data-caja="nuria" aria-label="Cuadro de Nuria"><span class="cn">Nuria</span></button>
+    </div>
+    <div class="mitad-preg">
+      <div class="preg-row">
+        <div class="resp">
+          <span class="resp-lbl">¿Cuántas <span class="fruta-pl">uvas</span> había?</span>
+          <div class="spinner">
+            <button class="spin" id="q1Down" aria-label="Bajar">▼</button>
+            <input id="q1Val" inputmode="numeric" maxlength="2" value="0" aria-label="¿Cuántas había?" autocomplete="off">
+            <button class="spin" id="q1Up" aria-label="Subir">▲</button>
+          </div>
+        </div>
+        <div class="resp">
+          <span class="resp-lbl">¿Cuántas <span class="fruta-pl">uvas</span> le toca a cada uno?</span>
+          <div class="spinner">
+            <button class="spin" id="q2Down" aria-label="Bajar">▼</button>
+            <input id="q2Val" inputmode="numeric" maxlength="2" value="0" aria-label="¿Cuántas le toca a cada uno?" autocomplete="off">
+            <button class="spin" id="q2Up" aria-label="Subir">▲</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-main btn-comprobar" id="btnComprobarMitad">✔ Comprobar</button>
+    </div>
+    <div class="prob-fb" id="mitadFb" aria-live="polite"></div>
+  </div>
+</section>
+
+<section class="screen" id="mitadPractica" aria-labelledby="tMitadPra">
+  <div class="prob">
+    <h2 id="tMitadPra">✏️ Práctica · Problemas de mitad</h2>
+    <div class="prob-bar">
+      <button class="btn btn-ghost" data-go="mitad">⬅ Volver a Mitad</button>
+      <button class="btn btn-alt" id="btnOtroMp">🔄 Otro ítem</button>
+      <button class="btn btn-main" id="btnPdfMp">⬇️ Descargar PDF</button>
+      <button class="btn btn-prob" id="btnPrintMp">🖨️ Imprimir</button>
+    </div>
+    <p class="prob-count" id="mpCount"></p>
+    <article class="paper" id="paperMp"></article>
+    <div class="resp" id="mpResp" hidden>
+      <span class="resp-lbl">Tu respuesta:</span>
+      <div class="spinner">
+        <button class="spin" id="mpDown" aria-label="Bajar el número">▼</button>
+        <input id="mpVal" inputmode="numeric" maxlength="2" value="0" aria-label="Tu respuesta" autocomplete="off">
+        <button class="spin" id="mpUp" aria-label="Subir el número">▲</button>
+      </div>
+      <button class="btn btn-main" id="mpCheck">✔ Revisar</button>
+    </div>
+    <div class="prob-fb" id="mpFb" aria-live="polite"></div>
+  </div>
+</section>
+
+<section class="screen" id="mitadJuego" aria-labelledby="tMitadJue">
+  <div class="teo">
+    <div class="sub-bar"><button class="btn btn-ghost" data-go="mitad">⬅ Volver a Mitad</button></div>
+    <h2 id="tMitadJue">🎮 Juego · Mitad de un número</h2>
+    <div class="card-wide"><p>Esta sección está en preparación.</p></div>
   </div>
 </section>
 
@@ -1426,6 +1554,256 @@ $('#btnPdfNm').addEventListener('click', () => {
   const url = URL.createObjectURL(problemPDF(NM.cur));
   const a = document.createElement('a');
   a.href = url; a.download = `Nivel mas ${NM.idx+1}.pdf`;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 2000);
+});
+
+/* ---------- Mitad · Teoría: repartir 20 uvas entre Carlos y Nuria ---------- */
+const UVA_SVG = `<svg viewBox="0 0 60 66" aria-hidden="true">
+  <defs><radialGradient id="gUva" cx="35%" cy="32%" r="70%"><stop offset="0" stop-color="#d9f99d"/><stop offset=".55" stop-color="#84cc16"/><stop offset="1" stop-color="#3f7a0c"/></radialGradient></defs>
+  <path d="M30 10 Q31 3 37 1" fill="none" stroke="#6b4423" stroke-width="3" stroke-linecap="round"/>
+  <path d="M33 6 Q42 2 46 9 Q38 11 33 6 z" fill="#4d9a2a"/>
+  <ellipse cx="30" cy="38" rx="23" ry="25" fill="url(#gUva)" stroke="#3a6b10" stroke-width="2"/>
+  <ellipse cx="22" cy="28" rx="6" ry="4" fill="#fff" opacity=".55" transform="rotate(-25 22 28)"/></svg>`;
+const MANZANA_SVG = `<svg viewBox="0 0 60 66" aria-hidden="true">
+  <defs><radialGradient id="gMan" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#ff8a8a"/><stop offset=".55" stop-color="#dc2626"/><stop offset="1" stop-color="#8b1010"/></radialGradient></defs>
+  <path d="M30 18 Q31 8 35 4" fill="none" stroke="#6b4423" stroke-width="3" stroke-linecap="round"/>
+  <path d="M34 12 Q45 3 51 11 Q41 16 34 12 z" fill="#4d9a2a"/>
+  <path d="M30 20 C20 9 3 15 6 36 C8 55 20 65 30 59 C40 65 52 55 54 36 C57 15 40 9 30 20 z" fill="url(#gMan)" stroke="#7a0f0f" stroke-width="2"/>
+  <ellipse cx="18" cy="30" rx="5" ry="8" fill="#fff" opacity=".45" transform="rotate(20 18 30)"/></svg>`;
+const NARANJA_SVG = `<svg viewBox="0 0 60 66" aria-hidden="true">
+  <defs><radialGradient id="gNar" cx="35%" cy="35%" r="70%"><stop offset="0" stop-color="#ffd08a"/><stop offset=".55" stop-color="#f97316"/><stop offset="1" stop-color="#b45309"/></radialGradient></defs>
+  <circle cx="30" cy="38" r="25" fill="url(#gNar)" stroke="#b45309" stroke-width="2"/>
+  <path d="M30 14 Q30 9 32 7" fill="none" stroke="#6b4423" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M31 12 Q42 4 48 12 Q39 16 31 12 z" fill="#4d9a2a"/>
+  <g fill="#c2410c" opacity=".35"><circle cx="40" cy="32" r="1.3"/><circle cx="44" cy="42" r="1.3"/><circle cx="36" cy="50" r="1.3"/><circle cx="24" cy="48" r="1.3"/><circle cx="18" cy="40" r="1.3"/><circle cx="30" cy="42" r="1.3"/></g>
+  <ellipse cx="21" cy="29" rx="6" ry="4" fill="#fff" opacity=".5" transform="rotate(-25 21 29)"/></svg>`;
+// Los tres ejercicios: 20 uvas, 16 manzanas y 12 naranjas
+const FRUTAS = [
+  {pl:'uvas', sg:'uva', n:20, svg:UVA_SVG, cols:5},
+  {pl:'manzanas', sg:'manzana', n:16, svg:MANZANA_SVG, cols:4},
+  {pl:'naranjas', sg:'naranja', n:12, svg:NARANJA_SVG, cols:4}
+];
+let FR = 0;
+const fruta = () => FRUTAS[FR];
+const U = {uvas:[], sel:null};   // cada uva: {el, zona:'bandeja'|'carlos'|'nuria', slot}
+const stage = $('#uvasStage');
+const rel = el => { const a = stage.getBoundingClientRect(), r = el.getBoundingClientRect(); return {x:r.left-a.left, y:r.top-a.top, w:r.width, h:r.height}; };
+function posicionar(u, x, y){ u.el.style.left = x + 'px'; u.el.style.top = y + 'px'; }
+// lugares ordenados: 5 columnas; en la bandeja 4 filas juntas, en cada cuadro hasta 20 uvas
+function medirEscenario(){
+  const g = U.uvas.length ? U.uvas[0].el.offsetWidth : 44, fila = g*1.12, filas = Math.ceil(fruta().n / fruta().cols);
+  const bandejaH = Math.round(filas*fila + 18), cajaH = Math.round(filas*fila + 52), gap = 14;
+  $('#uvasBandeja').style.height = bandejaH + 'px';
+  $$('.caja-nombre').forEach(b => { b.style.top = (bandejaH + gap) + 'px'; b.style.height = cajaH + 'px'; });
+  stage.style.height = (bandejaH + gap + cajaH) + 'px';
+}
+function lugar(zona, i){
+  const g = U.uvas[0].el.offsetWidth, cols = fruta().cols;
+  const box = zona === 'bandeja' ? rel($('#uvasBandeja')) : rel(zona === 'carlos' ? $('#cajaCarlos') : $('#cajaNuria'));
+  const top0 = zona === 'bandeja' ? 8 : 44, rows = Math.ceil(fruta().n / cols);
+  const cw = (box.w - 12) / cols, ch = Math.min(g*1.12, (box.h - top0 - 6) / rows);
+  return [box.x + 6 + (i % cols + .5)*cw - g/2, box.y + top0 + Math.floor(i / cols)*ch];
+}
+function libre(zona){ const usados = U.uvas.filter(u => u.zona === zona).map(u => u.slot); let i = 0; while(usados.includes(i)) i++; return i; }
+function contar(){
+  // no se muestra en los cuadros (daría la respuesta); solo se usa al comprobar
+  const c = U.uvas.filter(u => u.zona === 'carlos').length, n = U.uvas.filter(u => u.zona === 'nuria').length;
+  return {c, n};
+}
+function mover(u, zona){
+  u.zona = zona; u.slot = libre(zona);   // se acomoda en el siguiente lugar libre del cuadro
+  const [x, y] = lugar(zona, u.slot); posicionar(u, x, y); contar(); pop();
+}
+function zonaEn(cx, cy){
+  for(const [z, el] of [['carlos', $('#cajaCarlos')], ['nuria', $('#cajaNuria')]]){
+    const b = rel(el); if(cx >= b.x && cx <= b.x + b.w && cy >= b.y && cy <= b.y + b.h) return z;
+  }
+  return 'bandeja';
+}
+function seleccionar(u){
+  if(U.sel) U.sel.el.classList.remove('sel');
+  U.sel = (U.sel === u) ? null : u;
+  if(U.sel) U.sel.el.classList.add('sel');
+  $$('.caja-nombre').forEach(b => b.classList.toggle('destino', !!U.sel));
+}
+function empezarUvas(){
+  stage.querySelectorAll('.uva').forEach(e => e.remove());
+  U.uvas = []; U.sel = null;
+  const F = fruta();
+  $$('#mitadTeoria .fruta-pl').forEach(e => e.textContent = F.pl);
+  $$('#mitadTeoria .fruta-sg').forEach(e => e.textContent = F.sg);
+  for(let i = 0; i < F.n; i++){
+    const el = document.createElement('div');
+    el.className = 'uva'; el.tabIndex = 0; el.setAttribute('role','button'); el.setAttribute('aria-label', `${F.sg[0].toUpperCase() + F.sg.slice(1)} ${i+1}`);
+    el.innerHTML = F.svg; stage.appendChild(el);
+    const u = {el, zona:'bandeja', slot:i}; U.uvas.push(u); arrastrarUva(u);
+  }
+  medirEscenario();
+  U.uvas.forEach(u => { const [x, y] = lugar('bandeja', u.slot); posicionar(u, x, y); });
+  contar(); $$('.caja-nombre').forEach(b => b.classList.remove('destino'));
+  setSpin('#q1Val', 0); setSpin('#q2Val', 0); $('#mitadFb').innerHTML = '';
+}
+function arrastrarUva(u){
+  const el = u.el; let dx = 0, dy = 0, activo = false, movio = false, x0 = 0, y0 = 0;
+  el.addEventListener('pointerdown', e => {
+    activo = true; movio = false; x0 = e.clientX; y0 = e.clientY;
+    if(el !== stage.lastElementChild) stage.appendChild(el);   // primero al frente (mover el nodo cancela la captura)
+    try{ el.setPointerCapture(e.pointerId); }catch(err){}
+    const p = rel(el); const a = stage.getBoundingClientRect();
+    dx = e.clientX - a.left - p.x; dy = e.clientY - a.top - p.y; e.preventDefault();
+  });
+  el.addEventListener('pointermove', e => {
+    if(!activo) return;
+    if(Math.abs(e.clientX - x0) + Math.abs(e.clientY - y0) > 6){ movio = true; el.classList.add('drag'); }
+    if(!movio) return;
+    const a = stage.getBoundingClientRect();
+    const x = Math.max(0, Math.min(stage.clientWidth - el.offsetWidth, e.clientX - a.left - dx));
+    const y = Math.max(0, Math.min(stage.clientHeight - el.offsetHeight, e.clientY - a.top - dy));
+    posicionar(u, x, y);
+  });
+  const fin = () => {
+    if(!activo) return; activo = false; el.classList.remove('drag');
+    if(!movio){ seleccionar(u); return; }   // toque sin arrastrar: seleccionar la uva
+    const p = rel(el), z = zonaEn(p.x + p.w/2, p.y + p.h/2);
+    if(z !== 'bandeja') mover(u, z); else { u.zona = 'bandeja'; u.slot = -1; contar(); }
+  };
+  el.addEventListener('pointerup', fin); el.addEventListener('pointercancel', fin);
+  el.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); seleccionar(u); } });
+}
+// tocar un cuadro con una uva seleccionada la coloca ahí
+$$('.caja-nombre').forEach(b => b.addEventListener('click', () => {
+  if(!U.sel) return;
+  const u = U.sel; seleccionar(u); mover(u, b.dataset.caja);
+}));
+window.addEventListener('resize', () => { if(!$('#mitadTeoria').classList.contains('active')) return;
+  medirEscenario();
+  U.uvas.forEach(u => { if(u.slot >= 0){ const [x, y] = lugar(u.zona, u.slot); posicionar(u, x, y); } }); });
+
+// Contadores con flechas (▲ ▼): tocar = ±1, mantener presionado = repetir
+function setSpin(q, v){ $(q).value = Math.max(0, Math.min(40, v|0)); }
+const getSpin = q => parseInt(String($(q).value).replace(/\D/g,''), 10) || 0;
+function spinner(q, up, down){
+  [[up, 1], [down, -1]].forEach(([b, d]) => {
+    const btn = $(b); let t1 = null, t2 = null;
+    const stop = () => { clearTimeout(t1); clearInterval(t2); };
+    btn.addEventListener('pointerdown', e => { e.preventDefault(); setSpin(q, getSpin(q) + d); pop();
+      t1 = setTimeout(() => { t2 = setInterval(() => setSpin(q, getSpin(q) + d), 110); }, 420); });
+    ['pointerup','pointerleave','pointercancel'].forEach(ev => btn.addEventListener(ev, stop));
+    btn.addEventListener('click', e => { if(e.detail === 0) setSpin(q, getSpin(q) + d); });
+  });
+  $(q).addEventListener('input', () => { $(q).value = String($(q).value).replace(/\D/g,''); });
+  $(q).addEventListener('keydown', e => {
+    if(e.key === 'ArrowUp'){ e.preventDefault(); setSpin(q, getSpin(q) + 1); }
+    if(e.key === 'ArrowDown'){ e.preventDefault(); setSpin(q, getSpin(q) - 1); }
+  });
+}
+spinner('#q1Val', '#q1Up', '#q1Down'); spinner('#q2Val', '#q2Up', '#q2Down');
+
+$('#btnComprobarMitad').addEventListener('click', () => {
+  const F = fruta(), T = F.n, M = T/2;
+  const t = getSpin('#q1Val'), m = getSpin('#q2Val'), {c, n} = contar();
+  const repartoOk = c === M && n === M;
+  if(t === T && m === M){
+    chime(); fireworks();
+    $('#mitadFb').innerHTML = `<div class="fb-head ok fb-big"><span class="em">${pulgarImg()}</span>¡Correcto! Había ${T} ${F.pl} y a cada uno le tocan ${M}. La mitad de ${T} es ${M}.</div>`
+      + (repartoOk ? '' : `<p class="uvas-tip">Ahora reparte las ${F.pl} en los cuadros: ${M} para Carlos y ${M} para Nuria.</p>`);
+  }else{
+    boing();
+    const pasos = [
+      `Contamos todas las ${F.pl}: había <b>${T}</b>.${t === T ? ' ✔' : ` (escribiste ${t})`}`,
+      `Repartimos en dos grupos iguales, uno para Carlos y otro para Nuria: <b>${M}</b> y <b>${M}</b>.${m === M ? ' ✔' : ` (escribiste ${m})`}`,
+      `Comprobamos: ${M} + ${M} = ${T}. La <b>mitad de ${T} es ${M}</b>.`
+    ];
+    $('#mitadFb').innerHTML = `<div class="fb-head bad"><span class="em">${sorpresaSVG()}</span>¡Uy! Revisemos paso a paso:</div>
+      <div class="exp good"><ol>${pasos.map(x => `<li>${x}</li>`).join('')}</ol>
+      <div class="dbl-row">${ballsHTML(M)}${ballsHTML(M)}</div></div>`
+      + (repartoOk ? '' : `<p class="uvas-tip">Mueve las ${F.pl} hasta que Carlos y Nuria tengan la misma cantidad.</p>`);
+  }
+  $('#mitadFb').scrollIntoView({behavior:'smooth', block:'nearest'});
+});
+$('#btnOtroEj').addEventListener('click', () => { FR = (FR + 1) % FRUTAS.length; empezarUvas(); window.scrollTo(0,0); });
+$('#btnMitad').addEventListener('click', () => show('mitad'));
+$$('[data-go="mitadTeoria"]').forEach(b => b.addEventListener('click', () => requestAnimationFrame(empezarUvas)));
+$('#btnUvasReset').addEventListener('click', empezarUvas);
+
+/* ---------- Mitad · Práctica: problemas de mitad ---------- */
+// Ítems de opción (opciones) o de respuesta abierta con flechas (abierta: true). «total» es el número del que se busca la mitad.
+const MITAD_PROB = [
+  { bloques: [], total: 12,
+    pregunta: 'David tiene 12 años y su hermana Sofía tiene la mitad de su edad. ¿Cuál es la edad de Sofía?',
+    opciones: ['14','10','6'], nota: 'Sofía tiene la mitad de 12 años.' },
+  { bloques: [], total: 18,
+    pregunta: 'Jorge armó un rompecabezas de 18 piezas y su hermana Ana armó uno con la mitad de piezas. ¿Cuántas piezas tenía el rompecabezas que armó Ana?',
+    opciones: ['16','20','9'], nota: 'El rompecabezas de Ana tiene la mitad de 18 piezas.' },
+  { bloques: [], total: 14, abierta: true,
+    pregunta: 'Jorge compró una bolsa con 14 canicas y Manuel una con la mitad de canicas. ¿Cuántas canicas tenía la bolsa de Manuel?',
+    opciones: [], nota: 'La bolsa de Manuel tiene la mitad de 14 canicas.' },
+  { bloques: [{t:'p', text:'David lanza dos dados y obtiene el siguiente resultado:'}, {t:'dados', caras:[6,4]}], total: 10, abierta: true,
+    pregunta: '¿Cuál es la mitad del resultado obtenido por David?',
+    opciones: [], nota: 'Primero sumamos los puntos de los dados: 6 + 4 = 10. Luego buscamos la mitad de 10.' }
+];
+// Explicación de la mitad: el número como bolitas amarillas, se forman grupos de 2 y se cuentan los grupos
+function mitadExplain(n){
+  const grupos = Array.from({length:n/2}, (_,i) => `<span class="par"><span class="bb">${'<span class="ball am"></span>'.repeat(2)}</span><small>${i+1}</small></span>`).join('');
+  return `<ol>
+    <li>Representamos el <b>${n}</b> con ${n} bolitas amarillas:<div class="fila-bolas">${'<span class="ball am"></span>'.repeat(n)}</div></li>
+    <li>Formamos <b>grupos de 2</b> bolitas:<div class="pares">${grupos}</div></li>
+    <li>Contamos cuántos grupos de 2 se formaron: hay <b>${n/2}</b> grupos.</li>
+    <li class="concl">La mitad de ${n} es <b>${n/2}</b>. Comprobamos: ${n/2} + ${n/2} = ${n}.</li>
+  </ol>`;
+}
+const MP = {order:[], pos:0, cur:null, idx:0, done:false};
+function nextMitadProb(){
+  if(MP.pos >= MP.order.length){
+    const last = MP.order[MP.order.length-1];
+    do{ MP.order = MITAD_PROB.map((_,i) => i).sort(() => Math.random() - .5); }
+    while(MITAD_PROB.length > 1 && MP.order[0] === last);
+    MP.pos = 0;
+  }
+  MP.idx = MP.order[MP.pos++]; MP.cur = MITAD_PROB[MP.idx]; MP.done = false;
+  const p = MP.cur;
+  $('#mpCount').textContent = `Ítem ${MP.idx+1} de ${MITAD_PROB.length}`;
+  $('#paperMp').innerHTML = p.bloques.map(bloqueHTML).join('') + `<p>${esc(p.pregunta)}</p>`
+    + (p.abierta ? '<p class="print-only">Respuesta: ______________________</p>'
+                 : `<div class="popts">${p.opciones.map((o,i) => `<button class="popt" data-i="${i}"><span class="l">${LETRAS[i]})</span><span>${esc(o)}</span></button>`).join('')}</div>`);
+  $('#mpFb').innerHTML = '';
+  $('#mpResp').hidden = !p.abierta;
+  if(p.abierta){ setSpin('#mpVal', 0); ['#mpUp','#mpDown','#mpVal','#mpCheck'].forEach(q => $(q).disabled = false); }
+  $$('#paperMp .popt').forEach(b => b.addEventListener('click', () => responderMitad(+b.dataset.i)));
+}
+function responderMitad(i){
+  if(MP.done) return; MP.done = true;
+  const p = MP.cur, mitad = p.total/2;
+  let ok, txt;
+  if(p.abierta){
+    const v = getSpin('#mpVal'); ok = v === mitad; txt = ok ? `La respuesta es ${mitad}.` : `Escribiste ${v}, pero la respuesta es ${mitad}.`;
+    ['#mpUp','#mpDown','#mpVal','#mpCheck'].forEach(q => $(q).disabled = true);
+  }else{
+    const k = p.opciones.findIndex(o => +o === mitad), btns = $$('#paperMp .popt');
+    btns.forEach(b => b.disabled = true); btns[k].classList.add('ok'); if(i !== k) btns[i].classList.add('bad');
+    ok = i === k; txt = `La respuesta es ${LETRAS[k]}) ${mitad}.`;
+  }
+  if(ok){
+    chime(); fireworks();
+    $('#mpFb').innerHTML = `<div class="fb-head ok fb-big"><span class="em">${pulgarImg()}</span>¡Correcto! ¡Muy bien! ${txt}</div>`;
+  }else{
+    boing();
+    $('#mpFb').innerHTML = `<div class="fb-head bad"><span class="em">${sorpresaSVG()}</span>No es correcto. ${txt} Veamos paso a paso:</div>
+      <div class="exp good"><h4>${esc(p.nota)} Buscamos la mitad de <span class="n">${p.total}</span></h4>${mitadExplain(p.total)}</div>`;
+  }
+  $('#mpFb').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+spinner('#mpVal', '#mpUp', '#mpDown');
+$('#mpVal').addEventListener('keydown', e => { if(e.key === 'Enter') responderMitad(); });
+$('#mpCheck').addEventListener('click', () => responderMitad());
+$$('[data-go="mitadPractica"]').forEach(b => b.addEventListener('click', () => { if(!MP.cur) nextMitadProb(); }));
+$('#btnOtroMp').addEventListener('click', nextMitadProb);
+$('#btnPrintMp').addEventListener('click', () => window.print());
+$('#btnPdfMp').addEventListener('click', () => {
+  const url = URL.createObjectURL(problemPDF(MP.cur));
+  const a = document.createElement('a');
+  a.href = url; a.download = `Problema de mitad ${MP.idx+1}.pdf`;
   document.body.appendChild(a); a.click();
   setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 2000);
 });
