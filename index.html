@@ -930,11 +930,16 @@ function finish(){
 // Figuras de triángulos: cada triángulo es [x, fila] = posición de su vértice superior
 // (x en medios lados: triángulos vecinos de la misma fila están a 1 de distancia).
 const H3 = Math.sqrt(3)/2;
+// [x, fila] = triángulo hacia arriba; [x, fila, 1] = triángulo hacia abajo (el hueco entre dos triángulos de la misma fila)
+const triPts = ([x, r, abajo]) => abajo
+  ? {pts:[[x-.5, r*H3], [x+.5, r*H3], [x, r*H3+H3]], cx:x, cy:r*H3 + H3/3}
+  : {pts:[[x, r*H3], [x-.5, r*H3+H3], [x+.5, r*H3+H3]], cx:x, cy:r*H3 + H3*2/3};
 const F = {
   uno:        [[0,0]],
   dos:        [[-.5,0],[.5,0]],
   piramide3:  [[0,0],[-.5,1],[.5,1]],
   piramide6:  [[0,0],[-.5,1],[.5,1],[-1,2],[0,2],[1,2]],
+  piramide7:  [[0,0],[-.5,1],[0,1,1],[.5,1],[-1,2],[0,2],[1,2]],   // la misma figura con el hueco del centro relleno
   cinco:      [[-.5,0],[.5,0],[-1,1],[0,1],[1,1]],
   cuadro4:    [[-.5,0],[.5,0],[-.5,1],[.5,1]],
   fila4:      [[-1.5,0],[-.5,0],[.5,0],[1.5,0]],
@@ -974,9 +979,9 @@ function figSVG(tri, alto){
   const xs = tri.map(t => t[0]), rows = Math.max(...tri.map(t => t[1])) + 1;
   const minX = Math.min(...xs) - .5, maxX = Math.max(...xs) + .5, pad = .08;
   const W = maxX - minX + 2*pad, Ht = rows*H3 + 2*pad;
-  const poly = tri.map(([x,r]) => {
-    const cx = x, cy = r*H3 + H3*2/3, k = .9;   // se achica un poco para que se vea cada triángulo
-    const pts = [[x, r*H3], [x-.5, r*H3+H3], [x+.5, r*H3+H3]]
+  const poly = tri.map(t => {
+    const k = .9, {pts:P, cx, cy} = triPts(t);   // se achica un poco para que se vea cada triángulo
+    const pts = P
       .map(([px,py]) => [(cx + (px-cx)*k - minX + pad).toFixed(3), (cy + (py-cy)*k + pad).toFixed(3)].join(','));
     return `<polygon points="${pts.join(' ')}" fill="#4472c4" stroke="#2f528f" stroke-width=".03"/>`;
   }).join('');
@@ -1013,7 +1018,7 @@ const PROBLEMAS = [
     opciones: ['9','18','20'], base: 9, nota: 'David se comió el doble de 9 uvas.' },
   { bloques: [{t:'p', text:'Manuel forma la siguiente figura con triángulos:'}, {t:'fig', tri:F.piramide3}],
     pregunta: 'Su amiga Deyanira crea una figura similar con el doble de triángulos. ¿Cuál de las siguientes figuras fue la que creó Deyanira?',
-    opciones: [{tri:F.piramide6}, {tri:F.uno}, {tri:F.cinco}], base: 3,
+    opciones: [{tri:F.piramide6}, {tri:F.uno}, {tri:F.piramide7}], base: 3,
     nota: 'La figura de Manuel tiene 3 triángulos; la de Deyanira debe tener el doble: 6 triángulos (opción A).' },
   { bloques: [{t:'p', text:'Laura forma la siguiente figura con triángulos:'}, {t:'fig', tri:F.dos}],
     pregunta: 'Su amigo Pablo crea una figura con el doble de triángulos. ¿Cuál de las siguientes figuras fue la que creó Pablo?',
@@ -1129,9 +1134,9 @@ function problemPDF(p){
   const figPDF = (tri, x0, top, u) => {
     const minX = Math.min(...tri.map(t => t[0])) - .5, k = .9;
     ops.push('0.27 0.45 0.77 rg');
-    tri.forEach(([x,r]) => {
-      const cx = x, cy = r*H3 + H3*2/3;
-      const pts = [[x, r*H3], [x-.5, r*H3+H3], [x+.5, r*H3+H3]].map(([px,py]) =>
+    tri.forEach(t => {
+      const {pts:P, cx, cy} = triPts(t);
+      const pts = P.map(([px,py]) =>
         [x0 + (cx + (px-cx)*k - minX)*u, top - (cy + (py-cy)*k)*u]);
       ops.push(`${pts[0][0].toFixed(2)} ${pts[0][1].toFixed(2)} m ${pts[1][0].toFixed(2)} ${pts[1][1].toFixed(2)} l ${pts[2][0].toFixed(2)} ${pts[2][1].toFixed(2)} l h f`);
     });
