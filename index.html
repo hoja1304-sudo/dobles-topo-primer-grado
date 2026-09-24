@@ -191,6 +191,32 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn-prob{background:#6d4bd8;color:#fff}
 .btn-acs{background:#0e7490;color:#fff}
 .btn-nivel{background:#d97706;color:#fff}
+.btn-cartas{background:#db2777;color:#fff}
+/* ---------- CARTAS ---------- */
+#cartas{flex-direction:column;align-items:center;padding:70px 16px 30px}
+.cartas-wrap{width:min(760px,100%);text-align:center}
+.cartas-wrap h2{margin:.1em 0 .2em;font-size:clamp(1.4rem,3.5vw,2.1rem)}
+.cartas-ind{margin:0 0 .4em;font-size:clamp(1rem,2.3vw,1.25rem)}
+.cartas-bar,.cartas-stats{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:8px 0}
+.cartas-bar .btn{font-size:clamp(.92rem,2vw,1.1rem);padding:.55em 1em}
+.cartas-msg{min-height:1.5em;font-weight:800;font-size:clamp(1rem,2.4vw,1.3rem);color:var(--accent2);margin:.3em 0}
+.tablero{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(8px,2vw,16px);margin:8px auto;width:min(100%,620px)}
+.carta{aspect-ratio:3/4;perspective:900px;border:0;background:none;padding:0;cursor:pointer;touch-action:manipulation;border-radius:16px}
+.carta:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
+.carta .in{position:relative;display:block;width:100%;height:100%;transition:transform .45s;transform-style:preserve-3d}
+.carta.vuelta .in,.carta.ok .in{transform:rotateY(180deg)}
+.carta .cara{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;gap:6px;box-shadow:var(--shadow)}
+.carta .dorso{background:repeating-linear-gradient(45deg,#db2777 0 12px,#e8508f 12px 24px);border:4px solid #fff;color:#fff;
+  font-size:clamp(1.8rem,6vw,3rem);font-weight:900;text-shadow:0 2px 0 rgba(0,0,0,.25)}
+.carta .frente{background:#fff;border:4px solid #f5b82e;transform:rotateY(180deg);color:#1f130a;font-size:clamp(2rem,8vw,3.6rem);font-weight:900}
+.carta .mini{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;max-width:84%}
+.carta .mini i{width:clamp(6px,1.4vw,10px);height:clamp(6px,1.4vw,10px);border-radius:50%;background:#35b24a}
+.carta.ok .frente{border-color:#1f9d55;background:#e8f7ee}
+.carta.mal .frente{border-color:#d8453a;background:#fdeceb}
+.cartas-fin{margin:12px auto 0;width:min(560px,100%);background:var(--panel);border:4px solid var(--ok);border-radius:22px;padding:14px;box-shadow:var(--shadow)}
+.cartas-fin .t{font-weight:900;font-size:clamp(1.2rem,3vw,1.7rem);color:var(--ok)}
+.cartas-fin .s{color:var(--soft);font-size:clamp(1rem,2.2vw,1.2rem)}
 #nivelmas{flex-direction:column;align-items:center;padding:70px 16px 30px}
 .resp{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:12px 16px;margin:16px 0 4px;
   background:var(--panel);border:3px solid var(--line);border-radius:20px;padding:12px 14px;box-shadow:var(--shadow)}
@@ -321,6 +347,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <button class="btn btn-prob" id="btnProblemas">📝 Problemas</button>
       <button class="btn btn-acs" id="btnACS">♿ ACS</button>
       <button class="btn btn-nivel" id="btnNivelMas">⭐ Nivel +</button>
+      <button class="btn btn-cartas" id="btnCartas">🃏 Cartas</button>
     </div>
     <p class="autoria"><strong>Elaborado por: Alberto Jiménez Ruiz</strong><br>Asesor Regional de Matemática DRE-Cartag-DAP-2026</p>
   </div>
@@ -471,6 +498,28 @@ button{font:inherit;color:inherit;cursor:pointer}
     </div>
     <p class="resp-tip" id="nmTip">Usa las flechas ▲ ▼ para subir o bajar el número (mantenlas presionadas para ir más rápido).</p>
     <div class="prob-fb" id="nmFb" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- ============ CARTAS (memoria) ============ -->
+<section class="screen" id="cartas" aria-labelledby="tCartas">
+  <div class="cartas-wrap">
+    <h2 id="tCartas">🃏 Cartas de los dobles</h2>
+    <p class="cartas-ind">Da vuelta a dos cartas y busca la pareja: <b>un número y su doble</b>.</p>
+    <div class="cartas-bar">
+      <button class="btn btn-ghost" data-go="inicio">🏠 Volver al inicio</button>
+      <button class="btn btn-alt" id="btnInstr">🔊 Instrucción</button>
+      <button class="btn btn-main" id="btnReiniciar">🔄 Reiniciar juego</button>
+    </div>
+    <div class="cartas-stats">
+      <span class="pill" title="Tiempo">⏱ <span id="cTiempo">0:00</span></span>
+      <span class="pill score" title="Menor tiempo">🏆 Récord: <span id="cRecord">—</span></span>
+      <span class="pill" title="Intentos">🔁 <span id="cIntentos">0 intentos</span></span>
+      <span class="pill" title="Parejas encontradas">✔ <span id="cParejas">0</span>/4 parejas</span>
+    </div>
+    <p class="cartas-msg" id="cMsg" aria-live="polite">Toca una carta para comenzar.</p>
+    <div class="tablero" id="tablero"></div>
+    <div class="cartas-fin" id="cFin" hidden></div>
   </div>
 </section>
 
@@ -1380,6 +1429,89 @@ $('#btnPdfNm').addEventListener('click', () => {
   document.body.appendChild(a); a.click();
   setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 2000);
 });
+
+/* ---------- Cartas: juego de memoria de los dobles ---------- */
+// 8 cartas = 4 parejas (número y su doble) tomadas de los dobles de 1 a 9.
+// Se eligen de modo que cada carta tenga una sola pareja posible (p. ej. no salen juntas 1-2 y 2-4).
+const C = {cards:[], open:[], matched:0, tries:0, t0:0, timer:null, lock:false, bases:[], best:0};   // best: récord en memoria si el navegador no deja guardar
+const CARTAS_REC = 'dobleCartasRecord';
+const fmtT2 = ms => { const t = Math.round(ms/1000); return `${Math.floor(t/60)}:${String(t%60).padStart(2,'0')}`; };
+function elegirBases(prev){
+  for(let t = 0; t < 1000; t++){
+    const bs = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - .5).slice(0,4).sort((a,b) => a-b);
+    const cs = bs.flatMap(b => [b, 2*b]);
+    if(new Set(cs).size !== 8) continue;
+    if(!cs.every(x => cs.filter(y => y !== x && (y === 2*x || x === 2*y)).length === 1)) continue;
+    if(prev && bs.join() === prev.join()) continue;   // al reiniciar salen cartas distintas
+    return bs;
+  }
+  return [3,5,7,9];
+}
+const leerRecord = () => +store.get(CARTAS_REC) || C.best || 0;
+function pintarRecord(){ const r = leerRecord(); $('#cRecord').textContent = r ? fmtT2(r) : '—'; }
+function pararReloj(){ clearInterval(C.timer); C.timer = null; }
+function nuevoJuegoCartas(){
+  pararReloj();
+  C.bases = elegirBases(C.bases);
+  C.cards = C.bases.flatMap(b => [{v:b, b}, {v:2*b, b}]).sort(() => Math.random() - .5);
+  C.open = []; C.matched = 0; C.tries = 0; C.t0 = 0; C.lock = false;
+  $('#cTiempo').textContent = '0:00'; $('#cIntentos').textContent = '0 intentos'; $('#cParejas').textContent = 0;
+  $('#cMsg').textContent = 'Toca una carta para comenzar.';
+  $('#cFin').hidden = true;
+  pintarRecord();
+  $('#tablero').innerHTML = C.cards.map((c,i) => `<button class="carta" data-i="${i}" aria-label="Carta ${i+1}, boca abajo">
+      <span class="in"><span class="cara dorso">?</span>
+      <span class="cara frente"><span>${c.v}</span><span class="mini">${'<i></i>'.repeat(c.v)}</span></span></span></button>`).join('');
+  $$('#tablero .carta').forEach(el => el.addEventListener('click', () => tocarCarta(+el.dataset.i)));
+}
+function tocarCarta(i){
+  const el = $$('#tablero .carta')[i];
+  if(C.lock || el.classList.contains('vuelta') || el.classList.contains('ok')) return;
+  if(!C.t0){   // el reloj empieza con la primera carta
+    C.t0 = performance.now();
+    C.timer = setInterval(() => {
+      if(!$('#cartas').classList.contains('active')) return pararReloj();
+      $('#cTiempo').textContent = fmtT2(performance.now() - C.t0);
+    }, 250);
+  }
+  el.classList.add('vuelta'); el.setAttribute('aria-label', `Carta con el número ${C.cards[i].v}`); pop();
+  C.open.push(i);
+  if(C.open.length < 2) return;
+  const [a, b] = C.open.map(k => C.cards[k]), els = C.open.map(k => $$('#tablero .carta')[k]);
+  C.tries++; $('#cIntentos').textContent = `${C.tries} ${C.tries === 1 ? 'intento' : 'intentos'}`;
+  C.open = [];
+  if(a.b === b.b){   // pareja: el número y su doble
+    els.forEach(e => { e.classList.remove('vuelta'); e.classList.add('ok'); });
+    C.matched++; $('#cParejas').textContent = C.matched; chime();
+    $('#cMsg').textContent = `¡Pareja! El doble de ${a.b} es ${2*a.b}: ${a.b} + ${a.b} = ${2*a.b}.`;
+    if(C.matched === 4) finCartas();
+  }else{
+    C.lock = true; els.forEach(e => e.classList.add('mal')); tone(300,200,.2,'sine',.12);
+    $('#cMsg').textContent = `${a.v} y ${b.v} no son pareja. ¡Inténtalo de nuevo!`;
+    setTimeout(() => { els.forEach(e => { e.classList.remove('vuelta','mal'); e.setAttribute('aria-label','Carta boca abajo'); }); C.lock = false; }, 1100);
+  }
+}
+function finCartas(){
+  const ms = performance.now() - C.t0; pararReloj();
+  $('#cTiempo').textContent = fmtT2(ms);
+  const prev = leerRecord(), nuevo = !prev || ms < prev;
+  if(nuevo){ C.best = Math.round(ms); store.set(CARTAS_REC, C.best); }
+  pintarRecord();
+  $('#cMsg').textContent = '';
+  $('#cFin').innerHTML = `${pulgarImg()}<div class="t">¡Excelente! Encontraste las 4 parejas.</div>
+    <div class="s">Tiempo: <b>${fmtT2(ms)}</b> · ${C.tries} ${C.tries === 1 ? 'intento' : 'intentos'}${nuevo ? ' · 🏆 <b>¡Nuevo récord!</b>' : ` · Récord: ${fmtT2(prev)}`}</div>`;
+  $('#cFin').hidden = false;
+  fireworks(); chime();
+  say(nuevo ? '¡Excelente! Encontraste todas las parejas. ¡Nuevo récord!' : '¡Excelente! Encontraste todas las parejas.');
+  setTimeout(() => $('#cFin').scrollIntoView({behavior:'smooth', block:'nearest'}), 300);
+}
+const INSTR_CARTAS = 'Toca dos cartas para darles vuelta. Busca la pareja formada por un número y su doble. Por ejemplo, el tres y el seis son pareja, porque tres más tres es seis. Si las cartas son pareja, se quedan descubiertas. Si no lo son, se vuelven a esconder. Encuentra las cuatro parejas en el menor tiempo posible.';
+$('#btnInstr').addEventListener('click', () => {
+  if(!cfg.voz){ cfg.voz = 1; store.set('topoDobleSonido', 1); paintSound(); }   // el botón de instrucción activa el sonido
+  ctx(); say(INSTR_CARTAS);
+});
+$('#btnReiniciar').addEventListener('click', nuevoJuegoCartas);
+$('#btnCartas').addEventListener('click', () => { show('cartas'); nuevoJuegoCartas(); });
 
 /* ---------- Teoría: bolitas y selector de números ---------- */
 $$('#teoria .grp[data-balls]').forEach(g => { g.innerHTML = ball().repeat(+g.dataset.balls); });
