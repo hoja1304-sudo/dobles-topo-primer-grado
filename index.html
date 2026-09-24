@@ -953,9 +953,9 @@ const S = {
   escalera3: [[0,0],[1,1],[2,2]],
   escalera4: [[0,0],[1,1],[2,2],[3,3]]
 };
-const esFig = o => !!(o && (o.tri || o.sq || o.choc));
-const figCount = o => o.choc ? o.choc.r * o.choc.c : (o.tri || o.sq).length;
-const figNombre = o => { const n = figCount(o); return o.choc ? (n === 1 ? 'chocolate' : 'chocolates') : o.tri ? (n === 1 ? 'triángulo' : 'triángulos') : (n === 1 ? 'cuadrado' : 'cuadrados'); };
+const esFig = o => !!(o && (o.tri || o.sq || o.choc || o.bot));
+const figCount = o => o.bot ? o.bot : o.choc ? o.choc.r * o.choc.c : (o.tri || o.sq).length;
+const figNombre = o => { const n = figCount(o); return o.bot ? (n === 1 ? 'botella' : 'botellas') : o.choc ? (n === 1 ? 'chocolate' : 'chocolates') : o.tri ? (n === 1 ? 'triángulo' : 'triángulos') : (n === 1 ? 'cuadrado' : 'cuadrados'); };
 function sqSVG(cells, alto){
   const cols = Math.max(...cells.map(c => c[0])) + 1, rows = Math.max(...cells.map(c => c[1])) + 1;
   const rects = cells.map(([c,r]) => `<rect x="${c+.03}" y="${r+.03}" width=".94" height=".94" fill="#111" stroke="#2f528f" stroke-width=".03"/>`).join('');
@@ -974,7 +974,18 @@ function chocSVG({r, c}, alto){
     <rect x=".03" y=".03" width="${W-.06}" height="${H-.06}" rx=".22" fill="#b5652b" stroke="#6e3a14" stroke-width=".06"/>
     <rect x=".2" y=".2" width="${W-.4}" height="${H-.4}" rx=".12" fill="#f6e3c4"/>${ch}</svg>`;
 }
-const figHTML = (o, alto) => o.choc ? chocSVG(o.choc, alto) : o.tri ? figSVG(o.tri, alto) : sqSVG(o.sq, alto);
+// Botellas de agua en fila: {bot: cantidad}
+function botSVG(n, alto){
+  const one = x => `<g transform="translate(${x} 0)">
+    <rect x="13" y="1" width="14" height="9" rx="2" fill="#2b5fd9" stroke="#1d3f94" stroke-width="1"/>
+    <path d="M15 10 h10 v5 q9 4 9 14 v60 q0 9 -9 9 h-10 q-9 0 -9 -9 v-60 q0 -10 9 -14 z" fill="url(#gBot)" stroke="#4d93cf" stroke-width="1.6"/>
+    ${[36,46,56,66,76,86].map(y => `<path d="M7 ${y} q13 4 26 0" fill="none" stroke="#5fa8e0" stroke-width="1.6"/>`).join('')}
+    <rect x="10" y="30" width="4" height="52" rx="2" fill="#fff" opacity=".6"/></g>`;
+  let g = ''; for(let i = 0; i < n; i++) g += one(i*44);
+  return `<svg class="tri" viewBox="0 0 ${n*44 - 4} 100" style="height:${(alto*1.9).toFixed(1)}px" role="img" aria-label="${n} ${n === 1 ? 'botella' : 'botellas'} de agua">
+    <defs><linearGradient id="gBot" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e3f3fd"/><stop offset=".5" stop-color="#b9def7"/><stop offset="1" stop-color="#8cc5ee"/></linearGradient></defs>${g}</svg>`;
+}
+const figHTML = (o, alto) => o.bot ? botSVG(o.bot, alto) : o.choc ? chocSVG(o.choc, alto) : o.tri ? figSVG(o.tri, alto) : sqSVG(o.sq, alto);
 function figSVG(tri, alto){
   const xs = tri.map(t => t[0]), rows = Math.max(...tri.map(t => t[1])) + 1;
   const minX = Math.min(...xs) - .5, maxX = Math.max(...xs) + .5, pad = .08;
@@ -1020,10 +1031,6 @@ const PROBLEMAS = [
     pregunta: 'Su amiga Deyanira crea una figura similar con el doble de triángulos. ¿Cuál de las siguientes figuras fue la que creó Deyanira?',
     opciones: [{tri:F.piramide6}, {tri:F.uno}, {tri:F.piramide10}], base: 3,
     nota: 'La figura de Manuel tiene 3 triángulos; la de Deyanira debe tener el doble: 6 triángulos (opción A).' },
-  { bloques: [{t:'p', text:'Laura forma la siguiente figura con triángulos:'}, {t:'fig', tri:F.dos}],
-    pregunta: 'Su amigo Pablo crea una figura con el doble de triángulos. ¿Cuál de las siguientes figuras fue la que creó Pablo?',
-    opciones: [{tri:F.piramide3}, {tri:F.dos}, {tri:F.cuadro4}], base: 2,
-    nota: 'La figura de Laura tiene 2 triángulos; la de Pablo debe tener el doble: 4 triángulos (opción C).' },
   { bloques: [{t:'p', text:'David pintó en una pared la siguiente figura:'}, {t:'fig', sq:S.escalera2}],
     pregunta: 'Luego su hermano Marcos realizó una figura que representa el doble de la de David. ¿Cuál es la figura que dibujó Marcos?',
     opciones: [{sq:S.escalera3}, {sq:S.escalera4}, {sq:S.escalera2}], base: 2,
@@ -1031,13 +1038,17 @@ const PROBLEMAS = [
   { bloques: [{t:'p', text:'David compró una caja de chocolates como la siguiente:'}, {t:'fig', choc:{r:2, c:4}}],
     pregunta: 'Si Jorge, amigo de David, compró una caja con el doble de chocolates, ¿cuál de las siguientes cajas fue la que compró?',
     opciones: [{choc:{r:2, c:5}}, {choc:{r:4, c:4}}, {choc:{r:2, c:2}}], base: 8,
-    nota: 'La caja de David tiene 8 chocolates; la de Jorge debe tener el doble: 16 chocolates (opción B).' }
+    nota: 'La caja de David tiene 8 chocolates; la de Jorge debe tener el doble: 16 chocolates (opción B).' },
+  { bloques: [{t:'p', text:'Jorge se tomó la siguiente cantidad de botellas de agua:'}, {t:'fig', bot:2}],
+    pregunta: 'Daniel se tomó el doble. ¿Cuál opción representa la cantidad de botellas que se tomó Daniel?',
+    opciones: [{bot:1}, {bot:4}, {bot:6}], base: 2,
+    nota: 'Jorge se tomó 2 botellas; Daniel se tomó el doble: 4 botellas (opción B).' }
 ];
 const LETRAS = ['A','B','C','D'];
 const esc = t => String(t).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
 const esPar = o => Array.isArray(o);  // par de dados
 const correctaDe = p => p.opciones.findIndex(o => esFig(o) ? figCount(o) === 2*p.base : esPar(o) ? o[0] === o[1] : +o === 2*p.base);
-const optTexto = o => esFig(o) ? `${o.choc ? 'caja' : 'figura'} con ${figCount(o)} ${figNombre(o)}` : esPar(o) ? `dados con ${o[0]} y ${o[1]}` : String(o);
+const optTexto = o => o.bot ? `${o.bot} ${figNombre(o)}` : esFig(o) ? `${o.choc ? 'caja' : 'figura'} con ${figCount(o)} ${figNombre(o)}` : esPar(o) ? `dados con ${o[0]} y ${o[1]}` : String(o);
 const P = {order:[], pos:0, cur:null, idx:0};
 
 // Puntos de un dado en un cuadro de 100 × 100
@@ -1157,8 +1168,21 @@ function problemPDF(p){
     for(let i = 0; i < r; i++) for(let j = 0; j < c; j++) circ(x0 + (.85 + j)*u, top - (.85 + i)*u, .38*u);
     ops.push('0 g 0 G');
   };
-  const anySize = (o, u) => o.choc ? {w:(o.choc.c + .7)*u*.7, h:(o.choc.r + .7)*u*.7} : o.tri ? figSize(o.tri, u) : sqSize(o.sq, u*.8);
-  const anyPDF = (o, x0, top, u) => o.choc ? chocPDF(o.choc, x0, top, u*.7) : o.tri ? figPDF(o.tri, x0, top, u) : sqPDF(o.sq, x0, top, u*.8);
+  // botellas: tapa azul, cuerpo celeste con rayas
+  const botPDF = (n, x0, top, u) => {
+    const bw = u*.5, bh = u*1.25, gap = u*.12;
+    for(let i = 0; i < n; i++){
+      const x = x0 + i*(bw + gap);
+      ops.push(`0.17 0.37 0.85 rg ${(x + bw*.33).toFixed(2)} ${(top - bh*.1).toFixed(2)} ${(bw*.34).toFixed(2)} ${(bh*.1).toFixed(2)} re f`);
+      ops.push(`0.78 0.90 0.98 rg 0.30 0.58 0.81 RG 0.8 w ${(x + bw*.38).toFixed(2)} ${(top - bh*.2).toFixed(2)} ${(bw*.24).toFixed(2)} ${(bh*.1).toFixed(2)} re B`);
+      ops.push(`${x.toFixed(2)} ${(top - bh).toFixed(2)} ${bw.toFixed(2)} ${(bh*.8).toFixed(2)} re B`);
+      ops.push('0.37 0.66 0.88 RG 0.7 w');
+      for(let k = 1; k <= 5; k++){ const yy = top - bh*.2 - k*bh*.8/6; ops.push(`${(x+1).toFixed(2)} ${yy.toFixed(2)} m ${(x+bw-1).toFixed(2)} ${yy.toFixed(2)} l S`); }
+      ops.push('0 g 0 G');
+    }
+  };
+  const anySize = (o, u) => o.bot ? {w:o.bot*(u*.5 + u*.12) - u*.12, h:u*1.25} : o.choc ? {w:(o.choc.c + .7)*u*.7, h:(o.choc.r + .7)*u*.7} : o.tri ? figSize(o.tri, u) : sqSize(o.sq, u*.8);
+  const anyPDF = (o, x0, top, u) => o.bot ? botPDF(o.bot, x0, top, u) : o.choc ? chocPDF(o.choc, x0, top, u*.7) : o.tri ? figPDF(o.tri, x0, top, u) : sqPDF(o.sq, x0, top, u*.8);
   const figSize = (tri, u) => { const xs = tri.map(t => t[0]);
     return {w:(Math.max(...xs) - Math.min(...xs) + 1)*u, h:(Math.max(...tri.map(t => t[1])) + 1)*H3*u}; };
   const circ = (cx, cy, r) => { const k = r*.5523;
