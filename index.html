@@ -199,6 +199,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .mitad-h{font-size:clamp(1.3rem,3.4vw,2rem);line-height:1.25;margin:.5em 0 .3em}
 .mitad-back{margin-top:18px}
 #mitadTeoria,#mitadPractica,#mitadJuego{flex-direction:column;align-items:center;padding:70px 16px 30px}
+#mitadJuego{padding-top:62px}
 .sub-bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:10px}
 .sub-bar .btn{font-size:clamp(.92rem,2vw,1.1rem);padding:.55em 1em}
 .arial12{font-family:Arial,Helvetica,sans-serif;font-size:12pt;line-height:1.5;text-align:center;margin:0 auto 12px;max-width:640px}
@@ -217,7 +218,37 @@ button{font:inherit;color:inherit;cursor:pointer}
 .uva.drag{cursor:grabbing;transform:scale(1.15);z-index:6;transition:transform .12s}
 .uva.sel{transform:scale(1.18);filter:drop-shadow(0 0 6px #facc15) drop-shadow(0 3px 3px rgba(0,0,0,.25))}
 .mitad-preg{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:14px}
-.ball.am{background:radial-gradient(circle at 32% 30%,#fff7b0,#facc15 55%,#b45309)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.bolas-wrap{width:min(960px,100%);text-align:center}
+.bolas-stats{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:6px 0}
+.bolas-ind{min-height:2.2em;font-weight:900;font-size:clamp(1.2rem,3.4vw,2rem);margin:.2em 0 .4em;color:var(--ink)}
+.bolas-ind .n{display:inline-block;background:var(--gold);color:#3a2010;border-radius:12px;padding:0 .35em}
+.gym{position:relative;width:100%;height:clamp(360px,62vh,580px);border-radius:22px;overflow:hidden;box-shadow:var(--shadow);border:4px solid #7c4a1e;touch-action:manipulation}
+.gym-wall{position:absolute;inset:0;background:linear-gradient(#dfe8f2,#eef3f8 60%);}
+.gym-wall::before{content:"";position:absolute;left:0;right:0;top:18%;height:10px;background:#2563eb;opacity:.35}
+.gym-floor{position:absolute;left:0;right:0;bottom:0;height:22%;
+  background:
+    linear-gradient(90deg,transparent 49.6%,rgba(255,255,255,.9) 49.6% 50.4%,transparent 50.4%),
+    linear-gradient(rgba(0,0,0,.08) 1px,transparent 1px) 0 0/100% 14px,
+    repeating-linear-gradient(90deg,#d9a05b 0 58px,#c98f47 58px 60px,#e0ad6c 60px 118px,#cf9750 118px 120px);
+  border-top:6px solid #f97316;box-shadow:inset 0 10px 18px rgba(0,0,0,.18)}
+.gym-floor::after{content:"";position:absolute;left:50%;top:18%;width:22%;height:120%;transform:translateX(-50%);border:4px solid rgba(255,255,255,.85);border-radius:50%}
+.bola{position:absolute;left:0;top:0;width:var(--bs,64px);height:var(--bs,64px);border:0;padding:0;background:none;cursor:pointer;
+  touch-action:manipulation;will-change:transform;z-index:3;filter:drop-shadow(0 4px 3px rgba(0,0,0,.3))}
+.bola svg{width:100%;height:100%;display:block}
+.bola:focus-visible{outline:4px solid var(--gold);outline-offset:2px;border-radius:50%}
+.bola.volando{transition:transform .65s cubic-bezier(.3,.6,.4,1);z-index:6}
+.bola.cayendo{transition:transform .35s ease-in,opacity .35s;opacity:0}
+.bola.mal{animation:sacude .35s}
+@keyframes sacude{0%,100%{margin-left:0}25%{margin-left:-6px}75%{margin-left:6px}}
+.cesta{position:absolute;right:3%;bottom:14%;width:clamp(96px,17%,150px);z-index:4}
+.cesta svg{width:100%;display:block}
+.cesta-bolas{position:absolute;left:12%;right:12%;top:26%;display:flex;flex-wrap:wrap;gap:2px;justify-content:center}
+.cesta-bolas span{width:clamp(14px,2.4vw,20px);height:clamp(14px,2.4vw,20px);border-radius:50%;font-size:clamp(8px,1.4vw,11px);font-weight:900;
+  display:grid;place-items:center;color:#fff;border:1px solid rgba(0,0,0,.3)}
+.bolas-start{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:8;font-size:clamp(1.3rem,3.6vw,2rem);padding:.7em 1.6em}
+.bolas-start[hidden]{display:none}
+#mitadJuego .cartas-fin{margin-top:12px}background:radial-gradient(circle at 32% 30%,#fff7b0,#facc15 55%,#b45309)}
 .pares{display:flex;flex-wrap:wrap;gap:8px;margin:.5em 0}
 .par{display:inline-flex;flex-direction:column;align-items:center;gap:2px;padding:5px 7px;border:3px dashed #d97706;border-radius:14px;background:var(--panel)}
 .par .bb{display:flex;gap:4px}
@@ -622,10 +653,34 @@ button{font:inherit;color:inherit;cursor:pointer}
 </section>
 
 <section class="screen" id="mitadJuego" aria-labelledby="tMitadJue">
-  <div class="teo">
-    <div class="sub-bar"><button class="btn btn-ghost" data-go="mitad">⬅ Volver a Mitad</button></div>
-    <h2 id="tMitadJue">🎮 Juego · Mitad de un número</h2>
-    <div class="card-wide"><p>Esta sección está en preparación.</p></div>
+  <div class="bolas-wrap">
+    <div class="sub-bar">
+      <button class="btn btn-ghost" data-go="mitad">⬅ Volver a Mitad</button>
+      <button class="btn btn-alt" id="btnBolasAudio" title="Escuchar la indicación">🔊 Escuchar</button>
+      <button class="btn btn-main" id="btnBolasReiniciar">🔄 Reiniciar juego</button>
+    </div>
+    <h2 id="tMitadJue" class="sr">Juego de la mitad</h2>
+    <div class="bolas-stats">
+      <span class="pill" title="Ronda">🎯 <span id="bRonda">0/10</span></span>
+      <span class="pill score" title="Puntos">⭐ <span id="bPuntos">0</span> pts</span>
+      <span class="pill" title="Tiempo">⏱ <span id="bTiempo">0:00</span></span>
+      <span class="pill" title="Menor tiempo">🏆 Récord: <span id="bRecord">—</span></span>
+    </div>
+    <div class="bolas-ind" id="bInd" role="status" aria-live="polite">Toca <b>▶ ¡Empezar!</b> para jugar.</div>
+    <div class="gym" id="gym">
+      <div class="gym-wall" aria-hidden="true"></div>
+      <div class="gym-floor" aria-hidden="true"></div>
+      <div class="cesta" id="cesta" aria-label="Cesta">
+        <svg viewBox="0 0 120 90" aria-hidden="true">
+          <ellipse cx="60" cy="18" rx="54" ry="12" fill="#8b5a2b" stroke="#5c3a1a" stroke-width="3"/>
+          <path d="M8 18 L20 84 Q60 94 100 84 L112 18 Q60 34 8 18 z" fill="#c68642" stroke="#5c3a1a" stroke-width="3"/>
+          <g stroke="#8b5a2b" stroke-width="3" fill="none"><path d="M14 40 Q60 54 106 40"/><path d="M17 60 Q60 72 103 60"/>
+          <path d="M36 28 L40 88"/><path d="M60 30 L60 90"/><path d="M84 28 L80 88"/></g></svg>
+        <div class="cesta-bolas" id="cestaBolas"></div>
+      </div>
+      <button class="btn btn-main bolas-start" id="btnBolasStart">▶ ¡Empezar!</button>
+    </div>
+    <div class="cartas-fin" id="bFin" hidden></div>
   </div>
 </section>
 
@@ -1807,6 +1862,165 @@ $('#btnPdfMp').addEventListener('click', () => {
   document.body.appendChild(a); a.click();
   setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 2000);
 });
+
+/* ---------- Mitad · Juego: bolas que rebotan en el gimnasio ---------- */
+// 10 bolas (1 a 10) rebotan; se pide la mitad de 20, 18, …, 2 en orden aleatorio.
+// Acierto: la bola cae en la cesta (+1). Error: todas saltan con otras alturas y velocidades (−1).
+const COLORES_BOLA = ['#ef4444','#f97316','#eab308','#22c55e','#06b6d4','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f43f5e'];
+const NUMW20 = [...NUMW, 'diecinueve', 'veinte'];
+// Caras distintas para cada bola: ojos y boca
+const CARAS = [
+  '<circle cx="36" cy="34" r="5"/><circle cx="64" cy="34" r="5"/><path d="M36 46 Q50 56 64 46" fill="none" stroke="#1f1f1f" stroke-width="3.5" stroke-linecap="round"/>',
+  '<path d="M30 34 q6-6 12 0" fill="none" stroke="#1f1f1f" stroke-width="3.5" stroke-linecap="round"/><circle cx="64" cy="34" r="5"/><path d="M38 46 Q50 54 62 46" fill="none" stroke="#1f1f1f" stroke-width="3.5" stroke-linecap="round"/>',
+  '<circle cx="36" cy="33" r="6" fill="#fff" stroke="#1f1f1f" stroke-width="2"/><circle cx="36" cy="33" r="2.6"/><circle cx="64" cy="33" r="6" fill="#fff" stroke="#1f1f1f" stroke-width="2"/><circle cx="64" cy="33" r="2.6"/><ellipse cx="50" cy="49" rx="5" ry="6"/>',
+  '<circle cx="36" cy="34" r="5"/><circle cx="64" cy="34" r="5"/><path d="M36 45 Q50 58 64 45 z" fill="#7a1616"/><path d="M45 50 q5 8 10 0" fill="#ef5a5f"/>',
+  '<rect x="26" y="28" width="20" height="10" rx="4"/><rect x="54" y="28" width="20" height="10" rx="4"/><path d="M46 32 h8" stroke="#1f1f1f" stroke-width="3"/><path d="M38 48 Q50 54 62 46" fill="none" stroke="#1f1f1f" stroke-width="3.5" stroke-linecap="round"/>',
+  '<path d="M30 36 q6-7 12 0 M58 36 q6-7 12 0" fill="none" stroke="#1f1f1f" stroke-width="3.5" stroke-linecap="round"/><path d="M34 45 Q50 60 66 45" fill="none" stroke="#1f1f1f" stroke-width="3.5" stroke-linecap="round"/>',
+  '<circle cx="36" cy="34" r="5"/><circle cx="64" cy="34" r="5"/><path d="M40 50 h20" stroke="#1f1f1f" stroke-width="3.5" stroke-linecap="round"/>',
+  '<circle cx="36" cy="34" r="5"/><circle cx="64" cy="34" r="5"/><path d="M36 46 Q50 56 64 46" fill="none" stroke="#1f1f1f" stroke-width="3.5" stroke-linecap="round"/><ellipse cx="56" cy="53" rx="5" ry="6" fill="#ef5a5f"/>',
+  '<path d="M31 30 l10 6 M41 30 l-10 6 M59 30 l10 6 M69 30 l-10 6" stroke="#1f1f1f" stroke-width="3" stroke-linecap="round"/><ellipse cx="50" cy="49" rx="7" ry="5" fill="#7a1616"/>',
+  '<circle cx="36" cy="34" r="5"/><circle cx="64" cy="34" r="5"/><path d="M34 44 Q50 62 66 44" fill="none" stroke="#1f1f1f" stroke-width="3.5" stroke-linecap="round"/><circle cx="28" cy="44" r="4" fill="#ff9aa2" opacity=".7"/><circle cx="72" cy="44" r="4" fill="#ff9aa2" opacity=".7"/>'
+];
+const bolaSVG = (n, color) => `<svg viewBox="0 0 100 100" aria-hidden="true">
+  <defs><radialGradient id="gB${n}" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset=".35" stop-color="${color}"/><stop offset="1" stop-color="${color}" stop-opacity=".85"/></radialGradient></defs>
+  <circle cx="50" cy="50" r="47" fill="url(#gB${n})" stroke="rgba(0,0,0,.35)" stroke-width="2.5"/>
+  <g fill="#1f1f1f">${CARAS[(n-1) % CARAS.length]}</g>
+  <text x="50" y="86" text-anchor="middle" font-size="30" font-weight="900" fill="#fff" stroke="#1f1f1f" stroke-width="3" paint-order="stroke" font-family="Arial Black, Arial, sans-serif">${n}</text></svg>`;
+const B = {bolas:[], raf:0, last:0, estado:'idle', orden:[], ronda:0, pts:0, t0:0, timer:null, best:0};
+const B_REC = 'mitadBolasRecord';
+const gym = $('#gym');
+const leerRecB = () => +store.get(B_REC) || B.best || 0;
+const pintarRecB = () => { const r = leerRecB(); $('#bRecord').textContent = r ? fmtT2(r) : '—'; };
+function crearBolas(){
+  gym.querySelectorAll('.bola').forEach(e => e.remove());
+  const W = gym.clientWidth, H = gym.clientHeight, size = Math.max(44, Math.min(74, W/9));
+  gym.style.setProperty('--bs', size + 'px');
+  B.bolas = [];
+  for(let n = 1; n <= 10; n++){
+    const el = document.createElement('button');
+    el.className = 'bola'; el.setAttribute('aria-label', `Bola ${n}`); el.innerHTML = bolaSVG(n, COLORES_BOLA[n-1]);
+    gym.appendChild(el);
+    const b = {n, el, r:size/2, x: size/2 + (n-1)*(W - size)/9, y: H*.3 + Math.random()*H*.2, vx:(Math.random() < .5 ? -1 : 1)*(15 + Math.random()*30), vy:0, activa:true};   // velocidad lateral suave
+    B.bolas.push(b);
+    el.addEventListener('pointerdown', e => { e.preventDefault(); tocarBola(b); });
+    el.addEventListener('click', e => { if(e.detail === 0) tocarBola(b); });   // teclado
+  }
+  $('#cestaBolas').innerHTML = '';
+}
+function pisoY(){ return gym.clientHeight * .86; }   // altura donde rebotan (sobre el piso de madera)
+function paso(t){
+  if(!$('#mitadJuego').classList.contains('active')){ B.raf = 0; return; }
+  const dt = Math.min(.04, (t - (B.last || t)) / 1000); B.last = t;
+  const W = gym.clientWidth, piso = pisoY(), g = 420;   // gravedad baja: rebotes lentos
+  B.bolas.forEach(b => {
+    if(!b.activa) return;
+    b.vy += g*dt; b.x += b.vx*dt; b.y += b.vy*dt;
+    if(b.y + b.r > piso){   // rebote en el piso: cada bola sube a una altura distinta
+      b.y = piso - b.r;
+      const alto = b.salto || (gym.clientHeight*(.2 + Math.random()*.3));
+      b.vy = -Math.sqrt(2*g*alto); b.salto = 0;
+    }
+    if(b.x - b.r < 0){ b.x = b.r; b.vx = Math.abs(b.vx); }
+    if(b.x + b.r > W){ b.x = W - b.r; b.vx = -Math.abs(b.vx); }
+    if(b.y - b.r < 0){ b.y = b.r; b.vy = Math.abs(b.vy); }
+    b.el.style.transform = `translate(${b.x - b.r}px, ${b.y - b.r}px)`;
+  });
+  B.raf = requestAnimationFrame(paso);
+}
+function animarBolas(){ if(!B.raf){ B.last = 0; B.raf = requestAnimationFrame(paso); } }
+function pintarHudB(){
+  $('#bRonda').textContent = `${Math.min(B.ronda, 10)}/10`; $('#bPuntos').textContent = B.pts;
+}
+function decirBola(){ if(B.estado === 'play') say(`Toca la bola que es la mitad de ${NUMW20[B.orden[B.ronda-1]]}`); }
+function reiniciarBolas(){
+  clearInterval(B.timer); B.timer = null;
+  B.estado = 'idle'; B.ronda = 0; B.pts = 0; B.t0 = 0;
+  B.orden = [2,4,6,8,10,12,14,16,18,20].sort(() => Math.random() - .5);
+  crearBolas(); pintarHudB(); pintarRecB();
+  $('#bTiempo').textContent = '0:00'; $('#bFin').hidden = true;
+  $('#bInd').innerHTML = 'Toca <b>▶ ¡Empezar!</b> para jugar.';
+  $('#btnBolasStart').hidden = false;
+  animarBolas();
+}
+function empezarBolas(){
+  ctx(); $('#btnBolasStart').hidden = true;
+  B.estado = 'play'; B.t0 = performance.now();
+  B.timer = setInterval(() => {
+    if(!$('#mitadJuego').classList.contains('active')){ clearInterval(B.timer); return; }
+    $('#bTiempo').textContent = fmtT2(performance.now() - B.t0);
+  }, 250);
+  siguienteRonda();
+}
+function siguienteRonda(){
+  B.ronda++;
+  if(B.ronda > 10) return finBolas();
+  pintarHudB();
+  const n = B.orden[B.ronda-1];
+  $('#bInd').innerHTML = `Toca la bola que es la mitad de <span class="n">${n}</span>`;
+  decirBola();
+}
+function tocarBola(b){
+  if(B.estado !== 'play' || !b.activa) return;
+  const objetivo = B.orden[B.ronda-1] / 2;
+  if(b.n === objetivo){
+    B.estado = 'anim'; B.pts++; pintarHudB(); chime();
+    b.activa = false;
+    // la bola vuela sobre la cesta y cae dentro
+    const g = gym.getBoundingClientRect(), c = $('#cesta').getBoundingClientRect();
+    const cx = c.left - g.left + c.width/2, top = c.top - g.top;
+    b.el.classList.add('volando');
+    b.el.style.transform = `translate(${cx - b.r}px, ${top - b.r*2.4}px)`;
+    setTimeout(() => {
+      b.el.classList.remove('volando'); b.el.classList.add('cayendo');
+      b.el.style.transform = `translate(${cx - b.r}px, ${top + c.height*.25}px) scale(.45)`;
+      pop();
+    }, 650);
+    setTimeout(() => {
+      b.el.remove();
+      const m = document.createElement('span'); m.style.background = COLORES_BOLA[b.n-1]; m.textContent = b.n;
+      $('#cestaBolas').appendChild(m);
+      toast(pulgarImg(), '¡Muy bien!', `La mitad de ${B.orden[B.ronda-1]} es ${b.n}: ${b.n} + ${b.n} = ${B.orden[B.ronda-1]}.`);
+      fireworks(); say('¡Muy bien!');
+    }, 1000);
+    setTimeout(() => { $('#toast').classList.remove('show'); if(B.estado === 'anim'){ B.estado = 'play'; siguienteRonda(); } }, 2700);
+  }else{
+    B.pts--; pintarHudB(); boing();
+    b.el.classList.remove('mal'); void b.el.offsetWidth; b.el.classList.add('mal');
+    $('#bInd').innerHTML = `¡Uy! Esa bola tiene el ${b.n}. Busca la mitad de <span class="n">${B.orden[B.ronda-1]}</span>`;
+    // todas las bolas saltan a diferentes alturas y velocidades
+    B.bolas.forEach(o => { if(!o.activa) return;
+      o.vy = -(220 + Math.random()*260); o.vx = (Math.random() < .5 ? -1 : 1)*(40 + Math.random()*90);
+      o.salto = gym.clientHeight*(.3 + Math.random()*.4); });
+  }
+}
+function finBolas(){
+  B.estado = 'fin'; clearInterval(B.timer);
+  const ms = performance.now() - B.t0; $('#bTiempo').textContent = fmtT2(ms);
+  const prev = leerRecB(), nuevo = !prev || ms < prev;
+  if(nuevo){ B.best = Math.round(ms); store.set(B_REC, B.best); }
+  pintarRecB();
+  $('#bInd').textContent = '¡Todas las bolas están en la cesta!';
+  $('#bFin').innerHTML = `${pulgarImg()}<div class="t">¡Excelente! Encontraste las 10 mitades.</div>
+    <div class="s">Puntos: <b>${B.pts}</b> · Tiempo: <b>${fmtT2(ms)}</b>${nuevo ? ' · 🏆 <b>¡Nuevo récord!</b>' : ` · Récord: ${fmtT2(prev)}`}</div>`;
+  $('#bFin').hidden = false; fireworks(); chime();
+  say(nuevo ? '¡Excelente! Encontraste todas las mitades. ¡Nuevo récord!' : '¡Excelente! Encontraste todas las mitades.');
+  setTimeout(() => $('#bFin').scrollIntoView({behavior:'smooth', block:'nearest'}), 300);
+}
+$('#btnBolasStart').addEventListener('click', empezarBolas);
+$('#btnBolasReiniciar').addEventListener('click', reiniciarBolas);
+$('#btnBolasAudio').addEventListener('click', () => {
+  if(!cfg.voz){ cfg.voz = 1; store.set('topoDobleSonido', 1); paintSound(); }
+  ctx();
+  if(B.estado === 'play' || B.estado === 'anim') say(`Toca la bola que es la mitad de ${NUMW20[B.orden[B.ronda-1]]}`);
+  else say('Toca la bola que es la mitad del número que aparece. Si aciertas, la bola cae en la cesta.');
+});
+document.addEventListener('keydown', e => {   // teclado: 1 a 9 y 0 = 10
+  if(!$('#mitadJuego').classList.contains('active') || B.estado !== 'play') return;
+  if(/^[0-9]$/.test(e.key)){ const n = e.key === '0' ? 10 : +e.key; const b = B.bolas.find(x => x.n === n && x.activa); if(b) tocarBola(b); }
+});
+$$('[data-go="mitadJuego"]').forEach(b => b.addEventListener('click', () => requestAnimationFrame(reiniciarBolas)));
+window.addEventListener('resize', () => { if(!$('#mitadJuego').classList.contains('active')) return;
+  const W = gym.clientWidth; B.bolas.forEach(b => { b.x = Math.min(b.x, W - b.r); }); });
 
 /* ---------- Cartas: juego de memoria de los dobles ---------- */
 // 8 cartas = 4 parejas (número y su doble) tomadas de los dobles de 1 a 9.
