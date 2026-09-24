@@ -234,14 +234,14 @@ button{font:inherit;color:inherit;cursor:pointer}
   border-top:6px solid #f97316;box-shadow:inset 0 10px 18px rgba(0,0,0,.18)}
 .gym-floor::after{content:"";position:absolute;left:50%;top:18%;width:22%;height:120%;transform:translateX(-50%);border:4px solid rgba(255,255,255,.85);border-radius:50%}
 .bola{position:absolute;left:0;top:0;width:var(--bs,64px);height:var(--bs,64px);border:0;padding:0;background:none;cursor:pointer;
-  touch-action:manipulation;will-change:transform;z-index:3;filter:drop-shadow(0 4px 3px rgba(0,0,0,.3))}
+  touch-action:manipulation;will-change:transform;z-index:5;filter:drop-shadow(0 4px 3px rgba(0,0,0,.3))}   /* delante de la cesta: siempre se pueden tocar */
 .bola svg{width:100%;height:100%;display:block}
 .bola:focus-visible{outline:4px solid var(--gold);outline-offset:2px;border-radius:50%}
-.bola.volando{transition:transform .65s cubic-bezier(.3,.6,.4,1);z-index:6}
+.bola.volando{transition:transform .65s cubic-bezier(.3,.6,.4,1);z-index:7}
 .bola.cayendo{transition:transform .35s ease-in,opacity .35s;opacity:0}
 .bola.mal{animation:sacude .35s}
 @keyframes sacude{0%,100%{margin-left:0}25%{margin-left:-6px}75%{margin-left:6px}}
-.cesta{position:absolute;right:3%;bottom:14%;width:clamp(96px,17%,150px);z-index:4}
+.cesta{position:absolute;right:3%;bottom:14%;width:clamp(100px,20%,160px);z-index:4}
 .cesta svg{width:100%;display:block}
 .cesta-bolas{position:absolute;left:12%;right:12%;top:26%;display:flex;flex-wrap:wrap;gap:2px;justify-content:center}
 .cesta-bolas span{width:clamp(14px,2.4vw,20px);height:clamp(14px,2.4vw,20px);border-radius:50%;font-size:clamp(8px,1.4vw,11px);font-weight:900;
@@ -1884,8 +1884,8 @@ const CARAS = [
 const bolaSVG = (n, color) => `<svg viewBox="0 0 100 100" aria-hidden="true">
   <defs><radialGradient id="gB${n}" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset=".35" stop-color="${color}"/><stop offset="1" stop-color="${color}" stop-opacity=".85"/></radialGradient></defs>
   <circle cx="50" cy="50" r="47" fill="url(#gB${n})" stroke="rgba(0,0,0,.35)" stroke-width="2.5"/>
-  <g fill="#1f1f1f">${CARAS[(n-1) % CARAS.length]}</g>
-  <text x="50" y="86" text-anchor="middle" font-size="30" font-weight="900" fill="#fff" stroke="#1f1f1f" stroke-width="3" paint-order="stroke" font-family="Arial Black, Arial, sans-serif">${n}</text></svg>`;
+  <g fill="#1f1f1f" transform="translate(17 4) scale(.66)">${CARAS[(n-1) % CARAS.length]}</g>
+  <text x="50" y="88" text-anchor="middle" font-size="${n === 10 ? 40 : 48}" font-weight="900" fill="#fff" stroke="#1f1f1f" stroke-width="4" paint-order="stroke" font-family="Arial Black, Arial, sans-serif">${n}</text></svg>`;
 const B = {bolas:[], raf:0, last:0, estado:'idle', orden:[], ronda:0, pts:0, t0:0, timer:null, best:0};
 const B_REC = 'mitadBolasRecord';
 const gym = $('#gym');
@@ -1893,7 +1893,7 @@ const leerRecB = () => +store.get(B_REC) || B.best || 0;
 const pintarRecB = () => { const r = leerRecB(); $('#bRecord').textContent = r ? fmtT2(r) : '—'; };
 function crearBolas(){
   gym.querySelectorAll('.bola').forEach(e => e.remove());
-  const W = gym.clientWidth, H = gym.clientHeight, size = Math.max(44, Math.min(74, W/9));
+  const W = gym.clientWidth, H = gym.clientHeight, size = Math.round(Math.max(64, Math.min(104, W/6)));   // bolas grandes, también en celular
   gym.style.setProperty('--bs', size + 'px');
   B.bolas = [];
   for(let n = 1; n <= 10; n++){
