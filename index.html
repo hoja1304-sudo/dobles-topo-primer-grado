@@ -939,7 +939,7 @@ const F = {
   dos:        [[-.5,0],[.5,0]],
   piramide3:  [[0,0],[-.5,1],[.5,1]],
   piramide6:  [[0,0],[-.5,1],[.5,1],[-1,2],[0,2],[1,2]],
-  piramide7:  [[0,0],[-.5,1],[0,1,1],[.5,1],[-1,2],[0,2],[1,2]],   // la misma figura con el hueco del centro relleno
+  piramide10: [[0,0],[-.5,1],[.5,1],[-1,2],[0,2],[1,2],[-1.5,3],[-.5,3],[.5,3],[1.5,3]],   // filas de 1, 2, 3 y 4 (base de 4)
   cinco:      [[-.5,0],[.5,0],[-1,1],[0,1],[1,1]],
   cuadro4:    [[-.5,0],[.5,0],[-.5,1],[.5,1]],
   fila4:      [[-1.5,0],[-.5,0],[.5,0],[1.5,0]],
@@ -1018,7 +1018,7 @@ const PROBLEMAS = [
     opciones: ['9','18','20'], base: 9, nota: 'David se comió el doble de 9 uvas.' },
   { bloques: [{t:'p', text:'Manuel forma la siguiente figura con triángulos:'}, {t:'fig', tri:F.piramide3}],
     pregunta: 'Su amiga Deyanira crea una figura similar con el doble de triángulos. ¿Cuál de las siguientes figuras fue la que creó Deyanira?',
-    opciones: [{tri:F.piramide6}, {tri:F.uno}, {tri:F.piramide7}], base: 3,
+    opciones: [{tri:F.piramide6}, {tri:F.uno}, {tri:F.piramide10}], base: 3,
     nota: 'La figura de Manuel tiene 3 triángulos; la de Deyanira debe tener el doble: 6 triángulos (opción A).' },
   { bloques: [{t:'p', text:'Laura forma la siguiente figura con triángulos:'}, {t:'fig', tri:F.dos}],
     pregunta: 'Su amigo Pablo crea una figura con el doble de triángulos. ¿Cuál de las siguientes figuras fue la que creó Pablo?',
