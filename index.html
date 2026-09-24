@@ -234,18 +234,16 @@ button{font:inherit;color:inherit;cursor:pointer}
     repeating-linear-gradient(180deg,#dca462 0 17px,#c98d4a 17px 19px);
   border-top:6px solid #f97316}
 .bola{position:absolute;left:0;top:0;width:var(--bs,64px);height:var(--bs,64px);border:0;padding:0;background:none;cursor:pointer;
-  touch-action:manipulation;will-change:transform;z-index:5;filter:drop-shadow(0 4px 3px rgba(0,0,0,.3))}   /* delante de la cesta: siempre se pueden tocar */
+  touch-action:manipulation;will-change:transform;z-index:5;filter:drop-shadow(0 4px 3px rgba(0,0,0,.3))}
 .bola svg{width:100%;height:100%;display:block}
 .bola:focus-visible{outline:4px solid var(--gold);outline-offset:2px;border-radius:50%}
-.bola.volando{transition:transform .65s cubic-bezier(.3,.6,.4,1);z-index:7}
-.bola.cayendo{transition:transform .35s ease-in,opacity .35s;opacity:0}
+.bola.desaparece{animation:desaparece .55s ease-out forwards;z-index:7}
+@keyframes desaparece{0%{opacity:1;filter:brightness(1)}40%{opacity:1;filter:brightness(1.6)}100%{opacity:0;filter:brightness(2)}}
+.bola.desaparece svg{animation:crece .55s ease-out forwards}
+@keyframes crece{to{transform:scale(1.6)}}
 .bola.mal{animation:sacude .35s}
 @keyframes sacude{0%,100%{margin-left:0}25%{margin-left:-6px}75%{margin-left:6px}}
-.cesta{position:absolute;right:3%;bottom:14%;width:clamp(100px,20%,160px);z-index:4}
-.cesta svg{width:100%;display:block}
-.cesta-bolas{position:absolute;left:12%;right:12%;top:26%;display:flex;flex-wrap:wrap;gap:2px;justify-content:center}
-.cesta-bolas span{width:clamp(14px,2.4vw,20px);height:clamp(14px,2.4vw,20px);border-radius:50%;font-size:clamp(8px,1.4vw,11px);font-weight:900;
-  display:grid;place-items:center;color:#fff;border:1px solid rgba(0,0,0,.3)}
+
 .bolas-start{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);z-index:8;font-size:clamp(1.3rem,3.6vw,2rem);padding:.7em 1.6em}
 .bolas-start:active{transform:translate(-50%,-50%) scale(.96)}
 .bolas-start[hidden]{display:none}
@@ -671,14 +669,6 @@ button{font:inherit;color:inherit;cursor:pointer}
     <div class="gym" id="gym">
       <div class="gym-wall" aria-hidden="true"></div>
       <div class="gym-floor" aria-hidden="true"></div>
-      <div class="cesta" id="cesta" aria-label="Cesta">
-        <svg viewBox="0 0 120 90" aria-hidden="true">
-          <ellipse cx="60" cy="18" rx="54" ry="12" fill="#8b5a2b" stroke="#5c3a1a" stroke-width="3"/>
-          <path d="M8 18 L20 84 Q60 94 100 84 L112 18 Q60 34 8 18 z" fill="#c68642" stroke="#5c3a1a" stroke-width="3"/>
-          <g stroke="#8b5a2b" stroke-width="3" fill="none"><path d="M14 40 Q60 54 106 40"/><path d="M17 60 Q60 72 103 60"/>
-          <path d="M36 28 L40 88"/><path d="M60 30 L60 90"/><path d="M84 28 L80 88"/></g></svg>
-        <div class="cesta-bolas" id="cestaBolas"></div>
-      </div>
       <button class="btn btn-main bolas-start" id="btnBolasStart">▶ ¡Empezar!</button>
     </div>
     <div class="cartas-fin" id="bFin" hidden></div>
@@ -1880,7 +1870,7 @@ $('#btnPdfMp').addEventListener('click', () => {
 
 /* ---------- Mitad · Juego: bolas que rebotan en el gimnasio ---------- */
 // 10 bolas (1 a 10) rebotan; se pide la mitad de 20, 18, …, 2 en orden aleatorio.
-// Acierto: la bola cae en la cesta (+1). Error: todas saltan con otras alturas y velocidades (−1).
+// Acierto: la bola desaparece con un destello (+1). Error: todas saltan con otras alturas y velocidades (−1).
 const COLORES_BOLA = ['#ef4444','#f97316','#eab308','#22c55e','#06b6d4','#3b82f6','#8b5cf6','#ec4899','#14b8a6','#f43f5e'];
 const NUMW20 = [...NUMW, 'diecinueve', 'veinte'];
 // Caras distintas para cada bola: ojos y boca
@@ -1920,7 +1910,6 @@ function crearBolas(){
     el.addEventListener('pointerdown', e => { e.preventDefault(); tocarBola(b); });
     el.addEventListener('click', e => { if(e.detail === 0) tocarBola(b); });   // teclado
   }
-  $('#cestaBolas').innerHTML = '';
 }
 function pisoY(){ return gym.clientHeight * .86; }   // altura donde rebotan (sobre el piso de madera)
 function paso(t){
@@ -1980,23 +1969,16 @@ function tocarBola(b){
   if(b.n === objetivo){
     B.estado = 'anim'; B.pts++; pintarHudB(); chime();
     b.activa = false;
-    // la bola vuela sobre la cesta y cae dentro
-    const g = gym.getBoundingClientRect(), c = $('#cesta').getBoundingClientRect();
-    const cx = c.left - g.left + c.width/2, top = c.top - g.top;
-    b.el.classList.add('volando');
-    b.el.style.transform = `translate(${cx - b.r}px, ${top - b.r*2.4}px)`;
-    setTimeout(() => {
-      b.el.classList.remove('volando'); b.el.classList.add('cayendo');
-      b.el.style.transform = `translate(${cx - b.r}px, ${top + c.height*.25}px) scale(.45)`;
-      pop();
-    }, 650);
+    // la bola desaparece donde estaba, con estrellas
+    const g = gym.getBoundingClientRect();
+    b.el.classList.add('desaparece'); pop();
+    comicStars(g.left + b.x, g.top + b.y);
+    reventar(g.left + b.x, g.top + b.y, COLORES_BOLA[b.n-1]);
     setTimeout(() => {
       b.el.remove();
-      const m = document.createElement('span'); m.style.background = COLORES_BOLA[b.n-1]; m.textContent = b.n;
-      $('#cestaBolas').appendChild(m);
       toast(pulgarImg(), '¡Muy bien!', `La mitad de ${B.orden[B.ronda-1]} es ${b.n}: ${b.n} + ${b.n} = ${B.orden[B.ronda-1]}.`);
       fireworks(); say('¡Muy bien!');
-    }, 1000);
+    }, 550);
     setTimeout(() => { $('#toast').classList.remove('show'); if(B.estado === 'anim'){ B.estado = 'play'; siguienteRonda(); } }, 2700);
   }else{
     B.pts--; pintarHudB(); boing();
@@ -2008,13 +1990,26 @@ function tocarBola(b){
       o.salto = gym.clientHeight*(.3 + Math.random()*.4); });
   }
 }
+// efecto de «burbuja que revienta»: pedacitos del color de la bola salen disparados
+function reventar(x, y, color){
+  const fx = $('#fx');
+  for(let k = 0; k < 18; k++){
+    const sp = document.createElement('span'); sp.className = 'spark';
+    const a = Math.PI*2*k/18 + Math.random()*.3, d = 50 + Math.random()*70;
+    sp.style.left = x + 'px'; sp.style.top = y + 'px'; sp.style.background = k % 4 ? color : '#fff';
+    sp.style.width = sp.style.height = (7 + Math.random()*7) + 'px';
+    sp.style.setProperty('--dx', Math.cos(a)*d + 'px'); sp.style.setProperty('--dy', Math.sin(a)*d + 'px');
+    fx.appendChild(sp); setTimeout(() => sp.remove(), 1300);
+  }
+  tone(700, 1400, .12, 'triangle', .1);
+}
 function finBolas(){
   B.estado = 'fin'; clearInterval(B.timer);
   const ms = performance.now() - B.t0; $('#bTiempo').textContent = fmtT2(ms);
   const prev = leerRecB(), nuevo = !prev || ms < prev;
   if(nuevo){ B.best = Math.round(ms); store.set(B_REC, B.best); }
   pintarRecB();
-  $('#bInd').textContent = '¡Todas las bolas están en la cesta!';
+  $('#bInd').textContent = '¡Encontraste todas las mitades!';
   $('#bFin').innerHTML = `${pulgarImg()}<div class="t">¡Excelente! Encontraste las 10 mitades.</div>
     <div class="s">Puntos: <b>${B.pts}</b> · Tiempo: <b>${fmtT2(ms)}</b>${nuevo ? ' · 🏆 <b>¡Nuevo récord!</b>' : ` · Récord: ${fmtT2(prev)}`}</div>`;
   $('#bFin').hidden = false; fireworks(); chime();
@@ -2025,7 +2020,7 @@ $('#btnBolasStart').addEventListener('click', empezarBolas);
 $('#btnBolasReiniciar').addEventListener('click', reiniciarBolas);
 $('#btnBolasAudio').addEventListener('click', () => {
   alternarAudio((B.estado === 'play' || B.estado === 'anim') ? `Mitad de ${NUMW20[B.orden[B.ronda-1]]}`
-    : 'Toca la bola que es la mitad del número que aparece. Si aciertas, la bola cae en la cesta.');
+    : 'Toca la bola que es la mitad del número que aparece. Si aciertas, la bola desaparece.');
 });
 document.addEventListener('keydown', e => {   // teclado: 1 a 9 y 0 = 10
   if(!$('#mitadJuego').classList.contains('active') || B.estado !== 'play') return;
