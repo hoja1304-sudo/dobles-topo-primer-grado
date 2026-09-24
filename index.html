@@ -336,6 +336,9 @@ button{font:inherit;color:inherit;cursor:pointer}
         <button class="opt" data-v="2" aria-pressed="true">De 1 a 2<small>El doble de 1 · topos con 1 y 2</small></button>
         <button class="opt" data-v="3" aria-pressed="false">De 1 a 3<small>El doble de 1 · topos con 1, 2 y 3</small></button>
         <button class="opt" data-v="4" aria-pressed="false">De 1 a 4<small>El doble de 1 y de 2 · topos con números del 1 al 4</small></button>
+        <button class="opt" data-v="5" aria-pressed="false">De 1 a 5<small>El doble de 1 y de 2 · topos con números del 1 al 5</small></button>
+        <button class="opt" data-v="6" aria-pressed="false">De 1 a 6<small>El doble de 1, 2 y 3 · topos con números del 1 al 6</small></button>
+        <button class="opt" data-v="8" aria-pressed="false">De 1 a 8<small>El doble de 1, 2, 3 y 4 · topos con números del 1 al 8</small></button>
       </div>
     </fieldset>
     <fieldset><legend>Los topos entran y salen cada…</legend>
@@ -629,23 +632,24 @@ const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
 const ACS_RONDAS = 10;
 function makeOrder(){
   if(!cfg.acs) return [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - .5);
-  const max = Math.floor(cfg.acsfam/2), order = [];
+  const max = Math.floor(cfg.acsfam/2), bases = Array.from({length:max}, (_,i) => i+1), order = [];
+  // vueltas completas en desorden: cada doble posible sale al menos una vez y no se repite seguido
   while(order.length < ACS_RONDAS){
-    let n, k = 0;
-    do{ n = rnd(1, max); }while(n === order[order.length-1] && ++k < 10);
-    order.push(n);
+    const vuelta = bases.slice().sort(() => Math.random() - .5);
+    if(max > 1 && vuelta[0] === order[order.length-1]) vuelta.push(vuelta.shift());   // evita repetir seguido
+    order.push(...vuelta);
   }
-  return order;
+  return order.slice(0, ACS_RONDAS);
 }
 // 3 números: el doble y dos distractores parecidos (el mismo número, uno más o uno menos que el doble…)
 function makeNums(n){
   const correct = 2*n;
   if(cfg.acs){
     // ACS: solo aparecen números que el niño conoce (de 1 hasta la familia); con la familia De 1 a 2 salen 2 topos
-    const pool = [];
-    for(let v = 1; v <= cfg.acsfam; v++) if(v !== correct) pool.push(v);
-    pool.sort(() => Math.random() - .5);
-    if(pool.includes(n)){ pool.splice(pool.indexOf(n),1); pool.unshift(n); }   // el mismo número es el error más común
+    const fam = cfg.acsfam, dentro = v => v >= 1 && v <= fam && v !== correct;
+    const cerca = [correct-1, correct+1, n+1, correct-2, correct+2].filter(dentro).filter(v => v !== n).sort(() => Math.random() - .5);
+    const resto = []; for(let v = 1; v <= fam; v++) if(dentro(v) && v !== n && !cerca.includes(v)) resto.push(v);
+    const pool = [...(dentro(n) ? [n] : []), ...cerca, ...resto.sort(() => Math.random() - .5)];   // el mismo número es el error más común
     const nums = [correct, ...pool.slice(0,2)].sort(() => Math.random() - .5);
     return {nums, correct};
   }
