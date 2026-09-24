@@ -311,13 +311,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 <section class="screen" id="config" aria-labelledby="tCfg">
   <div class="cfg">
     <h2 id="tCfg">🔨 ¡Prepárate para golpear topos!</h2>
-    <p style="text-align:center;margin-top:0;color:var(--soft)">Escucha la indicación y golpea al topo que tiene el doble del número. ¡Los topos entran y salen de los agujeros! Acierto: <b>+1 punto</b> · Error: <b>−1 punto</b>.</p>
-    <fieldset><legend>Nivel</legend>
-      <div class="opts" data-group="nivel">
-        <button class="opt" data-v="1" aria-pressed="true">🌱 Del 1 al 5<small>Doble de números del 1 al 5</small></button>
-        <button class="opt" data-v="2" aria-pressed="false">🌳 Del 1 al 9<small>Doble de números del 1 al 9</small></button>
-      </div>
-    </fieldset>
+    <p style="text-align:center;margin-top:0;color:var(--soft)">Escucha la indicación y golpea al topo que tiene el doble del número. En cada juego se pregunta <b>el doble de 1, 2, 3, 4, 5, 6, 7, 8 y 9</b>, una vez cada uno y en desorden. ¡Los topos entran y salen de los agujeros! Acierto: <b>+1 punto</b> · Error: <b>−1 punto</b>.</p>
     <fieldset><legend>Los topos entran y salen cada…</legend>
       <div class="opts" data-group="tiempo">
         <button class="opt" data-v="2" aria-pressed="false">⚡ 2 segundos<small>Rápido</small></button>
@@ -629,13 +623,19 @@ function sayInstruction(n){ say(instrText(n)); }
 
 /* ---------- Matemática: dobles ---------- */
 const rnd = (a,b) => a + Math.floor(Math.random()*(b-a+1));
-const MAXN = {1:5, 2:9};
-function pickBase(prev){
-  let n, k = 0;
-  // en ACS el doble también debe estar en la familia: De 1 a 2 y De 1 a 3 → doble de 1; De 1 a 4 → doble de 1 y de 2
-  const max = cfg.acs ? Math.floor(cfg.acsfam/2) : MAXN[cfg.nivel];
-  do{ n = rnd(1, max); }while(n === prev && ++k < 10);
-  return n;
+// Orden de las preguntas de un juego completo:
+//  - juego normal: el doble de 1, 2, 3, 4, 5, 6, 7, 8 y 9, una vez cada uno y en orden aleatorio (9 rondas)
+//  - ACS: 10 rondas; el doble también debe estar en la familia (De 1 a 2 y De 1 a 3 → doble de 1; De 1 a 4 → doble de 1 y de 2)
+const ACS_RONDAS = 10;
+function makeOrder(){
+  if(!cfg.acs) return [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - .5);
+  const max = Math.floor(cfg.acsfam/2), order = [];
+  while(order.length < ACS_RONDAS){
+    let n, k = 0;
+    do{ n = rnd(1, max); }while(n === order[order.length-1] && ++k < 10);
+    order.push(n);
+  }
+  return order;
 }
 // 3 números: el doble y dos distractores parecidos (el mismo número, uno más o uno menos que el doble…)
 function makeNums(n){
@@ -670,7 +670,7 @@ function doubleExplain(n){
 }
 
 /* ---------- Juego ---------- */
-const TOTAL = 10, NHOLES = 6, NMOLES = 3;
+const NHOLES = 6, NMOLES = 3;
 const field = $('#field');
 field.innerHTML = Array.from({length:NHOLES}, (_,i) => `
   <button class="hole" data-i="${i}" aria-label="Agujero ${i+1}" disabled>
@@ -708,25 +708,26 @@ function startGame(){
   $('#acsPill').hidden = !cfg.acs;
   $('#acsFam').textContent = `De 1 a ${cfg.acsfam}`;
   G.round = 0; G.pts = 0; G.err = 0; G.score = 0; G.n = null;
+  G.order = makeOrder(); G.total = G.order.length;
   show('juego');
   nextRound();
 }
 function updateHud(){
-  $('#ronda').textContent = `${Math.min(G.round,TOTAL)}/${TOTAL}`;
+  $('#ronda').textContent = `${Math.min(G.round,G.total)}/${G.total}`;
   $('#puntos').textContent = G.score;
   $('#hA').textContent = G.pts; $('#hE').textContent = G.err;
 }
 function hideMoles(){ holes.forEach(h => { h.classList.remove('up','hit','wrong','correct-show'); h.disabled = true; }); }
 
-function nextRound(skip){
+function nextRound(){
   clearTimers();
-  if(!skip) G.round++;
-  if(G.round > TOTAL) return finish();
+  G.round++;
+  if(G.round > G.total) return finish();
   updateHud();
   hideMoles();
   G.state = 'play';
   G.num = Array(NHOLES).fill(null);
-  G.n = pickBase(G.n);
+  G.n = G.order[G.round - 1];
   ({nums:G.nums, correct:G.correct} = makeNums(G.n));   // los mismos 3 números durante toda la ronda
   $('#instruccion').innerHTML = `el doble de <span class="d">${G.n}</span>`;
   $('#boardBalls').innerHTML = ball().repeat(G.n);
@@ -864,7 +865,7 @@ function openModal(kind,em,title,cond,body){
   $('#modal').className = 'modal ' + kind;
   $('#mEm').textContent = em; $('#mTitle').textContent = title;
   $('#mCond').innerHTML = cond; $('#mBody').innerHTML = body;
-  $('#mCont').textContent = G.round >= TOTAL ? 'Ver resultados ▶' : 'Continuar ▶';
+  $('#mCont').textContent = G.round >= G.total ? 'Ver resultados ▶' : 'Continuar ▶';
   $('#modalBg').classList.add('show'); $('#modal').scrollTop = 0;
   setTimeout(() => $('#mCont').focus(), 50);
 }
@@ -902,7 +903,8 @@ $('#btnOtraVez').addEventListener('click', startGame);
 function finish(){
   clearTimers(); G.state = 'idle'; hideMoles();
   $('#rP').textContent = G.score; $('#rA').textContent = G.pts; $('#rE').textContent = G.err;
-  const st = G.score >= 9 ? 3 : G.score >= 6 ? 2 : G.score >= 3 ? 1 : 0;
+  const r = G.score / G.total;   // estrellas según la proporción de puntos (el juego normal tiene 9 rondas; ACS, 10)
+  const st = r >= .85 ? 3 : r >= .6 ? 2 : r >= .3 ? 1 : 0;
   $('#resStars').textContent = '⭐'.repeat(st) + '☆'.repeat(3-st);
   if(st >= 2) $('#resEmoji').innerHTML = pulgarImg(); else $('#resEmoji').textContent = ['💪','🙂'][st];
   $('#resMsg').textContent = ['¡Sigue practicando! Recuerda: el doble es sumar el número dos veces.','¡Buen comienzo! Usa las bolitas: dos grupos iguales.','¡Muy bien! Ya casi dominas los dobles.','¡Excelente! Eres un experto en dobles.'][st];
