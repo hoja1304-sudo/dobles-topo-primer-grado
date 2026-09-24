@@ -987,16 +987,16 @@ function figSVG(tri, alto){
   }).join('');
   return `<svg class="tri" viewBox="0 0 ${W.toFixed(3)} ${Ht.toFixed(3)}" style="height:${(rows*alto).toFixed(1)}px" role="img" aria-label="Figura con ${tri.length} ${tri.length === 1 ? 'triángulo' : 'triángulos'}">${poly}</svg>`;
 }
-const DADOS_TXT = 'En grupos de dos personas, se lanzan los dados y gana el que obtiene dos caras iguales.';
-const DADOS_PREG = 'De acuerdo con la información anterior, ¿cuál de las siguientes opciones muestra los dados de la persona que ganó?';
+// Dados con caras distintas: se suma el lanzamiento y se pide su doble (la suma siempre es menor que 10)
+const DADOS_PREG = '¿Cuál es el doble del resultado de ese lanzamiento?';
 const PROBLEMAS = [
-  { bloques: [{t:'p', text:DADOS_TXT}], pregunta: DADOS_PREG,
-    opciones: [[3,5],[4,4],[2,6]], base: 4, nota: 'Gana quien obtiene dos caras iguales: en la opción B los dos dados muestran 4.' },
+  { bloques: [{t:'p', text:'Se lanzan dos dados y se obtiene:'}, {t:'dados', caras:[3,5]}], pregunta: DADOS_PREG,
+    opciones: ['8','16','18'], base: 8, nota: 'Primero sumamos los puntos de los dos dados: 3 + 5 = 8.' },
   { bloques: [],
     pregunta: 'David tiene 8 años y su hermana Nuria el doble de su edad. ¿Cuál es la edad de Nuria?',
     opciones: ['4','10','16'], base: 8, nota: 'Nuria tiene el doble de 8 años.' },
-  { bloques: [{t:'p', text:DADOS_TXT}], pregunta: DADOS_PREG,
-    opciones: [[2,2],[1,3],[4,5]], base: 2, nota: 'Gana quien obtiene dos caras iguales: en la opción A los dos dados muestran 2.' },
+  { bloques: [{t:'p', text:'Se lanzan dos dados y se obtiene:'}, {t:'dados', caras:[1,2]}], pregunta: DADOS_PREG,
+    opciones: ['3','5','6'], base: 3, nota: 'Primero sumamos los puntos de los dos dados: 1 + 2 = 3.' },
   { bloques: [],
     pregunta: 'Luis tiene 3 canicas y Sofía tiene el doble de canicas que Luis. ¿Cuántas canicas tiene Sofía?',
     opciones: ['3','6','9'], base: 3, nota: 'Sofía tiene el doble de 3 canicas.' },
@@ -1006,13 +1006,13 @@ const PROBLEMAS = [
   { bloques: [],
     pregunta: 'María tiene 5 años y su hermano Pablo tiene el doble de su edad. ¿Cuál es la edad de Pablo?',
     opciones: ['5','7','10'], base: 5, nota: 'Pablo tiene el doble de 5 años.' },
-  { bloques: [{t:'p', text:DADOS_TXT}], pregunta: DADOS_PREG,
-    opciones: [[5,6],[6,4],[6,6]], base: 6, nota: 'Gana quien obtiene dos caras iguales: en la opción C los dos dados muestran 6.' },
+  { bloques: [{t:'p', text:'Se lanzan dos dados y se obtiene:'}, {t:'dados', caras:[2,4]}], pregunta: DADOS_PREG,
+    opciones: ['6','12','14'], base: 6, nota: 'Primero sumamos los puntos de los dos dados: 2 + 4 = 6.' },
   { bloques: [],
     pregunta: 'En una caja hay 9 lápices rojos y la misma cantidad de lápices azules. ¿Cuántos lápices hay en total?',
     opciones: ['18','19','27'], base: 9, nota: 'Hay 9 lápices rojos y 9 azules: el doble de 9.' },
-  { bloques: [{t:'p', text:DADOS_TXT}], pregunta: DADOS_PREG,
-    opciones: [[4,6],[5,5],[3,5]], base: 5, nota: 'Gana quien obtiene dos caras iguales: en la opción B los dos dados muestran 5.' },
+  { bloques: [{t:'p', text:'Se lanzan dos dados y se obtiene:'}, {t:'dados', caras:[4,5]}], pregunta: DADOS_PREG,
+    opciones: ['18','19','27'], base: 9, nota: 'Primero sumamos los puntos de los dos dados: 4 + 5 = 9.' },
   { bloques: [],
     pregunta: 'Manuel se comió nueve uvas y su amigo David el doble. ¿Cuántas uvas se comió David?',
     opciones: ['9','18','20'], base: 9, nota: 'David se comió el doble de 9 uvas.' },
@@ -1044,8 +1044,9 @@ const P = {order:[], pos:0, cur:null, idx:0};
 const PIPS = {1:[[50,50]], 2:[[27,27],[73,73]], 3:[[27,27],[50,50],[73,73]], 4:[[27,27],[73,27],[27,73],[73,73]],
   5:[[27,27],[73,27],[50,50],[27,73],[73,73]], 6:[[27,25],[73,25],[27,50],[73,50],[27,75],[73,75]]};
 const dieSVG = n => `<svg viewBox="0 0 100 100" class="die" role="img" aria-label="Dado con ${n} puntos">
-  <rect x="4" y="4" width="92" height="92" rx="16" fill="#d62828" stroke="#7a0f0f" stroke-width="4"/>
-  ${PIPS[n].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="9" fill="#fff"/>`).join('')}</svg>`;
+  <defs><linearGradient id="gDado" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dedede"/></linearGradient></defs>
+  <rect x="4" y="4" width="92" height="92" rx="18" fill="url(#gDado)" stroke="#b5b5b5" stroke-width="3"/>
+  ${PIPS[n].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="9" fill="#e01e1e"/>`).join('')}</svg>`;
 
 function nextProblem(){
   if(P.pos >= P.order.length){
@@ -1060,7 +1061,7 @@ function nextProblem(){
 }
 function bloqueHTML(b){
   if(b.t === 'p') return `<p>${esc(b.text)}</p>`;
-  if(b.t === 'dados') return `<div class="pdice">${dieSVG(b.cara)}${dieSVG(b.cara)}</div>`;
+  if(b.t === 'dados') return `<div class="pdice">${b.caras.map(dieSVG).join('')}</div>`;
   if(b.t === 'fig') return `<div class="pfig">${figHTML(b, 40)}</div>`;
   return '';
 }
@@ -1125,8 +1126,8 @@ function problemPDF(p){
   const para = s => { wrapText(s, W, S).forEach(l => { txt(L, l); y -= LEAD; }); };
   // dado rojo con puntos blancos; (x, top) = esquina superior izquierda
   const die = (x, top, size, cara) => {
-    ops.push(`0.84 0.16 0.16 rg 0.48 0.06 0.06 RG ${(size/32).toFixed(2)} w ${x} ${top - size} ${size} ${size} re B`);
-    ops.push('1 g');
+    ops.push(`0.96 0.96 0.96 rg 0.62 0.62 0.62 RG ${(size/40).toFixed(2)} w ${x} ${top - size} ${size} ${size} re B`);
+    ops.push('0.88 0.12 0.12 rg');
     PIPS[cara].forEach(([px,py]) => circ(x + px*size/100, top - py*size/100, size*.0875));
     ops.push('0 g 0 G');
   };
@@ -1172,7 +1173,7 @@ function problemPDF(p){
     }
     if(b.t === 'dados'){
       const size = 64, gap = 30, top = y - 6, x0 = L + W/2 - size - gap/2;
-      [0,1].forEach(d => die(x0 + d*(size + gap), top, size, b.cara));
+      b.caras.forEach((c, d) => die(x0 + d*(size + gap), top, size, c));
       y = top - size - 26;
     }
   });
