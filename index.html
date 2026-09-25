@@ -1751,7 +1751,7 @@ $('#btnPdfNm').addEventListener('click', () => {
 /* ---------- Situación problema: carrera de autos de control remoto ---------- */
 const SITUACION = {
   titulo: 'Situación problema',
-  texto: 'En una competencia de autos de juguete de control remoto el auto de Jorge avanza un metro por cada segundo, el automóvil de David avanza en un segundo dos veces la distancia que avanza el automóvil de Jorge. Faltando 5 segundos para que termine la competencia el automóvil de Jorge está a 6 metros de la meta y el de Manuel a 10 metros. Al pasar los cinco segundos, ¿Cuál auto llegará primero a la meta el de Jorge o el de David?'
+  texto: 'En una competencia de autos de juguete de control remoto el auto de Jorge avanza un metro por cada segundo, el automóvil de David avanza en un segundo el dos veces de la distancia que avanza el automóvil de Jorge. Faltando 5 segundos para que termine la competencia el automóvil de Jorge está a 6 metros de la meta y el de David a 10 metros de la meta. Al pasar los cinco segundos, ¿Cuál auto llegará primero a la meta el de Jorge o el de David?'
 };
 $('#paperSit').innerHTML = `<p class="sit-tit">${esc(SITUACION.titulo)}</p><p>${esc(SITUACION.texto)}</p><p class="print-only">Respuesta: ______________________</p>`;
 $('#btnPrintSit').addEventListener('click', () => window.print());
