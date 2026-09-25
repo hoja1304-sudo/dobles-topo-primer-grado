@@ -199,7 +199,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 /* ---------- Teoría (pasos) y Calcular el doble ---------- */
 .teo-paso{font-size:clamp(1rem,2.2vw,1.2rem);margin:.4em 0}
 .card-wide .big-sum{font-size:clamp(1.6rem,4.4vw,2.4rem);margin:.15em 0}
-#calcDoble{flex-direction:column;align-items:center;padding:70px 16px 30px}
+#calcDoble,#calcMitad{flex-direction:column;align-items:center;padding:70px 16px 30px}
 .cd-preg{text-align:center;font-weight:900;font-size:clamp(1.5rem,4.4vw,2.4rem);margin:.3em 0 .1em}
 .cd-preg b{color:var(--accent)}
 .paleta{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:10px;border-radius:16px;background:var(--panel2);margin-bottom:10px}
@@ -274,7 +274,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .mitad-back{margin-top:18px}
 #mitadTeoria,#mitadPractica,#mitadJuego{flex-direction:column;align-items:center;padding:70px 16px 30px}
 #mitadJuego{padding-top:62px}
-#mitadAcs,#calcAcs{align-items:center;justify-content:center;padding:70px 16px 24px}
+#mitadAcs,#calcAcs,#calcMitadAcs{align-items:center;justify-content:center;padding:70px 16px 24px}
 .cd-acs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin:0 0 6px}
 .cd-acs[hidden]{display:none}
 .cd-acs .btn{font-size:.95rem;padding:.4em .9em}
@@ -708,6 +708,59 @@ button{font:inherit;color:inherit;cursor:pointer}
   </div>
 </section>
 
+<!-- ============ CALCULAR LA MITAD (desde la teoría de Mitad) ============ -->
+<section class="screen" id="calcMitad" aria-labelledby="tCm">
+  <div class="prob">
+    <h2 id="tCm">🧮 Calcular la mitad</h2>
+    <div class="prob-bar">
+      <button class="btn btn-ghost" data-go="mitadTeoria">⬅ Volver a Teoría</button>
+      <button class="btn btn-alt" id="btnOtroCm">🔄 Otro ítem</button>
+    </div>
+    <p class="cd-acs" id="cmAcsInfo" hidden><span class="pill acs-pill">♿ ACS · <span id="cmAcsFam"></span></span>
+      <button class="btn btn-ghost" id="btnSalirAcsCm">✖ Salir de ACS</button></p>
+    <p class="cd-preg">¿Cuál es la mitad de <b id="cmN">10</b>?</p>
+    <div class="resp">
+      <span class="resp-lbl">Tu respuesta:</span>
+      <div class="spinner">
+        <button class="spin" id="cmDown" aria-label="Bajar el número" title="Bajar">▼</button>
+        <input id="cmVal" inputmode="numeric" maxlength="2" value="0" aria-label="Tu respuesta" autocomplete="off">
+        <button class="spin" id="cmUp" aria-label="Subir el número" title="Subir">▲</button>
+      </div>
+      <button class="btn btn-main" id="cmCheck">✔ Revisar</button>
+    </div>
+    <div class="prob-fb" id="cmFb" aria-live="polite"></div>
+    <div class="card-wide mesa-card">
+      <h3>🧰 Mesa de trabajo</h3>
+      <p class="uvas-tip">Toca o arrastra los círculos a la mesa. Puedes repartir bolitas en dos grupos iguales y contar un grupo, o comprobar con una suma. Para quitar un círculo, arrástralo fuera de la mesa.</p>
+      <div class="paleta" id="paletaM" role="group" aria-label="Círculos para usar en la mesa"></div>
+      <div class="mesa" id="mesaM" aria-label="Mesa de trabajo"></div>
+      <div class="teo-actions"><button class="btn btn-ghost" id="btnLimpiarMesaM">🧽 Limpiar la mesa</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACS de Calcular la mitad ============ -->
+<section class="screen" id="calcMitadAcs" aria-labelledby="tCmAcs">
+  <div class="cfg">
+    <h2 id="tCmAcs">♿ ACS · Calcular la mitad</h2>
+    <p style="text-align:center;margin-top:0;color:var(--soft)">Elige la familia de números que conoce el estudiante. Las preguntas, la respuesta y las bolitas numeradas estarán dentro de esa familia.</p>
+    <fieldset><legend>Familia</legend>
+      <div class="opts" data-group="cmfam">
+        <button class="opt" data-v="2" aria-pressed="true">De 1 a 2<small>La mitad de 2 · bolitas numeradas 1 y 2</small></button>
+        <button class="opt" data-v="3" aria-pressed="false">De 1 a 3<small>La mitad de 2 · bolitas numeradas del 1 al 3</small></button>
+        <button class="opt" data-v="4" aria-pressed="false">De 1 a 4<small>La mitad de 2 y de 4 · bolitas numeradas del 1 al 4</small></button>
+        <button class="opt" data-v="5" aria-pressed="false">De 1 a 5<small>La mitad de 2 y de 4 · bolitas numeradas del 1 al 5</small></button>
+        <button class="opt" data-v="6" aria-pressed="false">De 1 a 6<small>La mitad de 2, 4 y 6 · bolitas numeradas del 1 al 6</small></button>
+        <button class="opt" data-v="8" aria-pressed="false">De 1 a 8<small>La mitad de 2, 4, 6 y 8 · bolitas numeradas del 1 al 8</small></button>
+      </div>
+    </fieldset>
+    <div class="cfg-actions">
+      <button class="btn btn-ghost" data-go="mitadTeoria">⬅ Volver a Teoría</button>
+      <button class="btn btn-main" id="btnEmpezarCmAcs">¡Empezar! ▶</button>
+    </div>
+  </div>
+</section>
+
 <!-- ============ NIVEL + ============ -->
 <section class="screen" id="nivelmas" aria-labelledby="tNm">
   <div class="prob">
@@ -797,6 +850,8 @@ button{font:inherit;color:inherit;cursor:pointer}
       <button class="btn btn-ghost" data-go="mitad">⬅ Volver a Mitad</button>
       <button class="btn btn-main" id="btnOtroEj">➡️ Otro ejercicio</button>
       <button class="btn btn-alt" id="btnUvasReset">🔄 Empezar de nuevo</button>
+      <button class="btn btn-sit" id="btnCalcMitad">🧮 Calcular la mitad</button>
+      <button class="btn btn-acs" data-go="calcMitadAcs">♿ ACS</button>
     </div>
     <h2 id="tMitadTeo">Mitad de un número</h2>
     <p class="arial12">Reparte las siguientes <span class="fruta-pl">uvas</span> entre <b>Carlos</b> y <b>Nuria</b> de tal forma que ambos tengan la misma cantidad.</p>
@@ -994,7 +1049,7 @@ $('#btnTeoria').addEventListener('click', () => show('teoria'));
 $('#btnJuego').addEventListener('click', () => show('config'));
 
 /* ---------- Opciones ---------- */
-const cfg = {nivel:1, acs:0, acsfam:2, mfam:2, cdfam:2, tiempo:4, voz: store.get('topoDobleSonido') === '0' ? 0 : 1};
+const cfg = {nivel:1, acs:0, acsfam:2, mfam:2, cdfam:2, cmfam:2, tiempo:4, voz: store.get('topoDobleSonido') === '0' ? 0 : 1};
 $$('.opts').forEach(g => g.addEventListener('click', e => {
   const b = e.target.closest('.opt'); if(!b) return;
   g.querySelectorAll('.opt').forEach(o => o.setAttribute('aria-pressed', o === b));
@@ -2423,7 +2478,7 @@ function otroCalcDoble(){
   CD.n = CD.orden[CD.pos++]; CD.hecho = false;
   $('#cdN').textContent = CD.n; setSpin('#cdVal', 0); $('#cdFb').innerHTML = '';
   ['#cdUp','#cdDown','#cdVal','#cdCheck'].forEach(q => $(q).disabled = false);
-  limpiarMesa();
+  mesaDoble.limpiar();
 }
 function revisarCalcDoble(){
   if(CD.hecho) return;
@@ -2448,72 +2503,120 @@ function modoCalcDoble(fam){   // cambia entre normal y ACS y empieza de nuevo
   CD.acs = fam; CD.orden = []; CD.pos = 0; CD.n = 0;
   $('#cdAcsInfo').hidden = !fam; $('#cdAcsFam').textContent = `De 1 a ${fam}`;
   $('#cdVal').dataset.max = fam || 40;
-  pintarPaleta(); otroCalcDoble();
+  mesaDoble.pintar(); otroCalcDoble();
 }
 $('#btnCalcDoble').addEventListener('click', () => { show('calcDoble'); if(!CD.n || CD.acs) modoCalcDoble(0); });
 $('#btnEmpezarCdAcs').addEventListener('click', () => { show('calcDoble'); modoCalcDoble(cfg.cdfam); });
 $('#btnSalirAcsCd').addEventListener('click', () => modoCalcDoble(0));
 
-// Mesa: círculos morados del 1 al 10, el signo + y bolitas anaranjadas.
+// Mesa de trabajo: círculos morados numerados (del 1 al máximo), el signo + y bolitas anaranjadas.
 // Tocar un círculo de la caja lo pone en la mesa; también se puede arrastrar.
 // En la mesa se mueven libremente; si se sacan de la mesa, desaparecen.
-const mesa = $('#mesa');
-const FICHAS = [...Array.from({length:10}, (_,i) => String(i+1)), '+', 'o'];
 const fichaHTML = t => t === 'o'
   ? `<button class="ficha bolita" data-t="o" aria-label="Bolita anaranjada"></button>`
   : `<button class="ficha" data-t="${t}" aria-label="${t === '+' ? 'Signo más' : 'Número ' + t}">${t}</button>`;
-// en ACS solo las bolitas numeradas de la familia
-const pintarPaleta = () => { const k = CD.acs || 10; $('#paleta').innerHTML = FICHAS.filter(t => !/^\d+$/.test(t) || +t <= k).map(fichaHTML).join(''); };
-pintarPaleta();
 function nuevaFicha(t){ const w = document.createElement('div'); w.innerHTML = fichaHTML(t); const f = w.firstElementChild; f.tabIndex = -1; return f; }
-function ponerEnMesa(f, x, y){   // (x, y) = esquina superior izquierda, relativa a la mesa
-  const W = mesa.clientWidth, H = mesa.clientHeight, s = f.offsetWidth || 46;
-  f.classList.remove('arrastre'); f.style.left = Math.max(0, Math.min(W - s, x)) + 'px'; f.style.top = Math.max(0, Math.min(H - s, y)) + 'px';
-}
-function lugarLibre(s, nueva){   // primer hueco libre, de izquierda a derecha y de arriba abajo
-  const W = mesa.clientWidth, H = mesa.clientHeight, paso = 54;
-  const ocupados = [...mesa.children].filter(f => f !== nueva).map(f => [f.offsetLeft + f.offsetWidth/2, f.offsetTop + f.offsetHeight/2]);
-  for(let y = 8; y + s <= H; y += paso) for(let x = 8; x + s <= W; x += paso){
-    const cx = x + s/2, cy = y + s/2;
-    if(ocupados.every(([ox, oy]) => Math.hypot(ox - cx, oy - cy) > 42)) return [x, y];
+function crearMesa(mesa, paleta, maxNum){
+  // en ACS solo las bolitas numeradas de la familia
+  const pintar = () => { paleta.innerHTML = [...Array.from({length:maxNum()}, (_,i) => String(i+1)), '+', 'o'].map(fichaHTML).join(''); };
+  const limpiar = () => { mesa.innerHTML = ''; };
+  function ponerEnMesa(f, x, y){   // (x, y) = esquina superior izquierda, relativa a la mesa
+    const W = mesa.clientWidth, H = mesa.clientHeight, s = f.offsetWidth || 46;
+    f.classList.remove('arrastre'); f.style.left = Math.max(0, Math.min(W - s, x)) + 'px'; f.style.top = Math.max(0, Math.min(H - s, y)) + 'px';
   }
-  return [Math.random()*(W - s), Math.random()*(H - s)];
-}
-function agregarFicha(t){
-  const f = nuevaFicha(t); mesa.appendChild(f);
-  const [x, y] = lugarLibre(f.offsetWidth, f); ponerEnMesa(f, x, y); pop();
-}
-function limpiarMesa(){ mesa.innerHTML = ''; }
-$('#btnLimpiarMesa').addEventListener('click', limpiarMesa);
-function arrastrar(e, f, desdeCaja){
-  e.preventDefault();
-  const r0 = e.currentTarget.getBoundingClientRect(), dx = e.clientX - r0.left, dy = e.clientY - r0.top;
-  const x0 = e.clientX, y0 = e.clientY; let movio = false;
-  const sobreMesa = ev => { const m = mesa.getBoundingClientRect(); return ev.clientX > m.left && ev.clientX < m.right && ev.clientY > m.top && ev.clientY < m.bottom; };
-  const mover = ev => {
-    if(!movio && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 6) return;
-    if(!movio){   // empieza el arrastre: la ficha flota sobre todo (primero al frente, luego capturar)
-      movio = true; document.body.appendChild(f); f.classList.add('arrastre');
-      try{ f.setPointerCapture(ev.pointerId); }catch(_){}
+  function lugarLibre(s, nueva){   // primer hueco libre, de izquierda a derecha y de arriba abajo
+    const W = mesa.clientWidth, H = mesa.clientHeight, paso = 54;
+    const ocupados = [...mesa.children].filter(f => f !== nueva).map(f => [f.offsetLeft + f.offsetWidth/2, f.offsetTop + f.offsetHeight/2]);
+    for(let y = 8; y + s <= H; y += paso) for(let x = 8; x + s <= W; x += paso){
+      const cx = x + s/2, cy = y + s/2;
+      if(ocupados.every(([ox, oy]) => Math.hypot(ox - cx, oy - cy) > 42)) return [x, y];
     }
-    f.style.left = (ev.clientX - dx) + 'px'; f.style.top = (ev.clientY - dy) + 'px';
-    mesa.classList.toggle('encima', sobreMesa(ev));
-  };
-  const soltar = ev => {
-    window.removeEventListener('pointermove', mover); window.removeEventListener('pointerup', soltar); window.removeEventListener('pointercancel', soltar);
-    mesa.classList.remove('encima');
-    if(!movio){ if(desdeCaja) agregarFicha(f.dataset.t); return; }   // un toque en la caja = poner en la mesa
-    if(sobreMesa(ev)){
-      const m = mesa.getBoundingClientRect(); mesa.appendChild(f);
-      ponerEnMesa(f, ev.clientX - dx - m.left - 3, ev.clientY - dy - m.top - 3); pop();
-    }else f.remove();   // fuera de la mesa: se quita
-  };
-  window.addEventListener('pointermove', mover); window.addEventListener('pointerup', soltar); window.addEventListener('pointercancel', soltar);
+    return [Math.random()*(W - s), Math.random()*(H - s)];
+  }
+  function agregarFicha(t){
+    const f = nuevaFicha(t); mesa.appendChild(f);
+    const [x, y] = lugarLibre(f.offsetWidth, f); ponerEnMesa(f, x, y); pop();
+  }
+  function arrastrar(e, f, desdeCaja){
+    e.preventDefault();
+    const r0 = e.currentTarget.getBoundingClientRect(), dx = e.clientX - r0.left, dy = e.clientY - r0.top;
+    const x0 = e.clientX, y0 = e.clientY; let movio = false;
+    const sobreMesa = ev => { const m = mesa.getBoundingClientRect(); return ev.clientX > m.left && ev.clientX < m.right && ev.clientY > m.top && ev.clientY < m.bottom; };
+    const mover = ev => {
+      if(!movio && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 6) return;
+      if(!movio){   // empieza el arrastre: la ficha flota sobre todo (primero al frente, luego capturar)
+        movio = true; document.body.appendChild(f); f.classList.add('arrastre');
+        try{ f.setPointerCapture(ev.pointerId); }catch(_){}
+      }
+      f.style.left = (ev.clientX - dx) + 'px'; f.style.top = (ev.clientY - dy) + 'px';
+      mesa.classList.toggle('encima', sobreMesa(ev));
+    };
+    const soltar = ev => {
+      window.removeEventListener('pointermove', mover); window.removeEventListener('pointerup', soltar); window.removeEventListener('pointercancel', soltar);
+      mesa.classList.remove('encima');
+      if(!movio){ if(desdeCaja) agregarFicha(f.dataset.t); return; }   // un toque en la caja = poner en la mesa
+      if(sobreMesa(ev)){
+        const m = mesa.getBoundingClientRect(); mesa.appendChild(f);
+        ponerEnMesa(f, ev.clientX - dx - m.left - 3, ev.clientY - dy - m.top - 3); pop();
+      }else f.remove();   // fuera de la mesa: se quita
+    };
+    window.addEventListener('pointermove', mover); window.addEventListener('pointerup', soltar); window.addEventListener('pointercancel', soltar);
+  }
+  paleta.addEventListener('pointerdown', e => { const b = e.target.closest('.ficha'); if(b) arrastrar({preventDefault:() => e.preventDefault(), currentTarget:b, clientX:e.clientX, clientY:e.clientY}, nuevaFicha(b.dataset.t), true); });
+  paleta.addEventListener('click', e => { const b = e.target.closest('.ficha'); if(b && e.detail === 0) agregarFicha(b.dataset.t); });   // teclado (Enter/Espacio)
+  mesa.addEventListener('pointerdown', e => { const f = e.target.closest('.ficha'); if(f) arrastrar({preventDefault:() => e.preventDefault(), currentTarget:f, clientX:e.clientX, clientY:e.clientY}, f, false); });
+  window.addEventListener('resize', () => [...mesa.children].forEach(f => ponerEnMesa(f, f.offsetLeft, f.offsetTop)));
+  pintar();
+  return {pintar, limpiar};
 }
-$('#paleta').addEventListener('pointerdown', e => { const b = e.target.closest('.ficha'); if(b) arrastrar({preventDefault:() => e.preventDefault(), currentTarget:b, clientX:e.clientX, clientY:e.clientY}, nuevaFicha(b.dataset.t), true); });
-$('#paleta').addEventListener('click', e => { const b = e.target.closest('.ficha'); if(b && e.detail === 0) agregarFicha(b.dataset.t); });   // teclado (Enter/Espacio)
-mesa.addEventListener('pointerdown', e => { const f = e.target.closest('.ficha'); if(f) arrastrar({preventDefault:() => e.preventDefault(), currentTarget:f, clientX:e.clientX, clientY:e.clientY}, f, false); });
-window.addEventListener('resize', () => [...mesa.children].forEach(f => ponerEnMesa(f, f.offsetLeft, f.offsetTop)));
+const mesaDoble = crearMesa($('#mesa'), $('#paleta'), () => CD.acs || 10);
+$('#btnLimpiarMesa').addEventListener('click', mesaDoble.limpiar);
+
+/* ---------- Calcular la mitad: igual que Calcular el doble, con la mitad de 2, 4, …, 20 ---------- */
+const CM = {orden:[], pos:0, n:0, hecho:false, acs:0};   // acs: 0 = normal; si no, la familia (2…8)
+const mesaMitad = crearMesa($('#mesaM'), $('#paletaM'), () => CM.acs || 10);
+$('#btnLimpiarMesaM').addEventListener('click', mesaMitad.limpiar);
+function otroCalcMitad(){
+  if(CM.pos >= CM.orden.length){
+    // normal: la mitad de 20, 18, …, 2; ACS: solo los pares de la familia
+    const pares = []; for(let v = 2; v <= (CM.acs || 20); v += 2) pares.push(v);
+    const ultimo = CM.n;
+    do{ CM.orden = pares.slice().sort(() => Math.random() - .5); } while(pares.length > 1 && CM.orden[0] === ultimo);
+    CM.pos = 0;
+  }
+  CM.n = CM.orden[CM.pos++]; CM.hecho = false;
+  $('#cmN').textContent = CM.n; setSpin('#cmVal', 0); $('#cmFb').innerHTML = '';
+  ['#cmUp','#cmDown','#cmVal','#cmCheck'].forEach(q => $(q).disabled = false);
+  mesaMitad.limpiar();
+}
+function revisarCalcMitad(){
+  if(CM.hecho) return;
+  CM.hecho = true;
+  const v = getSpin('#cmVal'), n = CM.n;
+  ['#cmUp','#cmDown','#cmVal','#cmCheck'].forEach(q => $(q).disabled = true);
+  if(v === n/2){
+    chime(); fireworks();
+    $('#cmFb').innerHTML = `<div class="fb-head ok fb-big"><span class="em">${pulgarImg()}</span>¡Correcto! ¡Muy bien! La mitad de ${n} es ${n/2}.</div>`;
+  }else{
+    boing();
+    $('#cmFb').innerHTML = `<div class="fb-head bad"><span class="em">${sorpresaSVG()}</span>Escribiste ${v}, pero la mitad de ${n} es ${n/2}. Veamos paso a paso:</div>
+      <div class="exp good">${mitadExplain(n)}</div>`;
+  }
+  $('#cmFb').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+spinner('#cmVal', '#cmUp', '#cmDown');
+$('#cmVal').addEventListener('keydown', e => { if(e.key === 'Enter') revisarCalcMitad(); });
+$('#cmCheck').addEventListener('click', revisarCalcMitad);
+$('#btnOtroCm').addEventListener('click', otroCalcMitad);
+function modoCalcMitad(fam){   // cambia entre normal y ACS y empieza de nuevo
+  CM.acs = fam; CM.orden = []; CM.pos = 0; CM.n = 0;
+  $('#cmAcsInfo').hidden = !fam; $('#cmAcsFam').textContent = `De 1 a ${fam}`;
+  $('#cmVal').dataset.max = fam || 40;
+  mesaMitad.pintar(); otroCalcMitad();
+}
+$('#btnCalcMitad').addEventListener('click', () => { show('calcMitad'); if(!CM.n || CM.acs) modoCalcMitad(0); });
+$('#btnEmpezarCmAcs').addEventListener('click', () => { show('calcMitad'); modoCalcMitad(cfg.cmfam); });
+$('#btnSalirAcsCm').addEventListener('click', () => modoCalcMitad(0));
 })();
 </script>
 </body>
