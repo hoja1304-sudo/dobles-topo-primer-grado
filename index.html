@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Identificar el doble de un número menor que 10</title>
+<title>Identificar el doble y la mitad de un número</title>
 <style>
 :root{
   --bg:#fff7e8; --panel:#ffffff; --panel2:#fff1d6; --ink:#3a2618; --soft:#7a6250;
@@ -194,6 +194,17 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn-cartas{background:#db2777;color:#fff}
 .btn.audio-off{background:#6b7280;color:#fff}
 .btn-mitad{background:#16a34a;color:#fff}
+#doble{align-items:center;justify-content:center;padding:70px 16px 24px}
+.apr-botones{display:flex;flex-direction:column;gap:16px;margin:8px auto 0;width:min(620px,100%)}
+.apr-btn{display:flex;align-items:center;gap:14px;width:100%;min-height:92px;border:0;border-radius:22px;padding:14px 18px;text-align:left;
+  color:#fff;cursor:pointer;box-shadow:var(--shadow);font:inherit;transition:transform .12s}
+.apr-btn:active{transform:scale(.98)}
+.apr-btn:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
+.apr-doble{background:linear-gradient(135deg,#e0562b,#f59e0b)}
+.apr-mitad{background:linear-gradient(135deg,#16a34a,#0e7490)}
+.apr-num{flex:0 0 auto;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.25);display:grid;place-items:center;font-weight:900;font-size:1.5rem}
+.apr-txt{flex:1;font-weight:900;font-size:clamp(1.05rem,2.8vw,1.45rem);line-height:1.25}
+.apr-ico{flex:0 0 auto;font-weight:900;font-size:clamp(1.4rem,3.6vw,2rem);opacity:.9}
 .home-card .h1-2{font-size:clamp(1.2rem,3.2vw,1.9rem);line-height:1.25;margin:.1em 0 .4em;color:var(--ink)}
 /* ---------- MITAD ---------- */
 #mitad{align-items:center;justify-content:center;padding:70px 16px 24px}
@@ -408,18 +419,12 @@ button{font:inherit;color:inherit;cursor:pointer}
 <section class="screen active" id="inicio" aria-labelledby="tituloInicio">
   <div class="home-card">
     <svg class="home-mole" viewBox="0 0 160 170" aria-hidden="true"><use href="#moleArt"/><g class="eyes"><circle cx="60" cy="52" r="7" fill="#1b1b1b"/><circle cx="100" cy="52" r="7" fill="#1b1b1b"/><circle cx="62" cy="49" r="2.4" fill="#fff"/><circle cx="102" cy="49" r="2.4" fill="#fff"/></g></svg>
-    <span class="kicker">Aprendizajes esperados</span>
-    <h1 id="tituloInicio">Identificar el doble de un número menor que 10</h1>
-    <h1 class="h1-2">Identificar la mitad de un número par menor o igual a 20</h1>
-    <p class="grade">Matemática · Primer año · 🔨 El topo de los dobles</p>
-    <div class="home-buttons">
-      <button class="btn btn-alt" id="btnTeoria">📘 Teoría</button>
-      <button class="btn btn-main" id="btnJuego">🔨 Juego</button>
-      <button class="btn btn-prob" id="btnProblemas">📝 Problemas</button>
-      <button class="btn btn-acs" id="btnACS">♿ ACS</button>
-      <button class="btn btn-nivel" id="btnNivelMas">⭐ Nivel +</button>
-      <button class="btn btn-cartas" id="btnCartas">🃏 Cartas</button>
-      <button class="btn btn-mitad" id="btnMitad">Mitad de un número</button>
+    <span class="kicker">Matemática · Primer año</span>
+    <h1 id="tituloInicio">Aprendizajes esperados</h1>
+    <p class="grade">Elige el aprendizaje que vas a trabajar:</p>
+    <div class="apr-botones">
+      <button class="apr-btn apr-doble" data-go="doble"><span class="apr-num">1</span><span class="apr-txt">Identificar el doble de un número menor que 10</span><span class="apr-ico" aria-hidden="true">✖️2</span></button>
+      <button class="apr-btn apr-mitad" id="btnMitad"><span class="apr-num">2</span><span class="apr-txt">Identificar la mitad de un número par menor o igual a 20</span><span class="apr-ico" aria-hidden="true">½</span></button>
     </div>
     <p class="autoria"><strong>Elaborado por: Alberto Jiménez Ruiz</strong><br>Asesor Regional de Matemática DRE-Cartag-DAP-2026</p>
   </div>
@@ -438,7 +443,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       </div>
     </fieldset>
     <div class="cfg-actions">
-      <button class="btn btn-ghost" data-go="inicio">🏠 Inicio</button>
+      <button class="btn btn-ghost" data-go="doble">⬅ Volver al Doble</button>
       <button class="btn btn-main" id="btnEmpezar">¡A jugar! ▶</button>
     </div>
   </div>
@@ -467,7 +472,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       </div>
     </fieldset>
     <div class="cfg-actions">
-      <button class="btn btn-ghost" data-go="inicio">🏠 Inicio</button>
+      <button class="btn btn-ghost" data-go="doble">⬅ Volver al Doble</button>
       <button class="btn btn-main" id="btnEmpezarACS">¡A jugar! ▶</button>
     </div>
   </div>
@@ -488,7 +493,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   </div>
   <div class="hud">
     <div class="hud-left">
-      <button class="btn btn-ghost" id="btnInicioJuego" title="Regresar a inicio">🏠 Inicio</button>
+      <button class="btn btn-ghost" id="btnInicioJuego" title="Volver al Doble">⬅ Volver</button>
       <button class="icon-btn" id="btnSonido" aria-pressed="true" aria-label="Apagar sonido" title="Sonido encendido / apagado">🔊</button>
     </div>
     <div class="hud-right">
@@ -526,7 +531,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <div class="home-buttons">
       <button class="btn btn-main" id="btnOtraVez">🔁 Jugar otra vez</button>
       <button class="btn btn-alt" data-go="teoria">📘 Repasar teoría</button>
-      <button class="btn btn-ghost" data-go="inicio">🏠 Inicio</button>
+      <button class="btn btn-ghost" data-go="doble">⬅ Volver al Doble</button>
     </div>
   </div>
 </section>
@@ -536,7 +541,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   <div class="prob">
     <h2 id="tProb">📝 Problemas</h2>
     <div class="prob-bar">
-      <button class="btn btn-ghost" data-go="inicio">🏠 Volver al inicio</button>
+      <button class="btn btn-ghost" data-go="doble">⬅ Volver al Doble</button>
       <button class="btn btn-alt" id="btnOtroProb">🔄 Otro ítem</button>
       <button class="btn btn-main" id="btnPdfProb">⬇️ Descargar PDF</button>
       <button class="btn btn-prob" id="btnPrintProb">🖨️ Imprimir</button>
@@ -552,7 +557,7 @@ button{font:inherit;color:inherit;cursor:pointer}
   <div class="prob">
     <h2 id="tNm">⭐ Nivel +</h2>
     <div class="prob-bar">
-      <button class="btn btn-ghost" data-go="inicio">🏠 Volver al inicio</button>
+      <button class="btn btn-ghost" data-go="doble">⬅ Volver al Doble</button>
       <button class="btn btn-alt" id="btnOtroNm">🔄 Otro ítem</button>
       <button class="btn btn-main" id="btnPdfNm">⬇️ Descargar PDF</button>
       <button class="btn btn-prob" id="btnPrintNm">🖨️ Imprimir</button>
@@ -573,6 +578,25 @@ button{font:inherit;color:inherit;cursor:pointer}
   </div>
 </section>
 
+<!-- ============ DOBLE: página principal del aprendizaje ============ -->
+<section class="screen" id="doble" aria-labelledby="tDoble">
+  <div class="home-card">
+    <svg class="home-mole" viewBox="0 0 160 170" aria-hidden="true"><use href="#moleArt"/><g class="eyes"><circle cx="60" cy="52" r="7" fill="#1b1b1b"/><circle cx="100" cy="52" r="7" fill="#1b1b1b"/><circle cx="62" cy="49" r="2.4" fill="#fff"/><circle cx="102" cy="49" r="2.4" fill="#fff"/></g></svg>
+    <span class="kicker">Aprendizaje esperado</span>
+    <h2 id="tDoble" class="mitad-h">Identificar el doble de un número menor que 10</h2>
+    <p class="grade">Matemática · Primer año · 🔨 El topo de los dobles</p>
+    <div class="home-buttons">
+      <button class="btn btn-alt" id="btnTeoria">📘 Teoría</button>
+      <button class="btn btn-main" id="btnJuego">🔨 Juego</button>
+      <button class="btn btn-prob" id="btnProblemas">📝 Problemas</button>
+      <button class="btn btn-acs" id="btnACS">♿ ACS</button>
+      <button class="btn btn-nivel" id="btnNivelMas">⭐ Nivel +</button>
+      <button class="btn btn-cartas" id="btnCartas">🃏 Cartas</button>
+    </div>
+    <div class="mitad-back"><button class="btn btn-ghost" data-go="inicio">🏠 Regresar al menú</button></div>
+  </div>
+</section>
+
 <!-- ============ MITAD: página principal del aprendizaje ============ -->
 <section class="screen" id="mitad" aria-labelledby="tMitad">
   <div class="home-card">
@@ -585,7 +609,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <button class="btn btn-main" data-go="mitadJuego">🎮 Juego</button>
       <button class="btn btn-acs" data-go="mitadAcs">♿ ACS</button>
     </div>
-    <div class="mitad-back"><button class="btn btn-ghost" data-go="inicio">🏠 Regresar al inicio</button></div>
+    <div class="mitad-back"><button class="btn btn-ghost" data-go="inicio">🏠 Regresar al menú</button></div>
   </div>
 </section>
 
@@ -705,7 +729,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <h2 id="tCartas">🃏 Cartas de los dobles</h2>
     <p class="cartas-ind">Da vuelta a dos cartas y busca la pareja: <b>un número y su doble</b>.</p>
     <div class="cartas-bar">
-      <button class="btn btn-ghost" data-go="inicio">🏠 Volver al inicio</button>
+      <button class="btn btn-ghost" data-go="doble">⬅ Volver al Doble</button>
       <button class="btn btn-alt" id="btnInstr">🔊 Instrucción</button>
       <button class="btn btn-main" id="btnReiniciar">🔄 Reiniciar juego</button>
     </div>
@@ -751,7 +775,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <div id="pickOut"></div>
     </div>
     <div class="teo-actions">
-      <button class="btn btn-ghost" data-go="inicio">🏠 Inicio</button>
+      <button class="btn btn-ghost" data-go="doble">⬅ Volver al Doble</button>
       <button class="btn btn-main" data-go="config">🔨 Ir al juego</button>
     </div>
   </div>
@@ -765,7 +789,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <p class="cond" id="mCond"></p>
     <div id="mBody"></div>
     <div class="modal-actions">
-      <button class="btn btn-ghost" id="mInicio">🏠 Inicio</button>
+      <button class="btn btn-ghost" id="mInicio">⬅ Volver al Doble</button>
       <button class="btn btn-main" id="mCont">Continuar ▶</button>
     </div>
   </div>
@@ -1170,9 +1194,9 @@ function openModal(kind,em,title,cond,body){
 }
 function hideModal(){ $('#modalBg').classList.remove('show'); }
 $('#mCont').addEventListener('click', () => { hideModal(); stopVoice(); nextRound(); });
-$('#mInicio').addEventListener('click', () => show('inicio'));
+$('#mInicio').addEventListener('click', () => show('doble'));
 
-$('#btnInicioJuego').addEventListener('click', () => show('inicio'));
+$('#btnInicioJuego').addEventListener('click', () => show('doble'));
 $('#board').addEventListener('click', () => { if(G.n) sayInstruction(G.n); });
 function paintSound(){
   const b = $('#btnSonido');
