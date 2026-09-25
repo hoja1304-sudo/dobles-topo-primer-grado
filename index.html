@@ -196,6 +196,22 @@ button{font:inherit;color:inherit;cursor:pointer}
 #situacion{flex-direction:column;align-items:center;padding:70px 16px 30px}
 .paper .sit-tit{font-weight:700;text-align:center}
 .sit-anim{display:flex;justify-content:center;margin-top:16px}
+/* ---------- Teoría (pasos) y Calcular el doble ---------- */
+.teo-paso{font-size:clamp(1rem,2.2vw,1.2rem);margin:.4em 0}
+.card-wide .big-sum{font-size:clamp(1.6rem,4.4vw,2.4rem);margin:.15em 0}
+#calcDoble{flex-direction:column;align-items:center;padding:70px 16px 30px}
+.cd-preg{text-align:center;font-weight:900;font-size:clamp(1.5rem,4.4vw,2.4rem);margin:.3em 0 .1em}
+.cd-preg b{color:var(--accent)}
+.paleta{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:10px;border-radius:16px;background:var(--panel2);margin-bottom:10px}
+.ficha{width:56px;height:56px;border-radius:50%;border:2px solid #4c1d95;background:#7030a0;color:#fff;display:grid;place-items:center;
+  font:700 1.6rem Arial,Helvetica,sans-serif;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;padding:0;box-shadow:0 2px 4px rgba(0,0,0,.3)}
+.ficha.bolita{width:44px;height:44px;border-color:#9a3412;background:radial-gradient(circle at 32% 30%,#fed7aa,#f97316 55%,#c2410c)}
+.ficha:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
+.mesa .ficha,.ficha.arrastre{position:absolute;margin:0}
+.ficha.arrastre{position:fixed;z-index:60;cursor:grabbing;transform:scale(1.08);box-shadow:0 8px 14px rgba(0,0,0,.35)}
+.mesa{position:relative;height:clamp(260px,46vh,440px);border-radius:16px;border:3px dashed var(--line);touch-action:none;overflow:hidden;
+  background:#fff linear-gradient(rgba(112,48,160,.08) 1px,transparent 1px) 0 0/100% 32px}
+.mesa.encima{border-color:var(--accent)}
 /* ---------- Animación: dos pistas verticales, cada espacio = 1 metro ---------- */
 #animSit{flex-direction:column;align-items:center;padding:70px 16px 30px}
 .anim-wrap{width:min(900px,100%)}
@@ -633,6 +649,35 @@ button{font:inherit;color:inherit;cursor:pointer}
   </div>
 </section>
 
+<!-- ============ CALCULAR EL DOBLE (desde Teoría) ============ -->
+<section class="screen" id="calcDoble" aria-labelledby="tCd">
+  <div class="prob">
+    <h2 id="tCd">🧮 Calcular el doble</h2>
+    <div class="prob-bar">
+      <button class="btn btn-ghost" data-go="teoria">⬅ Volver a Teoría</button>
+      <button class="btn btn-alt" id="btnOtroCd">🔄 Otro ítem</button>
+    </div>
+    <p class="cd-preg">¿Cuál es el doble de <b id="cdN">6</b>?</p>
+    <div class="resp">
+      <span class="resp-lbl">Tu respuesta:</span>
+      <div class="spinner">
+        <button class="spin" id="cdDown" aria-label="Bajar el número" title="Bajar">▼</button>
+        <input id="cdVal" inputmode="numeric" maxlength="2" value="0" aria-label="Tu respuesta" autocomplete="off">
+        <button class="spin" id="cdUp" aria-label="Subir el número" title="Subir">▲</button>
+      </div>
+      <button class="btn btn-main" id="cdCheck">✔ Revisar</button>
+    </div>
+    <div class="prob-fb" id="cdFb" aria-live="polite"></div>
+    <div class="card-wide mesa-card">
+      <h3>🧰 Mesa de trabajo</h3>
+      <p class="uvas-tip">Toca o arrastra los círculos a la mesa. Puedes sumar con los números o formar dos grupos de bolitas y contarlas. Para quitar un círculo, arrástralo fuera de la mesa.</p>
+      <div class="paleta" id="paleta" role="group" aria-label="Círculos para usar en la mesa"></div>
+      <div class="mesa" id="mesa" aria-label="Mesa de trabajo"></div>
+      <div class="teo-actions"><button class="btn btn-ghost" id="btnLimpiarMesa">🧽 Limpiar la mesa</button></div>
+    </div>
+  </div>
+</section>
+
 <!-- ============ NIVEL + ============ -->
 <section class="screen" id="nivelmas" aria-labelledby="tNm">
   <div class="prob">
@@ -833,31 +878,26 @@ button{font:inherit;color:inherit;cursor:pointer}
     <h2 id="tTeo">📘 ¿Qué es el doble?</h2>
     <p class="teo-lead">El <b>doble</b> de un número es tener <b>dos veces</b> ese mismo número.</p>
     <div class="card-wide">
-      <h3>➕ Forma 1: sumando el número dos veces</h3>
-      <p class="big-sum">El doble de <b>4</b> es &nbsp; <span class="sum">4 + 4 = <b>8</b></span></p>
+      <h3>➕ Forma 1: Sumando dos veces el mismo número</h3>
+      <p class="teo-paso"><b>Doble de 3</b></p>
+      <p class="big-sum"><span class="sum">3 + 3</span></p>
+      <p class="big-sum"><b>6</b></p>
     </div>
     <div class="card-wide">
-      <h3>🟢 Forma 2: con bolitas</h3>
+      <h3>🟢 Forma 2: Colocando bolitas</h3>
       <div class="dbl-example">
-        <p><b>El doble de 3</b></p>
-        <div class="dbl-row"><span class="dbl-lbl">3</span><span class="grp" data-balls="3"></span></div>
-        <div class="dbl-row"><span class="dbl-lbl">6</span><span class="grp" data-balls="3"></span><span class="grp" data-balls="3"></span></div>
-        <p class="ex">Ponemos 3 bolitas. Para el doble, ponemos <b>dos grupos de 3</b> bolitas: en total hay <b>6</b>. &nbsp; 3 + 3 = 6</p>
+        <p class="teo-paso"><b>Doble de 3</b></p>
+        <div class="dbl-row"><span class="grp" data-balls="3"></span></div>
+        <p class="teo-paso"><b>Primer paso:</b> colocar dos grupos de tres bolitas.</p>
+        <div class="dbl-row"><span class="grp" data-balls="3"></span></div>
+        <div class="dbl-row"><span class="grp" data-balls="3"></span></div>
+        <p class="teo-paso"><b>Segundo paso:</b> contar todas las bolitas.</p>
+        <p class="teo-paso">Hay <b>6</b> bolitas, el doble de 3 es <b>6</b>.</p>
       </div>
-      <div class="dbl-example">
-        <p><b>El doble de 5</b></p>
-        <div class="dbl-row"><span class="dbl-lbl">5</span><span class="grp" data-balls="5"></span></div>
-        <div class="dbl-row"><span class="dbl-lbl">10</span><span class="grp" data-balls="5"></span><span class="grp" data-balls="5"></span></div>
-        <p class="ex">Primero ponemos 5 bolitas y luego otras 5: en total hay <b>10</b>. &nbsp; 5 + 5 = 10</p>
-      </div>
-    </div>
-    <div class="card-wide">
-      <h3>🔍 Elige un número y mira su doble</h3>
-      <div class="pick" id="pick" role="group" aria-label="Elige un número del 1 al 9"></div>
-      <div id="pickOut"></div>
     </div>
     <div class="teo-actions">
       <button class="btn btn-ghost" data-go="doble">⬅ Volver al Doble</button>
+      <button class="btn btn-sit" id="btnCalcDoble">🧮 Calcular el doble</button>
       <button class="btn btn-main" data-go="config">🔨 Ir al juego</button>
     </div>
   </div>
@@ -2339,17 +2379,101 @@ $('#btnCartas').addEventListener('click', () => { show('cartas'); nuevoJuegoCart
 
 /* ---------- Teoría: bolitas y selector de números ---------- */
 $$('#teoria .grp[data-balls]').forEach(g => { g.innerHTML = ball().repeat(+g.dataset.balls); });
-function showDouble(n){
-  $$('#pick button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.n === n));
-  $('#pickOut').innerHTML = `<div class="dbl-example">
-    <p><b>El doble de ${n}</b></p>
-    <div class="dbl-row"><span class="dbl-lbl">${n}</span>${ballsHTML(n)}</div>
-    <div class="dbl-row"><span class="dbl-lbl">${2*n}</span>${ballsHTML(n)}${ballsHTML(n)}</div>
-    <p class="big-sum"><span class="sum">${n} + ${n} = <b>${2*n}</b></span></p></div>`;
+
+/* ---------- Calcular el doble: ítems con flechas y mesa de trabajo ---------- */
+const CD = {orden:[], pos:0, n:0, hecho:false};
+function otroCalcDoble(){
+  if(CD.pos >= CD.orden.length){   // del 1 al 9 en desorden, sin repetir seguido
+    const ultimo = CD.n;
+    do{ CD.orden = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - .5); } while(CD.orden[0] === ultimo);
+    CD.pos = 0;
+  }
+  CD.n = CD.orden[CD.pos++]; CD.hecho = false;
+  $('#cdN').textContent = CD.n; setSpin('#cdVal', 0); $('#cdFb').innerHTML = '';
+  ['#cdUp','#cdDown','#cdVal','#cdCheck'].forEach(q => $(q).disabled = false);
+  limpiarMesa();
 }
-$('#pick').innerHTML = Array.from({length:9}, (_,i) => `<button data-n="${i+1}" aria-pressed="false">${i+1}</button>`).join('');
-$$('#pick button').forEach(b => b.addEventListener('click', () => showDouble(+b.dataset.n)));
-showDouble(4);
+function revisarCalcDoble(){
+  if(CD.hecho) return;
+  CD.hecho = true;
+  const v = getSpin('#cdVal'), n = CD.n;
+  ['#cdUp','#cdDown','#cdVal','#cdCheck'].forEach(q => $(q).disabled = true);
+  if(v === 2*n){
+    chime(); fireworks();
+    $('#cdFb').innerHTML = `<div class="fb-head ok fb-big"><span class="em">${pulgarImg()}</span>¡Correcto! ¡Muy bien! El doble de ${n} es ${2*n}.</div>`;
+  }else{
+    boing();
+    $('#cdFb').innerHTML = `<div class="fb-head bad"><span class="em">${sorpresaSVG()}</span>Escribiste ${v}, pero el doble de ${n} es ${2*n}. Veamos paso a paso:</div>
+      <div class="exp good">${doubleExplain(n)}</div>`;
+  }
+  $('#cdFb').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+spinner('#cdVal', '#cdUp', '#cdDown');
+$('#cdVal').addEventListener('keydown', e => { if(e.key === 'Enter') revisarCalcDoble(); });
+$('#cdCheck').addEventListener('click', revisarCalcDoble);
+$('#btnOtroCd').addEventListener('click', otroCalcDoble);
+$('#btnCalcDoble').addEventListener('click', () => { show('calcDoble'); if(!CD.n) otroCalcDoble(); });
+
+// Mesa: círculos morados del 1 al 10, el signo + y bolitas anaranjadas.
+// Tocar un círculo de la caja lo pone en la mesa; también se puede arrastrar.
+// En la mesa se mueven libremente; si se sacan de la mesa, desaparecen.
+const mesa = $('#mesa');
+const FICHAS = [...Array.from({length:10}, (_,i) => String(i+1)), '+', 'o'];
+const fichaHTML = t => t === 'o'
+  ? `<button class="ficha bolita" data-t="o" aria-label="Bolita anaranjada"></button>`
+  : `<button class="ficha" data-t="${t}" aria-label="${t === '+' ? 'Signo más' : 'Número ' + t}">${t}</button>`;
+$('#paleta').innerHTML = FICHAS.map(fichaHTML).join('');
+function nuevaFicha(t){ const w = document.createElement('div'); w.innerHTML = fichaHTML(t); const f = w.firstElementChild; f.tabIndex = -1; return f; }
+function ponerEnMesa(f, x, y){   // (x, y) = esquina superior izquierda, relativa a la mesa
+  const W = mesa.clientWidth, H = mesa.clientHeight, s = f.offsetWidth || 56;
+  f.classList.remove('arrastre'); f.style.left = Math.max(0, Math.min(W - s, x)) + 'px'; f.style.top = Math.max(0, Math.min(H - s, y)) + 'px';
+}
+function lugarLibre(s, nueva){   // primer hueco libre, de izquierda a derecha y de arriba abajo
+  const W = mesa.clientWidth, H = mesa.clientHeight, paso = 64;
+  const ocupados = [...mesa.children].filter(f => f !== nueva).map(f => [f.offsetLeft + f.offsetWidth/2, f.offsetTop + f.offsetHeight/2]);
+  for(let y = 8; y + s <= H; y += paso) for(let x = 8; x + s <= W; x += paso){
+    const cx = x + s/2, cy = y + s/2;
+    if(ocupados.every(([ox, oy]) => Math.hypot(ox - cx, oy - cy) > 50)) return [x, y];
+  }
+  return [Math.random()*(W - s), Math.random()*(H - s)];
+}
+function agregarFicha(t){
+  const f = nuevaFicha(t); mesa.appendChild(f);
+  const [x, y] = lugarLibre(f.offsetWidth, f); ponerEnMesa(f, x, y); pop();
+}
+function limpiarMesa(){ mesa.innerHTML = ''; }
+$('#btnLimpiarMesa').addEventListener('click', limpiarMesa);
+function arrastrar(e, f, desdeCaja){
+  e.preventDefault();
+  const r0 = e.currentTarget.getBoundingClientRect(), dx = e.clientX - r0.left, dy = e.clientY - r0.top;
+  const x0 = e.clientX, y0 = e.clientY; let movio = false;
+  const sobreMesa = ev => { const m = mesa.getBoundingClientRect(); return ev.clientX > m.left && ev.clientX < m.right && ev.clientY > m.top && ev.clientY < m.bottom; };
+  const mover = ev => {
+    if(!movio && Math.hypot(ev.clientX - x0, ev.clientY - y0) < 6) return;
+    if(!movio){   // empieza el arrastre: la ficha flota sobre todo (primero al frente, luego capturar)
+      movio = true; document.body.appendChild(f); f.classList.add('arrastre');
+      try{ f.setPointerCapture(ev.pointerId); }catch(_){}
+    }
+    f.style.left = (ev.clientX - dx) + 'px'; f.style.top = (ev.clientY - dy) + 'px';
+    mesa.classList.toggle('encima', sobreMesa(ev));
+  };
+  const soltar = ev => {
+    window.removeEventListener('pointermove', mover); window.removeEventListener('pointerup', soltar); window.removeEventListener('pointercancel', soltar);
+    mesa.classList.remove('encima');
+    if(!movio){ if(desdeCaja) agregarFicha(f.dataset.t); return; }   // un toque en la caja = poner en la mesa
+    if(sobreMesa(ev)){
+      const m = mesa.getBoundingClientRect(); mesa.appendChild(f);
+      ponerEnMesa(f, ev.clientX - dx - m.left - 3, ev.clientY - dy - m.top - 3); pop();
+    }else f.remove();   // fuera de la mesa: se quita
+  };
+  window.addEventListener('pointermove', mover); window.addEventListener('pointerup', soltar); window.addEventListener('pointercancel', soltar);
+}
+$$('#paleta .ficha').forEach(b => {
+  b.addEventListener('pointerdown', e => arrastrar(e, nuevaFicha(b.dataset.t), true));
+  b.addEventListener('click', e => { if(e.detail === 0) agregarFicha(b.dataset.t); });   // teclado (Enter/Espacio)
+});
+mesa.addEventListener('pointerdown', e => { const f = e.target.closest('.ficha'); if(f) arrastrar({preventDefault:() => e.preventDefault(), currentTarget:f, clientX:e.clientX, clientY:e.clientY}, f, false); });
+window.addEventListener('resize', () => [...mesa.children].forEach(f => ponerEnMesa(f, f.offsetLeft, f.offsetTop)));
 })();
 </script>
 </body>
