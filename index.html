@@ -274,7 +274,10 @@ button{font:inherit;color:inherit;cursor:pointer}
 .mitad-back{margin-top:18px}
 #mitadTeoria,#mitadPractica,#mitadJuego{flex-direction:column;align-items:center;padding:70px 16px 30px}
 #mitadJuego{padding-top:62px}
-#mitadAcs{align-items:center;justify-content:center;padding:70px 16px 24px}
+#mitadAcs,#calcAcs{align-items:center;justify-content:center;padding:70px 16px 24px}
+.cd-acs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin:0 0 6px}
+.cd-acs[hidden]{display:none}
+.cd-acs .btn{font-size:.95rem;padding:.4em .9em}
 .sub-bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:10px}
 .sub-bar .btn{font-size:clamp(.92rem,2vw,1.1rem);padding:.55em 1em}
 .arial12{font-family:Arial,Helvetica,sans-serif;font-size:12pt;line-height:1.5;text-align:center;margin:0 auto 12px;max-width:640px}
@@ -660,6 +663,8 @@ button{font:inherit;color:inherit;cursor:pointer}
       <button class="btn btn-ghost" data-go="teoria">⬅ Volver a Teoría</button>
       <button class="btn btn-alt" id="btnOtroCd">🔄 Otro ítem</button>
     </div>
+    <p class="cd-acs" id="cdAcsInfo" hidden><span class="pill acs-pill">♿ ACS · <span id="cdAcsFam"></span></span>
+      <button class="btn btn-ghost" id="btnSalirAcsCd">✖ Salir de ACS</button></p>
     <p class="cd-preg">¿Cuál es el doble de <b id="cdN">6</b>?</p>
     <div class="resp">
       <span class="resp-lbl">Tu respuesta:</span>
@@ -677,6 +682,28 @@ button{font:inherit;color:inherit;cursor:pointer}
       <div class="paleta" id="paleta" role="group" aria-label="Círculos para usar en la mesa"></div>
       <div class="mesa" id="mesa" aria-label="Mesa de trabajo"></div>
       <div class="teo-actions"><button class="btn btn-ghost" id="btnLimpiarMesa">🧽 Limpiar la mesa</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ACS de Calcular el doble ============ -->
+<section class="screen" id="calcAcs" aria-labelledby="tCdAcs">
+  <div class="cfg">
+    <h2 id="tCdAcs">♿ ACS · Calcular el doble</h2>
+    <p style="text-align:center;margin-top:0;color:var(--soft)">Elige la familia de números que conoce el estudiante. Las preguntas, la respuesta y las bolitas numeradas estarán dentro de esa familia.</p>
+    <fieldset><legend>Familia</legend>
+      <div class="opts" data-group="cdfam">
+        <button class="opt" data-v="2" aria-pressed="true">De 1 a 2<small>El doble de 1 · bolitas numeradas 1 y 2</small></button>
+        <button class="opt" data-v="3" aria-pressed="false">De 1 a 3<small>El doble de 1 · bolitas numeradas del 1 al 3</small></button>
+        <button class="opt" data-v="4" aria-pressed="false">De 1 a 4<small>El doble de 1 y de 2 · bolitas numeradas del 1 al 4</small></button>
+        <button class="opt" data-v="5" aria-pressed="false">De 1 a 5<small>El doble de 1 y de 2 · bolitas numeradas del 1 al 5</small></button>
+        <button class="opt" data-v="6" aria-pressed="false">De 1 a 6<small>El doble de 1, 2 y 3 · bolitas numeradas del 1 al 6</small></button>
+        <button class="opt" data-v="8" aria-pressed="false">De 1 a 8<small>El doble de 1, 2, 3 y 4 · bolitas numeradas del 1 al 8</small></button>
+      </div>
+    </fieldset>
+    <div class="cfg-actions">
+      <button class="btn btn-ghost" data-go="teoria">⬅ Volver a Teoría</button>
+      <button class="btn btn-main" id="btnEmpezarCdAcs">¡Empezar! ▶</button>
     </div>
   </div>
 </section>
@@ -901,6 +928,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     <div class="teo-actions">
       <button class="btn btn-ghost" data-go="doble">⬅ Volver al Doble</button>
       <button class="btn btn-sit" id="btnCalcDoble">🧮 Calcular el doble</button>
+      <button class="btn btn-acs" data-go="calcAcs">♿ ACS</button>
       <button class="btn btn-main" data-go="config">🔨 Ir al juego</button>
     </div>
   </div>
@@ -966,7 +994,7 @@ $('#btnTeoria').addEventListener('click', () => show('teoria'));
 $('#btnJuego').addEventListener('click', () => show('config'));
 
 /* ---------- Opciones ---------- */
-const cfg = {nivel:1, acs:0, acsfam:2, mfam:2, tiempo:4, voz: store.get('topoDobleSonido') === '0' ? 0 : 1};
+const cfg = {nivel:1, acs:0, acsfam:2, mfam:2, cdfam:2, tiempo:4, voz: store.get('topoDobleSonido') === '0' ? 0 : 1};
 $$('.opts').forEach(g => g.addEventListener('click', e => {
   const b = e.target.closest('.opt'); if(!b) return;
   g.querySelectorAll('.opt').forEach(o => o.setAttribute('aria-pressed', o === b));
@@ -1986,7 +2014,7 @@ window.addEventListener('resize', () => { if(!$('#mitadTeoria').classList.contai
   U.uvas.forEach(u => { if(u.slot >= 0){ const [x, y] = lugar(u.zona, u.slot); posicionar(u, x, y); } }); });
 
 // Contadores con flechas (▲ ▼): tocar = ±1, mantener presionado = repetir
-function setSpin(q, v){ $(q).value = Math.max(0, Math.min(40, v|0)); }
+function setSpin(q, v){ $(q).value = Math.max(0, Math.min(+($(q).dataset.max || 40), v|0)); }
 const getSpin = q => parseInt(String($(q).value).replace(/\D/g,''), 10) || 0;
 function spinner(q, up, down){
   [[up, 1], [down, -1]].forEach(([b, d]) => {
@@ -2384,11 +2412,12 @@ $('#btnCartas').addEventListener('click', () => { show('cartas'); nuevoJuegoCart
 $$('#teoria .grp[data-balls]').forEach(g => { g.innerHTML = ball().repeat(+g.dataset.balls); });
 
 /* ---------- Calcular el doble: ítems con flechas y mesa de trabajo ---------- */
-const CD = {orden:[], pos:0, n:0, hecho:false};
+const CD = {orden:[], pos:0, n:0, hecho:false, acs:0};   // acs: 0 = normal; si no, la familia (2…8)
 function otroCalcDoble(){
   if(CD.pos >= CD.orden.length){   // del 1 al 9 en desorden, sin repetir seguido
-    const ultimo = CD.n;
-    do{ CD.orden = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - .5); } while(CD.orden[0] === ultimo);
+    // normal: el doble de 1 a 9; ACS: solo los números cuyo doble está en la familia
+    const bases = Array.from({length: CD.acs ? Math.floor(CD.acs/2) : 9}, (_,i) => i+1), ultimo = CD.n;
+    do{ CD.orden = bases.slice().sort(() => Math.random() - .5); } while(bases.length > 1 && CD.orden[0] === ultimo);
     CD.pos = 0;
   }
   CD.n = CD.orden[CD.pos++]; CD.hecho = false;
@@ -2415,7 +2444,15 @@ spinner('#cdVal', '#cdUp', '#cdDown');
 $('#cdVal').addEventListener('keydown', e => { if(e.key === 'Enter') revisarCalcDoble(); });
 $('#cdCheck').addEventListener('click', revisarCalcDoble);
 $('#btnOtroCd').addEventListener('click', otroCalcDoble);
-$('#btnCalcDoble').addEventListener('click', () => { show('calcDoble'); if(!CD.n) otroCalcDoble(); });
+function modoCalcDoble(fam){   // cambia entre normal y ACS y empieza de nuevo
+  CD.acs = fam; CD.orden = []; CD.pos = 0; CD.n = 0;
+  $('#cdAcsInfo').hidden = !fam; $('#cdAcsFam').textContent = `De 1 a ${fam}`;
+  $('#cdVal').dataset.max = fam || 40;
+  pintarPaleta(); otroCalcDoble();
+}
+$('#btnCalcDoble').addEventListener('click', () => { show('calcDoble'); if(!CD.n || CD.acs) modoCalcDoble(0); });
+$('#btnEmpezarCdAcs').addEventListener('click', () => { show('calcDoble'); modoCalcDoble(cfg.cdfam); });
+$('#btnSalirAcsCd').addEventListener('click', () => modoCalcDoble(0));
 
 // Mesa: círculos morados del 1 al 10, el signo + y bolitas anaranjadas.
 // Tocar un círculo de la caja lo pone en la mesa; también se puede arrastrar.
@@ -2425,7 +2462,9 @@ const FICHAS = [...Array.from({length:10}, (_,i) => String(i+1)), '+', 'o'];
 const fichaHTML = t => t === 'o'
   ? `<button class="ficha bolita" data-t="o" aria-label="Bolita anaranjada"></button>`
   : `<button class="ficha" data-t="${t}" aria-label="${t === '+' ? 'Signo más' : 'Número ' + t}">${t}</button>`;
-$('#paleta').innerHTML = FICHAS.map(fichaHTML).join('');
+// en ACS solo las bolitas numeradas de la familia
+const pintarPaleta = () => { const k = CD.acs || 10; $('#paleta').innerHTML = FICHAS.filter(t => !/^\d+$/.test(t) || +t <= k).map(fichaHTML).join(''); };
+pintarPaleta();
 function nuevaFicha(t){ const w = document.createElement('div'); w.innerHTML = fichaHTML(t); const f = w.firstElementChild; f.tabIndex = -1; return f; }
 function ponerEnMesa(f, x, y){   // (x, y) = esquina superior izquierda, relativa a la mesa
   const W = mesa.clientWidth, H = mesa.clientHeight, s = f.offsetWidth || 46;
@@ -2471,10 +2510,8 @@ function arrastrar(e, f, desdeCaja){
   };
   window.addEventListener('pointermove', mover); window.addEventListener('pointerup', soltar); window.addEventListener('pointercancel', soltar);
 }
-$$('#paleta .ficha').forEach(b => {
-  b.addEventListener('pointerdown', e => arrastrar(e, nuevaFicha(b.dataset.t), true));
-  b.addEventListener('click', e => { if(e.detail === 0) agregarFicha(b.dataset.t); });   // teclado (Enter/Espacio)
-});
+$('#paleta').addEventListener('pointerdown', e => { const b = e.target.closest('.ficha'); if(b) arrastrar({preventDefault:() => e.preventDefault(), currentTarget:b, clientX:e.clientX, clientY:e.clientY}, nuevaFicha(b.dataset.t), true); });
+$('#paleta').addEventListener('click', e => { const b = e.target.closest('.ficha'); if(b && e.detail === 0) agregarFicha(b.dataset.t); });   // teclado (Enter/Espacio)
 mesa.addEventListener('pointerdown', e => { const f = e.target.closest('.ficha'); if(f) arrastrar({preventDefault:() => e.preventDefault(), currentTarget:f, clientX:e.clientX, clientY:e.clientY}, f, false); });
 window.addEventListener('resize', () => [...mesa.children].forEach(f => ponerEnMesa(f, f.offsetLeft, f.offsetTop)));
 })();
