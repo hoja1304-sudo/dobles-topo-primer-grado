@@ -192,6 +192,10 @@ button{font:inherit;color:inherit;cursor:pointer}
 .btn-acs{background:#0e7490;color:#fff}
 .btn-nivel{background:#d97706;color:#fff}
 .btn-cartas{background:#db2777;color:#fff}
+.btn-sit{background:#2563eb;color:#fff}
+#situacion{flex-direction:column;align-items:center;padding:70px 16px 30px}
+.paper .sit-tit{font-weight:700;text-align:center}
+.sit-anim{display:flex;justify-content:center;margin-top:16px}
 .btn.audio-off{background:#6b7280;color:#fff}
 .btn-mitad{background:#16a34a;color:#fff}
 #doble{align-items:center;justify-content:center;padding:70px 16px 24px}
@@ -391,7 +395,8 @@ button{font:inherit;color:inherit;cursor:pointer}
   .theme-toggle,.prob-bar,.prob-count,.prob h2,.prob-fb,.fx,.toast,.modal-bg,.resp,.resp-tip{display:none!important}
   .print-only{display:block}
   #nivelmas,#mitadPractica{padding:0}
-  #problemas{padding:0}
+  #problemas,#situacion{padding:0}
+  .sit-anim{display:none!important}
   .paper{box-shadow:none;border:0;border-radius:0;padding:0;font-family:Arial,Helvetica,sans-serif;font-size:12pt;color:#000}
   .popt{background:none!important;border:0!important;padding:0;min-height:0;margin:.3em 0;font-size:12pt}
   .popt .l{font-weight:400}
@@ -552,6 +557,20 @@ button{font:inherit;color:inherit;cursor:pointer}
   </div>
 </section>
 
+<!-- ============ SITUACIÓN PROBLEMA ============ -->
+<section class="screen" id="situacion" aria-labelledby="tSit">
+  <div class="prob">
+    <h2 id="tSit">🏁 Situación problema</h2>
+    <div class="prob-bar">
+      <button class="btn btn-ghost" data-go="doble">⬅ Volver al Doble</button>
+      <button class="btn btn-main" id="btnPdfSit">⬇️ Descargar PDF</button>
+      <button class="btn btn-prob" id="btnPrintSit">🖨️ Imprimir</button>
+    </div>
+    <article class="paper" id="paperSit"></article>
+    <div class="sit-anim"><button class="btn btn-sit" id="btnAnimSit">🎬 Animación situación problema</button></div>
+  </div>
+</section>
+
 <!-- ============ NIVEL + ============ -->
 <section class="screen" id="nivelmas" aria-labelledby="tNm">
   <div class="prob">
@@ -592,6 +611,7 @@ button{font:inherit;color:inherit;cursor:pointer}
       <button class="btn btn-acs" id="btnACS">♿ ACS</button>
       <button class="btn btn-nivel" id="btnNivelMas">⭐ Nivel +</button>
       <button class="btn btn-cartas" id="btnCartas">🃏 Cartas</button>
+      <button class="btn btn-sit" data-go="situacion">🏁 Situación problema</button>
     </div>
     <div class="mitad-back"><button class="btn btn-ghost" data-go="inicio">🏠 Regresar al menú</button></div>
   </div>
@@ -1665,6 +1685,22 @@ $('#btnPdfNm').addEventListener('click', () => {
   document.body.appendChild(a); a.click();
   setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 2000);
 });
+
+/* ---------- Situación problema: carrera de autos de control remoto ---------- */
+const SITUACION = {
+  titulo: 'Situación problema',
+  texto: 'En una competencia de autos de juguete de control remoto el auto de Jorge avanza un metro por cada segundo, el automóvil de David avanza en un segundo el dos veces de la distancia que avanza el automóvil de Jorge. Faltando 5 segundos para que termine la competencia el automóvil de Jorge está a 6 metros de la meta y el de Manuel a 10 metros. Al pasar los cinco segundos, ¿Cuál auto llegará primero a la meta el de Jorge o el de David?'
+};
+$('#paperSit').innerHTML = `<p class="sit-tit">${esc(SITUACION.titulo)}</p><p>${esc(SITUACION.texto)}</p><p class="print-only">Respuesta: ______________________</p>`;
+$('#btnPrintSit').addEventListener('click', () => window.print());
+$('#btnPdfSit').addEventListener('click', () => {
+  const url = URL.createObjectURL(problemPDF({bloques:[{t:'p', text:SITUACION.titulo}, {t:'p', text:' '}], pregunta:SITUACION.texto, opciones:[], abierta:true}));
+  const a = document.createElement('a');
+  a.href = url; a.download = 'Situación problema - carrera de autos.pdf';
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 2000);
+});
+$('#btnAnimSit').addEventListener('click', () => { toast('🎬', 'Animación', 'Estará disponible muy pronto.'); setTimeout(() => $('#toast').classList.remove('show'), 2200); });
 
 /* ---------- Mitad · Teoría: repartir 20 uvas entre Carlos y Nuria ---------- */
 const UVA_SVG = `<svg viewBox="0 0 60 66" aria-hidden="true">
