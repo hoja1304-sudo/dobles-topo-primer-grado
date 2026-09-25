@@ -196,6 +196,45 @@ button{font:inherit;color:inherit;cursor:pointer}
 #situacion{flex-direction:column;align-items:center;padding:70px 16px 30px}
 .paper .sit-tit{font-weight:700;text-align:center}
 .sit-anim{display:flex;justify-content:center;margin-top:16px}
+/* ---------- Animación: dos pistas verticales, cada espacio = 1 metro ---------- */
+#animSit{flex-direction:column;align-items:center;padding:70px 16px 30px}
+.anim-wrap{width:min(900px,100%)}
+.anim-wrap h2{text-align:center;font-size:clamp(1.4rem,3.5vw,2.1rem);margin:.1em 0 .4em}
+.anim-grid{display:flex;flex-wrap:wrap;gap:18px;justify-content:center;align-items:flex-start}
+.pistas{display:flex;gap:clamp(20px,6vw,70px);justify-content:center;background:var(--panel);border:3px solid var(--line);border-radius:20px;
+  padding:14px clamp(16px,4vw,34px) 10px;box-shadow:var(--shadow)}
+.pista{position:relative;width:clamp(78px,16vw,110px);height:clamp(320px,62vh,620px);margin-top:3.4em;font-size:clamp(1rem,2.4vw,1.3rem)}
+.meta-lbl{position:absolute;top:-1.75em;left:0;right:0;text-align:center;font-weight:900;color:var(--ink)}
+.carril{position:absolute;left:50%;top:3%;bottom:2%;width:10px;transform:translateX(-50%);background:#6b7280;border-radius:5px}
+.carril::before{content:"";position:absolute;left:-28px;right:-28px;top:-7px;height:14px;border:2px solid #111;
+  background:conic-gradient(#111 25%,#fff 0 50%,#111 0 75%,#fff 0) 0 0/14px 14px}
+.marca{position:absolute;left:50%;width:34px;height:3px;background:var(--ink);transform:translate(-50%,-50%);border-radius:2px;opacity:.75}
+.huella{position:absolute;left:50%;width:12px;height:12px;border-radius:50%;transform:translate(-50%,-50%);opacity:.55}
+#pistaJ .huella{background:#2563eb}#pistaD .huella{background:#dc2626}
+.auto{position:absolute;left:50%;width:clamp(40px,8vw,54px);aspect-ratio:3/5;transform:translate(-50%,-9%);z-index:2;
+  transition:top .9s cubic-bezier(.45,0,.3,1);filter:drop-shadow(0 3px 3px rgba(0,0,0,.35))}
+.auto svg{width:100%;height:100%;display:block}
+.auto-nom{position:absolute;top:-3.2em;left:0;right:0;text-align:center;font-weight:900}
+#pistaJ .auto-nom{color:#2563eb}#pistaD .auto-nom{color:#dc2626}
+.pista.llego .carril::before{box-shadow:0 0 0 4px #facc15,0 0 18px 6px #facc15}
+.anim-ctrl{flex:1 1 260px;max-width:360px;display:flex;flex-direction:column;gap:14px;align-items:stretch}
+.tiempo{display:flex;flex-direction:column;align-items:center;background:var(--panel);border:3px solid #2563eb;border-radius:20px;padding:10px;box-shadow:var(--shadow)}
+.tiempo-lbl{font-weight:800;color:var(--soft)}
+.tiempo b{font-size:clamp(2.6rem,8vw,4rem);line-height:1.1;color:#2563eb}
+.tiempo span:last-child{font-weight:800}
+.btn-mover{font-size:clamp(1.15rem,3vw,1.5rem);padding:.7em 1em}
+.btn-mover:disabled{opacity:.5;cursor:default}
+.anim-nota{margin:0;text-align:center;color:var(--soft)}
+.anim-fin{margin:0;text-align:center;font-weight:900;font-size:clamp(1.05rem,2.6vw,1.3rem);min-height:1.3em}
+@media (max-width:700px){
+  .anim-ctrl{order:-1;max-width:none;flex-basis:100%;flex-direction:row;flex-wrap:wrap;gap:10px}
+  .tiempo{flex:0 0 auto;padding:4px 14px;flex-direction:row;gap:8px;align-items:baseline}
+  .tiempo b{font-size:2.2rem}
+  .btn-mover{flex:1 1 150px}
+  .anim-nota{display:none}.anim-fin{flex-basis:100%;min-height:0}
+  .pista{height:max(280px,calc(100dvh - 575px))}
+  #animSit{padding-top:62px}
+}
 .btn.audio-off{background:#6b7280;color:#fff}
 .btn-mitad{background:#16a34a;color:#fff}
 #doble{align-items:center;justify-content:center;padding:70px 16px 24px}
@@ -568,6 +607,29 @@ button{font:inherit;color:inherit;cursor:pointer}
     </div>
     <article class="paper" id="paperSit"></article>
     <div class="sit-anim"><button class="btn btn-sit" id="btnAnimSit">🎬 Animación situación problema</button></div>
+  </div>
+</section>
+
+<!-- ============ ANIMACIÓN DE LA SITUACIÓN PROBLEMA ============ -->
+<section class="screen" id="animSit" aria-labelledby="tAnim">
+  <div class="anim-wrap">
+    <h2 id="tAnim">🎬 Simulación de la carrera</h2>
+    <div class="prob-bar">
+      <button class="btn btn-ghost" data-go="situacion">⬅ Volver a la situación problema</button>
+      <button class="btn btn-alt" id="btnReiniciarAutos">🔄 Reiniciar</button>
+    </div>
+    <div class="anim-grid">
+      <div class="pistas" aria-hidden="true">
+        <div class="pista" id="pistaJ"><div class="meta-lbl">Meta</div><div class="carril"></div><div class="auto" id="autoJ"></div><div class="auto-nom">Jorge</div></div>
+        <div class="pista" id="pistaD"><div class="meta-lbl">Meta</div><div class="carril"></div><div class="auto" id="autoD"></div><div class="auto-nom">David</div></div>
+      </div>
+      <div class="anim-ctrl">
+        <div class="tiempo" role="status" aria-live="polite"><span class="tiempo-lbl">⏱ Tiempo</span><b id="tiempoSeg">0</b><span id="tiempoUni">segundos</span></div>
+        <button class="btn btn-sit btn-mover" id="btnMoverAutos">🚗 Mover autos</button>
+        <p class="anim-nota">Cada vez que tocas <b>Mover autos</b> pasa 1 segundo: el auto de Jorge avanza <b>1 espacio</b> y el de David <b>2 espacios</b>.</p>
+        <p class="anim-fin" id="animFin" aria-live="polite"></p>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1700,7 +1762,58 @@ $('#btnPdfSit').addEventListener('click', () => {
   document.body.appendChild(a); a.click();
   setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 2000);
 });
-$('#btnAnimSit').addEventListener('click', () => { toast('🎬', 'Animación', 'Estará disponible muy pronto.'); setTimeout(() => $('#toast').classList.remove('show'), 2200); });
+$('#btnAnimSit').addEventListener('click', () => { show('animSit'); reiniciarAutos(); });
+
+/* ---------- Animación: cada toque = 1 segundo; Jorge avanza 1 espacio y David 2 ---------- */
+const CARRERA = {espacios:12, jorge:6, david:10, vj:1, vd:2, maxSeg:5};
+const AS = {t:0, j:0, d:0, moviendo:false};
+const autoSVG = (color, oscuro, letra) => `<svg viewBox="0 0 60 100" aria-hidden="true">
+  <rect x="2" y="14" width="10" height="20" rx="4" fill="#222"/><rect x="48" y="14" width="10" height="20" rx="4" fill="#222"/>
+  <rect x="2" y="66" width="10" height="20" rx="4" fill="#222"/><rect x="48" y="66" width="10" height="20" rx="4" fill="#222"/>
+  <path d="M14 10 Q30 0 46 10 L50 88 Q30 98 10 88 Z" fill="${color}" stroke="${oscuro}" stroke-width="2.5"/>
+  <path d="M17 22 Q30 15 43 22 L41 34 Q30 30 19 34 Z" fill="#bfe3ff" stroke="${oscuro}" stroke-width="1.5"/>
+  <circle cx="30" cy="58" r="13" fill="#fff" stroke="${oscuro}" stroke-width="2"/>
+  <text x="30" y="64" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="17" fill="${oscuro}">${letra}</text></svg>`;
+$('#autoJ').innerHTML = autoSVG('#60a5fa', '#1e3a8a', 'J');
+$('#autoD').innerHTML = autoSVG('#f87171', '#7f1d1d', 'D');
+// posición vertical (en % de la pista) de un punto que está a «m» metros de la meta
+const posPista = m => 3 + m*(85/CARRERA.espacios);   // el frente del auto queda sobre la marca
+function marcasPista(){
+  $$('.pista').forEach(pi => {
+    pi.querySelectorAll('.marca,.huella').forEach(e => e.remove());
+    for(let m = 1; m <= CARRERA.espacios; m++){
+      const mk = document.createElement('div'); mk.className = 'marca'; mk.style.top = posPista(m) + '%'; pi.appendChild(mk);
+    }
+  });
+}
+function huella(pista, m){ const h = document.createElement('div'); h.className = 'huella'; h.style.top = posPista(m) + '%'; $(pista).appendChild(h); }
+function pintarAutos(){
+  $('#autoJ').style.top = posPista(AS.j) + '%'; $('#autoD').style.top = posPista(AS.d) + '%';
+  $('#tiempoSeg').textContent = AS.t; $('#tiempoUni').textContent = AS.t === 1 ? 'segundo' : 'segundos';
+  $('#btnMoverAutos').disabled = AS.moviendo || AS.t >= CARRERA.maxSeg;
+}
+function reiniciarAutos(){
+  AS.t = 0; AS.j = CARRERA.jorge; AS.d = CARRERA.david; AS.moviendo = false;
+  marcasPista(); $$('.pista').forEach(pi => pi.classList.remove('llego')); $('#animFin').textContent = '';
+  $$('.auto').forEach(a => a.style.transition = 'none'); pintarAutos();
+  requestAnimationFrame(() => requestAnimationFrame(() => $$('.auto').forEach(a => a.style.transition = '')));
+}
+function moverAutos(){
+  if(AS.moviendo || AS.t >= CARRERA.maxSeg) return;
+  huella('#pistaJ', AS.j); huella('#pistaD', AS.d);
+  AS.t++; AS.j = Math.max(0, AS.j - CARRERA.vj); AS.d = Math.max(0, AS.d - CARRERA.vd); AS.moviendo = true;
+  tone(220, 520, .8, 'sawtooth', .05);   // motorcito
+  pintarAutos();
+  setTimeout(() => {
+    AS.moviendo = false;
+    if(AS.j === 0) $('#pistaJ').classList.add('llego');
+    if(AS.d === 0) $('#pistaD').classList.add('llego');
+    if(AS.t >= CARRERA.maxSeg){ chime(); $('#animFin').textContent = '⏱ ¡Pasaron los 5 segundos! Observa dónde quedó cada auto.'; }
+    pintarAutos();
+  }, 950);
+}
+$('#btnMoverAutos').addEventListener('click', moverAutos);
+$('#btnReiniciarAutos').addEventListener('click', reiniciarAutos);
 
 /* ---------- Mitad · Teoría: repartir 20 uvas entre Carlos y Nuria ---------- */
 const UVA_SVG = `<svg viewBox="0 0 60 66" aria-hidden="true">
