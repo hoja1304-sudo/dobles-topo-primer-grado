@@ -201,6 +201,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .mitad-back{margin-top:18px}
 #mitadTeoria,#mitadPractica,#mitadJuego{flex-direction:column;align-items:center;padding:70px 16px 30px}
 #mitadJuego{padding-top:62px}
+#mitadAcs{align-items:center;justify-content:center;padding:70px 16px 24px}
 .sub-bar{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:10px}
 .sub-bar .btn{font-size:clamp(.92rem,2vw,1.1rem);padding:.55em 1em}
 .arial12{font-family:Arial,Helvetica,sans-serif;font-size:12pt;line-height:1.5;text-align:center;margin:0 auto 12px;max-width:640px}
@@ -582,8 +583,30 @@ button{font:inherit;color:inherit;cursor:pointer}
       <button class="btn btn-alt" data-go="mitadTeoria">📘 Teoría</button>
       <button class="btn btn-prob" data-go="mitadPractica">✏️ Práctica</button>
       <button class="btn btn-main" data-go="mitadJuego">🎮 Juego</button>
+      <button class="btn btn-acs" data-go="mitadAcs">♿ ACS</button>
     </div>
     <div class="mitad-back"><button class="btn btn-ghost" data-go="inicio">🏠 Regresar al inicio</button></div>
+  </div>
+</section>
+
+<section class="screen" id="mitadAcs" aria-labelledby="tMitadAcs">
+  <div class="cfg">
+    <h2 id="tMitadAcs">♿ ACS · Juego de la mitad</h2>
+    <p style="text-align:center;margin-top:0;color:var(--soft)">Elige la familia de números que conoce el estudiante. Todas las bolas y las preguntas estarán dentro de esa familia.</p>
+    <fieldset><legend>Familia</legend>
+      <div class="opts" data-group="mfam">
+        <button class="opt" data-v="2" aria-pressed="true">De 1 a 2<small>La mitad de 2 · bolas 1 y 2</small></button>
+        <button class="opt" data-v="3" aria-pressed="false">De 1 a 3<small>La mitad de 2 · bolas 1, 2 y 3</small></button>
+        <button class="opt" data-v="4" aria-pressed="false">De 1 a 4<small>La mitad de 2 y de 4 · bolas del 1 al 4</small></button>
+        <button class="opt" data-v="5" aria-pressed="false">De 1 a 5<small>La mitad de 2 y de 4 · bolas del 1 al 5</small></button>
+        <button class="opt" data-v="6" aria-pressed="false">De 1 a 6<small>La mitad de 2, 4 y 6 · bolas del 1 al 6</small></button>
+        <button class="opt" data-v="8" aria-pressed="false">De 1 a 8<small>La mitad de 2, 4, 6 y 8 · bolas del 1 al 8</small></button>
+      </div>
+    </fieldset>
+    <div class="cfg-actions">
+      <button class="btn btn-ghost" data-go="mitad">⬅ Volver a Mitad</button>
+      <button class="btn btn-main" id="btnEmpezarMitadAcs">¡A jugar! ▶</button>
+    </div>
   </div>
 </section>
 
@@ -660,6 +683,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     </div>
     <h2 id="tMitadJue" class="sr">Juego de la mitad</h2>
     <div class="bolas-stats">
+      <span class="pill acs-pill" id="bAcsPill" hidden>♿ ACS · <span id="bAcsFam"></span></span>
       <span class="pill" title="Ronda">🎯 <span id="bRonda">0/10</span></span>
       <span class="pill score" title="Puntos">⭐ <span id="bPuntos">0</span> pts</span>
       <span class="pill" title="Tiempo">⏱ <span id="bTiempo">0:00</span></span>
@@ -793,7 +817,7 @@ $('#btnTeoria').addEventListener('click', () => show('teoria'));
 $('#btnJuego').addEventListener('click', () => show('config'));
 
 /* ---------- Opciones ---------- */
-const cfg = {nivel:1, acs:0, acsfam:2, tiempo:4, voz: store.get('topoDobleSonido') === '0' ? 0 : 1};
+const cfg = {nivel:1, acs:0, acsfam:2, mfam:2, tiempo:4, voz: store.get('topoDobleSonido') === '0' ? 0 : 1};
 $$('.opts').forEach(g => g.addEventListener('click', e => {
   const b = e.target.closest('.opt'); if(!b) return;
   g.querySelectorAll('.opt').forEach(o => o.setAttribute('aria-pressed', o === b));
@@ -1891,21 +1915,23 @@ const bolaSVG = (n, color) => `<svg viewBox="0 0 100 100" aria-hidden="true">
   <circle cx="50" cy="50" r="47" fill="url(#gB${n})" stroke="rgba(0,0,0,.35)" stroke-width="2.5"/>
   <g fill="#1f1f1f" transform="translate(17 4) scale(.66)">${CARAS[(n-1) % CARAS.length]}</g>
   <text x="50" y="88" text-anchor="middle" font-size="${n === 10 ? 40 : 48}" font-weight="900" fill="#fff" stroke="#1f1f1f" stroke-width="4" paint-order="stroke" font-family="Arial Black, Arial, sans-serif">${n}</text></svg>`;
-const B = {bolas:[], raf:0, last:0, estado:'idle', orden:[], ronda:0, pts:0, t0:0, timer:null, best:0};
+const B = {bolas:[], raf:0, last:0, estado:'idle', orden:[], ronda:0, pts:0, t0:0, timer:null, best:0, acs:0, bestAcs:{}};   // acs: 0 = juego normal; si no, la familia (2…8)
 const B_REC = 'mitadBolasRecord';
 const gym = $('#gym');
-const leerRecB = () => +store.get(B_REC) || B.best || 0;
+const claveRecB = () => B.acs ? `${B_REC}_acs${B.acs}` : B_REC;   // récord aparte para cada familia ACS
+const leerRecB = () => +store.get(claveRecB()) || (B.acs ? B.bestAcs[B.acs] : B.best) || 0;
 const pintarRecB = () => { const r = leerRecB(); $('#bRecord').textContent = r ? fmtT2(r) : '—'; };
 function crearBolas(){
   gym.querySelectorAll('.bola').forEach(e => e.remove());
   const W = gym.clientWidth, H = gym.clientHeight, size = Math.round(Math.max(64, Math.min(104, W/6)));   // bolas grandes, también en celular
   gym.style.setProperty('--bs', size + 'px');
   B.bolas = [];
-  for(let n = 1; n <= 10; n++){
+  const cant = B.acs || 10;   // en ACS solo las bolas de la familia
+  for(let n = 1; n <= cant; n++){
     const el = document.createElement('button');
     el.className = 'bola'; el.setAttribute('aria-label', `Bola ${n}`); el.innerHTML = bolaSVG(n, COLORES_BOLA[n-1]);
     gym.appendChild(el);
-    const b = {n, el, r:size/2, x: size/2 + (n-1)*(W - size)/9, y: H*.3 + Math.random()*H*.2, vx:(Math.random() < .5 ? -1 : 1)*(15 + Math.random()*30), vy:0, activa:true};   // velocidad lateral suave
+    const b = {n, el, r:size/2, x: size/2 + (n-1)*(W - size)/Math.max(1, cant-1), y: H*.3 + Math.random()*H*.2, vx:(Math.random() < .5 ? -1 : 1)*(15 + Math.random()*30), vy:0, activa:true};   // velocidad lateral suave
     B.bolas.push(b);
     el.addEventListener('pointerdown', e => { e.preventDefault(); tocarBola(b); });
     el.addEventListener('click', e => { if(e.detail === 0) tocarBola(b); });   // teclado
@@ -1933,13 +1959,26 @@ function paso(t){
 }
 function animarBolas(){ if(!B.raf){ B.last = 0; B.raf = requestAnimationFrame(paso); } }
 function pintarHudB(){
-  $('#bRonda').textContent = `${Math.min(B.ronda, 10)}/10`; $('#bPuntos').textContent = B.pts;
+  $('#bRonda').textContent = `${Math.min(B.ronda, B.orden.length)}/${B.orden.length}`; $('#bPuntos').textContent = B.pts;
 }
 function decirBola(){ if(B.estado === 'play') say(`Mitad de ${NUMW20[B.orden[B.ronda-1]]}`); }
+// ACS: 10 rondas con los pares que caben en la familia (la mitad de 2, 4, … hasta la familia);
+// cada uno sale al menos una vez, en desorden y sin repetir seguido
+function ordenMitadAcs(fam){
+  const pares = []; for(let v = 2; v <= fam; v += 2) pares.push(v);
+  const orden = [];
+  while(orden.length < 10){
+    const vuelta = pares.slice().sort(() => Math.random() - .5);
+    if(pares.length > 1 && vuelta[0] === orden[orden.length-1]) vuelta.push(vuelta.shift());
+    orden.push(...vuelta);
+  }
+  return orden.slice(0, 10);
+}
 function reiniciarBolas(){
   clearInterval(B.timer); B.timer = null;
   B.estado = 'idle'; B.ronda = 0; B.pts = 0; B.t0 = 0;
-  B.orden = [2,4,6,8,10,12,14,16,18,20].sort(() => Math.random() - .5);
+  B.orden = B.acs ? ordenMitadAcs(B.acs) : [2,4,6,8,10,12,14,16,18,20].sort(() => Math.random() - .5);
+  $('#bAcsPill').hidden = !B.acs; $('#bAcsFam').textContent = `De 1 a ${B.acs}`;
   crearBolas(); pintarHudB(); pintarRecB();
   $('#bTiempo').textContent = '0:00'; $('#bFin').hidden = true;
   $('#bInd').innerHTML = 'Toca <b>▶ ¡Empezar!</b> para jugar.';
@@ -1957,7 +1996,7 @@ function empezarBolas(){
 }
 function siguienteRonda(){
   B.ronda++;
-  if(B.ronda > 10) return finBolas();
+  if(B.ronda > B.orden.length) return finBolas();
   pintarHudB();
   const n = B.orden[B.ronda-1];
   $('#bInd').innerHTML = `Toca la bola que es la mitad de <span class="n">${n}</span>`;
@@ -1975,7 +2014,10 @@ function tocarBola(b){
     comicStars(g.left + b.x, g.top + b.y);
     reventar(g.left + b.x, g.top + b.y, COLORES_BOLA[b.n-1]);
     setTimeout(() => {
-      b.el.remove();
+      if(B.acs){   // vuelve a caer desde arriba
+        b.el.classList.remove('desaparece'); b.activa = true;
+        b.y = b.r + 4; b.vy = 0; b.x = b.r + Math.random()*(gym.clientWidth - 2*b.r);
+      }else b.el.remove();
       toast(pulgarImg(), '¡Muy bien!', `La mitad de ${B.orden[B.ronda-1]} es ${b.n}: ${b.n} + ${b.n} = ${B.orden[B.ronda-1]}.`);
       fireworks(); say('¡Muy bien!');
     }, 550);
@@ -2007,10 +2049,10 @@ function finBolas(){
   B.estado = 'fin'; clearInterval(B.timer);
   const ms = performance.now() - B.t0; $('#bTiempo').textContent = fmtT2(ms);
   const prev = leerRecB(), nuevo = !prev || ms < prev;
-  if(nuevo){ B.best = Math.round(ms); store.set(B_REC, B.best); }
+  if(nuevo){ const v = Math.round(ms); if(B.acs) B.bestAcs[B.acs] = v; else B.best = v; store.set(claveRecB(), v); }
   pintarRecB();
   $('#bInd').textContent = '¡Encontraste todas las mitades!';
-  $('#bFin').innerHTML = `${pulgarImg()}<div class="t">¡Excelente! Encontraste las 10 mitades.</div>
+  $('#bFin').innerHTML = `${pulgarImg()}<div class="t">¡Excelente! Encontraste ${B.orden.length} mitades.</div>
     <div class="s">Puntos: <b>${B.pts}</b> · Tiempo: <b>${fmtT2(ms)}</b>${nuevo ? ' · 🏆 <b>¡Nuevo récord!</b>' : ` · Récord: ${fmtT2(prev)}`}</div>`;
   $('#bFin').hidden = false; fireworks(); chime();
   say(nuevo ? '¡Excelente! Encontraste todas las mitades. ¡Nuevo récord!' : '¡Excelente! Encontraste todas las mitades.');
@@ -2026,7 +2068,8 @@ document.addEventListener('keydown', e => {   // teclado: 1 a 9 y 0 = 10
   if(!$('#mitadJuego').classList.contains('active') || B.estado !== 'play') return;
   if(/^[0-9]$/.test(e.key)){ const n = e.key === '0' ? 10 : +e.key; const b = B.bolas.find(x => x.n === n && x.activa); if(b) tocarBola(b); }
 });
-$$('[data-go="mitadJuego"]').forEach(b => b.addEventListener('click', () => requestAnimationFrame(reiniciarBolas)));
+$$('[data-go="mitadJuego"]').forEach(b => b.addEventListener('click', () => { B.acs = 0; requestAnimationFrame(reiniciarBolas); }));
+$('#btnEmpezarMitadAcs').addEventListener('click', () => { B.acs = cfg.mfam; show('mitadJuego'); requestAnimationFrame(reiniciarBolas); });
 window.addEventListener('resize', () => { if(!$('#mitadJuego').classList.contains('active')) return;
   const W = gym.clientWidth; B.bolas.forEach(b => { b.x = Math.min(b.x, W - b.r); }); });
 
