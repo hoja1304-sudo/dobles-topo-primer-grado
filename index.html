@@ -1755,7 +1755,7 @@ const SITUACION = {
     'Dos amigos Jorge y David tienen una competencia de autos de control remoto. Colocan los autos en la pista que tiene dos carriles, ambos autos avanzan en línea recta, al iniciar la competencia Jorge coloca su automóvil a 6 metros de la meta y David a 10 metros de la meta.',
     'El automóvil de Jorge avanza un metro por cada segundo y el automóvil de David avanza por cada segundo dos veces la distancia que avanza el automóvil de Jorge.'
   ],
-  pregunta: '¿Cuál automóvil llegara primero a la meta? ¿Cuántos segundos pasaron?'
+  pregunta: '¿Cuál automóvil llegará primero a la meta? ¿Cuántos segundos pasaron?'
 };
 $('#paperSit').innerHTML = `<p class="sit-tit">${esc(SITUACION.titulo)}</p>${SITUACION.parrafos.map(t => `<p>${esc(t)}</p>`).join('')}<p>${esc(SITUACION.pregunta)}</p><p class="print-only">Respuesta: ______________________</p>`;
 $('#btnPrintSit').addEventListener('click', () => window.print());
@@ -1769,8 +1769,9 @@ $('#btnPdfSit').addEventListener('click', () => {
 $('#btnAnimSit').addEventListener('click', () => { show('animSit'); reiniciarAutos(); });
 
 /* ---------- Animación: cada toque = 1 segundo; Jorge avanza 1 espacio y David 2 ---------- */
-const CARRERA = {espacios:12, jorge:6, david:10, vj:1, vd:2, maxSeg:5};
+const CARRERA = {espacios:12, jorge:6, david:10, vj:1, vd:2};
 const AS = {t:0, j:0, d:0, moviendo:false};
+const llegoAlguno = () => AS.j === 0 || AS.d === 0;   // la simulación se detiene cuando el primer auto llega a la meta
 const autoSVG = (color, oscuro, letra) => `<svg viewBox="0 0 60 100" aria-hidden="true">
   <rect x="2" y="14" width="10" height="20" rx="4" fill="#222"/><rect x="48" y="14" width="10" height="20" rx="4" fill="#222"/>
   <rect x="2" y="66" width="10" height="20" rx="4" fill="#222"/><rect x="48" y="66" width="10" height="20" rx="4" fill="#222"/>
@@ -1794,7 +1795,7 @@ function huella(pista, m){ const h = document.createElement('div'); h.className 
 function pintarAutos(){
   $('#autoJ').style.top = posPista(AS.j) + '%'; $('#autoD').style.top = posPista(AS.d) + '%';
   $('#tiempoSeg').textContent = AS.t; $('#tiempoUni').textContent = AS.t === 1 ? 'segundo' : 'segundos';
-  $('#btnMoverAutos').disabled = AS.moviendo || AS.t >= CARRERA.maxSeg;
+  $('#btnMoverAutos').disabled = AS.moviendo || llegoAlguno();
 }
 function reiniciarAutos(){
   AS.t = 0; AS.j = CARRERA.jorge; AS.d = CARRERA.david; AS.moviendo = false;
@@ -1803,7 +1804,7 @@ function reiniciarAutos(){
   requestAnimationFrame(() => requestAnimationFrame(() => $$('.auto').forEach(a => a.style.transition = '')));
 }
 function moverAutos(){
-  if(AS.moviendo || AS.t >= CARRERA.maxSeg) return;
+  if(AS.moviendo || llegoAlguno()) return;
   huella('#pistaJ', AS.j); huella('#pistaD', AS.d);
   AS.t++; AS.j = Math.max(0, AS.j - CARRERA.vj); AS.d = Math.max(0, AS.d - CARRERA.vd); AS.moviendo = true;
   tone(220, 520, .8, 'sawtooth', .05);   // motorcito
@@ -1812,7 +1813,7 @@ function moverAutos(){
     AS.moviendo = false;
     if(AS.j === 0) $('#pistaJ').classList.add('llego');
     if(AS.d === 0) $('#pistaD').classList.add('llego');
-    if(AS.t >= CARRERA.maxSeg){ chime(); $('#animFin').textContent = '⏱ ¡Pasaron los 5 segundos! Observa dónde quedó cada auto.'; }
+    if(llegoAlguno()){ chime(); $('#animFin').textContent = '🏁 ¡Un automóvil llegó a la meta! Observa el tiempo y dónde quedó cada auto.'; }
     pintarAutos();
   }, 950);
 }
