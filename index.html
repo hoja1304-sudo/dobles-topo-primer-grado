@@ -1751,12 +1751,16 @@ $('#btnPdfNm').addEventListener('click', () => {
 /* ---------- Situación problema: carrera de autos de control remoto ---------- */
 const SITUACION = {
   titulo: 'Situación problema',
-  texto: 'En una competencia de autos de juguete de control remoto el auto de Jorge avanza un metro por cada segundo, el automóvil de David avanza en un segundo el dos veces de la distancia que avanza el automóvil de Jorge. Faltando 5 segundos para que termine la competencia el automóvil de Jorge está a 6 metros de la meta y el de David a 10 metros de la meta. Al pasar los cinco segundos, ¿Cuál auto llegará primero a la meta el de Jorge o el de David?'
+  parrafos: [
+    'Dos amigos Jorge y David tienen una competencia de autos de control remoto. Colocan los autos en la pista que tiene dos carriles, ambos autos avanzan en línea recta, al iniciar la competencia Jorge coloca su automóvil a 6 metros de la meta y David a 10 metros de la meta.',
+    'El auto de Jorge avanza un metro por cada segundo y el automóvil de David avanza por cada segundo dos veces la distancia que avanza el automóvil de Jorge.'
+  ],
+  pregunta: '¿Cuál automóvil llegara primero a la meta? ¿Cuántos segundos pasaron?'
 };
-$('#paperSit').innerHTML = `<p class="sit-tit">${esc(SITUACION.titulo)}</p><p>${esc(SITUACION.texto)}</p><p class="print-only">Respuesta: ______________________</p>`;
+$('#paperSit').innerHTML = `<p class="sit-tit">${esc(SITUACION.titulo)}</p>${SITUACION.parrafos.map(t => `<p>${esc(t)}</p>`).join('')}<p>${esc(SITUACION.pregunta)}</p><p class="print-only">Respuesta: ______________________</p>`;
 $('#btnPrintSit').addEventListener('click', () => window.print());
 $('#btnPdfSit').addEventListener('click', () => {
-  const url = URL.createObjectURL(problemPDF({bloques:[{t:'p', text:SITUACION.titulo}, {t:'p', text:' '}], pregunta:SITUACION.texto, opciones:[], abierta:true}));
+  const url = URL.createObjectURL(problemPDF({bloques:[{t:'p', text:SITUACION.titulo}, {t:'p', text:' '}, ...SITUACION.parrafos.flatMap(t => [{t:'p', text:t}, {t:'p', text:' '}])], pregunta:SITUACION.pregunta, opciones:[], abierta:true}));
   const a = document.createElement('a');
   a.href = url; a.download = 'Situación problema - carrera de autos.pdf';
   document.body.appendChild(a); a.click();
