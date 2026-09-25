@@ -212,9 +212,13 @@ button{font:inherit;color:inherit;cursor:pointer}
 .ficha:focus-visible{outline:4px solid var(--gold);outline-offset:2px}
 .mesa .ficha,.ficha.arrastre{position:absolute;margin:0}
 .ficha.arrastre{position:fixed;z-index:60;cursor:grabbing;transform:scale(1.08);box-shadow:0 8px 14px rgba(0,0,0,.35)}
-.mesa{position:relative;height:clamp(260px,46vh,440px);border-radius:16px;border:3px dashed var(--line);touch-action:none;overflow:hidden;
+.mesa{position:relative;height:clamp(300px,58vh,540px);border-radius:16px;border:3px dashed var(--line);touch-action:none;overflow:hidden;
   background:#fff linear-gradient(rgba(112,48,160,.08) 1px,transparent 1px) 0 0/100% 32px}
 .mesa.encima{border-color:var(--accent)}
+.mesa-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.mesa-head h3{margin:0}
+.btn-indic{font-size:clamp(.95rem,2vw,1.1rem);padding:.45em 1em}
+.btn-indic[aria-pressed="true"]{background:#dc2626;color:#fff}
 /* ---------- Animación: dos pistas verticales, cada espacio = 1 metro ---------- */
 #animSit{flex-direction:column;align-items:center;padding:70px 16px 30px}
 .anim-wrap{width:min(900px,100%)}
@@ -677,8 +681,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     </div>
     <div class="prob-fb" id="cdFb" aria-live="polite"></div>
     <div class="card-wide mesa-card">
-      <h3>🧰 Mesa de trabajo</h3>
-      <p class="uvas-tip">Toca o arrastra los círculos a la mesa. Puedes sumar con los números o formar dos grupos de bolitas y contarlas. Para quitar un círculo, arrástralo fuera de la mesa.</p>
+      <div class="mesa-head"><h3>🧰 Mesa de trabajo</h3><button class="btn btn-alt btn-indic" data-indic aria-pressed="false">🔊 Indicaciones</button></div>
       <div class="paleta" id="paleta" role="group" aria-label="Círculos para usar en la mesa"></div>
       <div class="mesa" id="mesa" aria-label="Mesa de trabajo"></div>
       <div class="teo-actions"><button class="btn btn-ghost" id="btnLimpiarMesa">🧽 Limpiar la mesa</button></div>
@@ -730,8 +733,7 @@ button{font:inherit;color:inherit;cursor:pointer}
     </div>
     <div class="prob-fb" id="cmFb" aria-live="polite"></div>
     <div class="card-wide mesa-card">
-      <h3>🧰 Mesa de trabajo</h3>
-      <p class="uvas-tip">Toca o arrastra los círculos a la mesa. Puedes repartir bolitas en dos grupos iguales y contar un grupo, o comprobar con una suma. Para quitar un círculo, arrástralo fuera de la mesa.</p>
+      <div class="mesa-head"><h3>🧰 Mesa de trabajo</h3><button class="btn btn-alt btn-indic" data-indic aria-pressed="false">🔊 Indicaciones</button></div>
       <div class="paleta" id="paletaM" role="group" aria-label="Círculos para usar en la mesa"></div>
       <div class="mesa" id="mesaM" aria-label="Mesa de trabajo"></div>
       <div class="teo-actions"><button class="btn btn-ghost" id="btnLimpiarMesaM">🧽 Limpiar la mesa</button></div>
@@ -2569,6 +2571,26 @@ function crearMesa(mesa, paleta, maxNum){
   pintar();
   return {pintar, limpiar};
 }
+// Botón Indicaciones: el primer toque lee las indicaciones; otro toque detiene el audio
+const INDICACIONES = 'Toca un círculo con el mouse y aparecerá en la mesa de trabajo blanca. Ahí podrás moverlo con el mouse. Si sacas un círculo fuera de la mesa de trabajo, desaparece. Al tocar el botón Limpiar la mesa, se quitan todos los círculos de la mesa.';
+let indicBtn = null, indicTimer = null;
+function pintarIndic(){
+  $$('[data-indic]').forEach(b => { const on = b === indicBtn;
+    b.setAttribute('aria-pressed', on); b.textContent = on ? '⏹ Detener audio' : '🔊 Indicaciones'; });
+}
+function pararIndic(){ if(!indicBtn) return; clearInterval(indicTimer); stopVoice(); indicBtn = null; pintarIndic(); }
+$$('[data-indic]').forEach(b => b.addEventListener('click', () => {
+  if(indicBtn === b) return pararIndic();
+  pararIndic(); stopVoice();
+  if(!('speechSynthesis' in window)) return;
+  indicBtn = b; pintarIndic(); loadVoices();
+  const tok = speechTok, t0 = Date.now();
+  speakNow(INDICACIONES, 0, () => { if(tok === speechTok && indicBtn === b){ clearInterval(indicTimer); indicBtn = null; pintarIndic(); } });
+  // por si el navegador no avisa que terminó o que otra voz lo interrumpió
+  indicTimer = setInterval(() => { if(Date.now() - t0 > 1500 && !speechSynthesis.speaking && indicBtn === b){ clearInterval(indicTimer); indicBtn = null; pintarIndic(); } }, 500);
+}));
+// al salir de la sección se calla
+document.addEventListener('click', () => { if(indicBtn && !indicBtn.closest('.screen').classList.contains('active')) pararIndic(); });
 const mesaDoble = crearMesa($('#mesa'), $('#paleta'), () => CD.acs || 10);
 $('#btnLimpiarMesa').addEventListener('click', mesaDoble.limpiar);
 
