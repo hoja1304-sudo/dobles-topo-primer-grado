@@ -1170,19 +1170,19 @@ function makeOrder(){
   }
   return order.slice(0, ACS_RONDAS);
 }
-// 3 números: el doble y dos distractores = el doble + 1 y el doble + 2 (p. ej. doble de 4 → 8, 9 y 10).
-// En ACS solo se usan números de la familia: si alguno de esos dos se pasa, se completa con otros números
-// de la familia (el mismo número, el doble − 1…). Con la familia De 1 a 2 salen 2 topos (el 1 y el 2).
+// 3 números: el doble y dos distractores = el número + 1 y el número + 2 (p. ej. doble de 3 → 6, 4 y 5).
+// Nunca aparece el mismo número (el 3) si hay otros distractores posibles. Si n + 1 coincide con el doble
+// (doble de 1), se usa el siguiente (n + 3). Sin ACS el niño conoce del 1 al 19, así que siempre se pueden usar.
+// En ACS solo números de la familia; si no caben, se completa con otros de la familia y, al final, el mismo número
+// (De 1 a 2 → 1 y 2, solo 2 topos; De 1 a 3 → 1, 2 y 3).
 function makeNums(n){
-  const correct = 2*n;
-  if(cfg.acs){
-    const fam = cfg.acsfam, dentro = v => v >= 1 && v <= fam && v !== correct;
-    const pref = [correct+1, correct+2].filter(dentro);
-    const resto = [n, correct-1, correct-2, ...Array.from({length:fam}, (_,i) => i+1)].filter((v,i,a) => dentro(v) && !pref.includes(v) && a.indexOf(v) === i);
-    const nums = [correct, ...[...pref, ...resto].slice(0,2)].sort(() => Math.random() - .5);
-    return {nums, correct};
-  }
-  const nums = [correct, correct+1, correct+2].sort(() => Math.random() - .5);
+  const correct = 2*n, max = cfg.acs ? cfg.acsfam : 19;
+  const vale = v => v >= 1 && v <= max && v !== correct;
+  const sig = [n+1, n+2, n+3, n+4].filter(v => vale(v));              // número + 1, + 2 (saltando el doble)
+  const otros = Array.from({length:max}, (_,i) => i+1).filter(v => vale(v) && v !== n && !sig.includes(v))
+    .sort((x,y) => Math.abs(x - n) - Math.abs(y - n));
+  const pool = [...sig, ...otros, ...(vale(n) ? [n] : [])];
+  const nums = [correct, ...pool.slice(0,2)].sort(() => Math.random() - .5);
   return {nums, correct};
 }
 const ball = () => '<span class="ball"></span>';
