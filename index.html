@@ -185,6 +185,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .checker{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .checker input{min-height:48px;font-size:1.3rem;border-radius:12px;border:2px solid var(--line);padding:0 .6em;width:min(220px,100%);
   background:var(--panel2);color:var(--ink);font-weight:800}
+.teo-menu .btn{font-size:clamp(1.1rem,2.6vw,1.4rem);padding:.8em 1.2em}
 .teo-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:18px}
 
 /* ---------- PROBLEMAS ---------- */
@@ -962,7 +963,26 @@ button{font:inherit;color:inherit;cursor:pointer}
 <!-- ============ TEORÍA ============ -->
 <section class="screen" id="teoria" aria-labelledby="tTeo">
   <div class="teo">
-    <h2 id="tTeo">📘 ¿Qué es el doble?</h2>
+    <h2 id="tTeo">📘 Doble de un número</h2>
+    <div class="teo-actions teo-menu">
+      <button class="btn btn-main" data-go="teoDef">📖 Definición de doble</button>
+      <button class="btn btn-sit" data-go="teoSit">🏁 Situación problema</button>
+    </div>
+    <div class="teo-actions">
+      <button class="btn btn-sit" id="btnCalcDoble">🧮 Calcular el doble</button>
+      <button class="btn btn-acs" data-go="calcAcs">♿ ACS</button>
+      <button class="btn btn-main" data-go="config">🔨 Ir al juego</button>
+    </div>
+    <div class="teo-actions">
+      <button class="btn btn-ghost" data-go="doble">⬅ Volver al Doble</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TEORÍA · DEFINICIÓN DE DOBLE ============ -->
+<section class="screen" id="teoDef" aria-labelledby="tTeoDef">
+  <div class="teo">
+    <h2 id="tTeoDef">📖 ¿Qué es el doble?</h2>
     <p class="teo-lead">El <b>doble</b> de un número es tener <b>dos veces</b> ese mismo número.</p>
     <div class="card-wide">
       <h3>➕ Forma 1: Sumando dos veces el mismo número</h3>
@@ -982,12 +1002,15 @@ button{font:inherit;color:inherit;cursor:pointer}
         <p class="teo-paso">Hay <b>6</b> bolitas, el doble de 3 es <b>6</b>.</p>
       </div>
     </div>
-    <div class="teo-actions">
-      <button class="btn btn-ghost" data-go="doble">⬅ Volver al Doble</button>
-      <button class="btn btn-sit" id="btnCalcDoble">🧮 Calcular el doble</button>
-      <button class="btn btn-acs" data-go="calcAcs">♿ ACS</button>
-      <button class="btn btn-main" data-go="config">🔨 Ir al juego</button>
-    </div>
+    <div class="teo-actions"><button class="btn btn-ghost" data-go="teoria">⬅ Volver a Teoría</button></div>
+  </div>
+</section>
+
+<!-- ============ TEORÍA · SITUACIÓN PROBLEMA ============ -->
+<section class="screen" id="teoSit" aria-labelledby="tTeoSit">
+  <div class="teo">
+    <h2 id="tTeoSit">🏁 Situación problema</h2>
+    <div class="teo-actions"><button class="btn btn-ghost" data-go="teoria">⬅ Volver a Teoría</button></div>
   </div>
 </section>
 
@@ -2462,7 +2485,7 @@ $('#btnReiniciar').addEventListener('click', nuevoJuegoCartas);
 $('#btnCartas').addEventListener('click', () => { show('cartas'); nuevoJuegoCartas(); });
 
 /* ---------- Teoría: bolitas y selector de números ---------- */
-$$('#teoria .grp[data-balls]').forEach(g => { g.innerHTML = ball().repeat(+g.dataset.balls); });
+$$('#teoDef .grp[data-balls]').forEach(g => { g.innerHTML = ball().repeat(+g.dataset.balls); });
 
 /* ---------- Calcular el doble: ítems con flechas y mesa de trabajo ---------- */
 const CD = {orden:[], pos:0, n:0, hecho:false, acs:0};   // acs: 0 = normal; si no, la familia (2…8)
