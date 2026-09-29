@@ -2587,7 +2587,7 @@ $$('[data-indic]').forEach(b => b.addEventListener('click', () => {
 }));
 // al salir de la sección se calla
 document.addEventListener('click', () => { if(indicBtn && !indicBtn.closest('.screen').classList.contains('active')) pararIndic(); });
-const mesaDoble = crearMesa($('#mesa'), $('#paleta'), () => CD.acs || 10);
+const mesaDoble = crearMesa($('#mesa'), $('#paleta'), () => CD.acs || 19);   // sin ACS: bolitas del 1 al 19 (la numeración que domina el estudiante)
 $('#btnLimpiarMesa').addEventListener('click', mesaDoble.limpiar);
 
 /* ---------- Calcular la mitad: igual que Calcular el doble, con la mitad de 2, 4, …, 20 ---------- */
