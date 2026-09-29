@@ -199,12 +199,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 .pb-cuadros{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .pb-col{display:flex;flex-direction:column;align-items:stretch;min-width:0}
 .pb-nombre{margin:0 0 4px;text-align:center;font-weight:900;font-size:clamp(1rem,2.4vw,1.25rem)}
-.pb-cuadro{min-height:clamp(180px,32vh,300px);background:#fff;border:4px solid #7c3aed;border-radius:8px;padding:6px;display:flex;flex-wrap:wrap;align-content:flex-start;justify-content:center;gap:4px;cursor:pointer}
+.pb-cuadro{position:relative;height:clamp(240px,40vh,360px);background:#fff;border:4px solid #7c3aed;border-radius:8px;overflow:hidden;cursor:pointer;touch-action:none}
 .pb-cuadro.b{border-color:#16a34a}
 .pb-cuadro.encima,.pb-cuadro:focus-visible{box-shadow:0 0 0 4px rgba(245,184,46,.7)}
-.pb-cuadro .pb-pieza{width:clamp(30px,6.5vw,44px);height:clamp(30px,6.5vw,44px);display:grid;place-items:center;cursor:grab;touch-action:none}
+.pb-cuadro .pb-pieza{position:absolute;width:clamp(30px,6.5vw,44px);height:clamp(30px,6.5vw,44px);display:grid;place-items:center;cursor:grab;touch-action:none}
 .pb-cuadro .pb-pieza img{width:clamp(28px,6vw,40px);height:clamp(28px,6vw,40px);object-fit:contain;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))}
-.pb-cuenta{margin:4px 0 0;text-align:center;font-weight:900;color:var(--soft)}
 .pb-arrastre{position:fixed;z-index:80;width:44px;height:44px;pointer-events:none;display:grid;place-items:center}
 .pb-arrastre img{width:44px;height:44px;object-fit:contain}
 .teo-menu .btn{font-size:clamp(1.1rem,2.6vw,1.4rem);padding:.8em 1.2em}
@@ -1051,12 +1050,12 @@ button{font:inherit;color:inherit;cursor:pointer}
     <div class="prob-fb" id="pbFb" aria-live="polite"></div>
     <div class="card-wide">
       <h3 class="pb-sub">Objetos</h3>
-      <p class="pb-ayuda">Toca un objeto y luego el cuadro de una persona (o arrástralo). Puedes usar cada objeto las veces que quieras. Toca un objeto del cuadro para quitarlo.</p>
+      <p class="pb-ayuda">Toca un objeto y luego el cuadro de una persona (o arrástralo). Puedes usar cada objeto las veces que quieras y moverlo dentro del cuadro. Si lo sacas del cuadro, regresa a los objetos.</p>
       <div class="pb-paleta" id="pbPaleta" role="group" aria-label="Objetos"></div>
       <h3 class="pb-sub">Representa la situación anterior</h3>
       <div class="pb-cuadros">
-        <div class="pb-col"><p class="pb-nombre" id="pbNomA">Daniel</p><div class="pb-cuadro a" id="pbCuadroA" role="button" tabindex="0" aria-label="Cuadro de Daniel"></div><p class="pb-cuenta" id="pbCuentaA">0</p></div>
-        <div class="pb-col"><p class="pb-nombre" id="pbNomB">Nuria</p><div class="pb-cuadro b" id="pbCuadroB" role="button" tabindex="0" aria-label="Cuadro de Nuria"></div><p class="pb-cuenta" id="pbCuentaB">0</p></div>
+        <div class="pb-col"><p class="pb-nombre" id="pbNomA">Daniel</p><div class="pb-cuadro a" id="pbCuadroA" role="button" tabindex="0" aria-label="Cuadro de Daniel"></div></div>
+        <div class="pb-col"><p class="pb-nombre" id="pbNomB">Nuria</p><div class="pb-cuadro b" id="pbCuadroB" role="button" tabindex="0" aria-label="Cuadro de Nuria"></div></div>
       </div>
       <div class="teo-actions"><button class="btn btn-ghost" id="pbLimpiar">🧽 Limpiar los cuadros</button></div>
     </div>
@@ -2602,15 +2601,28 @@ function pbPintarPaleta(){
   $('#pbPaleta').innerHTML = ['naranja','manzana','lapiz'].map(o => `<button class="pb-obj" data-o="${o}" aria-label="${PB_OBJ[o][0]}" title="${PB_OBJ[o][0]}"><img src="${PB_IMG[o]}" alt="" draggable="false"></button>`).join('');
 }
 function pbSel(o){ PB.sel = o; $$('#pbPaleta .pb-obj').forEach(b => b.classList.toggle('sel', b.dataset.o === o)); }
-function pbContar(){ $('#pbCuentaA').textContent = $('#pbCuadroA').children.length; $('#pbCuentaB').textContent = $('#pbCuadroB').children.length; }
-function pbPoner(cuadro, o){
+// Cada objeto se coloca donde se suelta (o en el primer lugar libre) y se puede mover dentro del cuadro
+function pbUbicar(cuadro, pieza, x, y){
+  const w = pieza.offsetWidth || 40, h = pieza.offsetHeight || 40, W = cuadro.clientWidth, H = cuadro.clientHeight;
+  pieza.style.left = Math.max(0, Math.min(W - w, x)) + 'px'; pieza.style.top = Math.max(0, Math.min(H - h, y)) + 'px';
+}
+function pbLibre(cuadro, pieza){
+  const w = pieza.offsetWidth, h = pieza.offsetHeight, W = cuadro.clientWidth, H = cuadro.clientHeight;
+  const otros = [...cuadro.children].filter(p => p !== pieza).map(p => [p.offsetLeft, p.offsetTop]);
+  for(let y = 4; y + h <= H; y += h + 2) for(let x = 4; x + w <= W; x += w + 2)
+    if(otros.every(([ox, oy]) => x + w <= ox || ox + w <= x || y + h <= oy || oy + h <= y)) return [x, y];
+  return [Math.random()*(W - w), Math.random()*(H - h)];
+}
+function pbPoner(cuadro, o, x, y){
   const d = document.createElement('span'); d.className = 'pb-pieza'; d.dataset.o = o;
   d.innerHTML = `<img src="${PB_IMG[o]}" alt="${PB_OBJ[o][0]}" draggable="false">`;
-  cuadro.appendChild(d); pop(); pbContar();
+  cuadro.appendChild(d);
+  if(x === undefined) [x, y] = pbLibre(cuadro, d); else { x -= d.offsetWidth/2; y -= d.offsetHeight/2; }
+  pbUbicar(cuadro, d, x, y); pop();
 }
-function pbLimpiar(){ $('#pbCuadroA').innerHTML = ''; $('#pbCuadroB').innerHTML = ''; pbContar(); }
+function pbLimpiar(){ $('#pbCuadroA').innerHTML = ''; $('#pbCuadroB').innerHTML = ''; }
 const pbCuadroEn = (x, y) => [$('#pbCuadroA'), $('#pbCuadroB')].find(c => { const r = c.getBoundingClientRect(); return x > r.left && x < r.right && y > r.top && y < r.bottom; });
-// arrastrar desde la paleta o de un cuadro a otro; fuera de los cuadros = se quita
+// arrastrar desde la paleta o mover un objeto (dentro de su cuadro o al otro); fuera de los cuadros regresa a los objetos
 function pbArrastrar(e, o, pieza){
   e.preventDefault();
   const x0 = e.clientX, y0 = e.clientY; let fantasma = null;
@@ -2618,7 +2630,7 @@ function pbArrastrar(e, o, pieza){
     if(!fantasma){
       if(Math.hypot(ev.clientX - x0, ev.clientY - y0) < 6) return;
       fantasma = document.createElement('div'); fantasma.className = 'pb-arrastre'; fantasma.innerHTML = `<img src="${PB_IMG[o]}" alt="">`;
-      document.body.appendChild(fantasma); if(pieza) pieza.style.opacity = '.3';
+      document.body.appendChild(fantasma); if(pieza) pieza.style.visibility = 'hidden';
     }
     fantasma.style.left = ev.clientX - 22 + 'px'; fantasma.style.top = ev.clientY - 22 + 'px';
     [$('#pbCuadroA'), $('#pbCuadroB')].forEach(c => c.classList.toggle('encima', c === pbCuadroEn(ev.clientX, ev.clientY)));
@@ -2626,14 +2638,16 @@ function pbArrastrar(e, o, pieza){
   const soltar = ev => {
     removeEventListener('pointermove', mover); removeEventListener('pointerup', soltar); removeEventListener('pointercancel', soltar);
     [$('#pbCuadroA'), $('#pbCuadroB')].forEach(c => c.classList.remove('encima'));
-    if(!fantasma){   // fue un toque
-      if(pieza){ pieza.remove(); pbContar(); } else pbSel(PB.sel === o ? null : o);
-      return;
-    }
-    fantasma.remove();
+    if(!fantasma){ if(!pieza) pbSel(PB.sel === o ? null : o); return; }   // toque en la paleta = elegir el objeto
+    fantasma.remove(); PB.arrastre = Date.now();
     const c = pbCuadroEn(ev.clientX, ev.clientY);
-    if(pieza){ if(c && c !== pieza.parentElement){ c.appendChild(pieza); pop(); } else if(!c) pieza.remove(); pieza.style.opacity = ''; pbContar(); }
-    else if(c) pbPoner(c, o);
+    if(pieza){
+      if(!c){ pieza.remove(); return; }   // fuera del cuadro: regresa a los objetos
+      const r = c.getBoundingClientRect();
+      if(c !== pieza.parentElement) c.appendChild(pieza);
+      pieza.style.visibility = '';
+      pbUbicar(c, pieza, ev.clientX - r.left - c.clientLeft - pieza.offsetWidth/2, ev.clientY - r.top - c.clientTop - pieza.offsetHeight/2); pop();
+    }else if(c){ const r = c.getBoundingClientRect(); pbPoner(c, o, ev.clientX - r.left - c.clientLeft, ev.clientY - r.top - c.clientTop); }
   };
   addEventListener('pointermove', mover); addEventListener('pointerup', soltar); addEventListener('pointercancel', soltar);
 }
@@ -2641,7 +2655,11 @@ $('#pbPaleta').addEventListener('pointerdown', e => { const b = e.target.closest
 $('#pbPaleta').addEventListener('keydown', e => { const b = e.target.closest('.pb-obj'); if(b && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); pbSel(b.dataset.o); } });
 [$('#pbCuadroA'), $('#pbCuadroB')].forEach(c => {
   c.addEventListener('pointerdown', e => { const p = e.target.closest('.pb-pieza'); if(p && e.button <= 0) pbArrastrar(e, p.dataset.o, p); });
-  c.addEventListener('click', e => { if(!e.target.closest('.pb-pieza') && PB.sel) pbPoner(c, PB.sel); });
+  // tocar el cuadro con un objeto elegido lo coloca donde se tocó (no después de mover un objeto)
+  c.addEventListener('click', e => {
+    if(e.target.closest('.pb-pieza') || !PB.sel || Date.now() - (PB.arrastre || 0) < 400) return;
+    const r = c.getBoundingClientRect(); pbPoner(c, PB.sel, e.clientX - r.left - c.clientLeft, e.clientY - r.top - c.clientTop);
+  });
   c.addEventListener('keydown', e => { if((e.key === 'Enter' || e.key === ' ') && PB.sel){ e.preventDefault(); pbPoner(c, PB.sel); } });
 });
 function pbComprobar(){
