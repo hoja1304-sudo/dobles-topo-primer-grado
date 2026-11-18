@@ -134,6 +134,35 @@
   @media (max-width:420px){
     .segmented{grid-template-columns:1fr}.stage{min-height:500px}.hint{border-radius:10px;text-align:center}
   }
+  .theme-toggle{display:inline-grid;place-items:center;width:34px;height:34px;border:1px solid var(--line);border-radius:9px;background:rgba(9,18,30,.5);color:var(--ink);cursor:pointer;transition:.15s;flex:none}
+  .theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+  .theme-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .theme-toggle .ic-moon{display:none}
+  :root[data-theme="light"] .theme-toggle .ic-sun{display:none}
+  :root[data-theme="light"] .theme-toggle .ic-moon{display:inline}
+  /* ---- Tema claro ---- */
+  :root[data-theme="light"]{--bg:#eaf0f6;--panel:#ffffff;--panel-2:#f4f7fb;--line:#d2dce7;--ink:#17222e;--muted:#5a6b7b;--shadow:0 16px 40px rgba(20,40,70,.12)}
+  [data-theme="light"] body{background:radial-gradient(circle at 52% 16%,#ffffff 0,#e8eef5 52%,#dce6f1 100%)}
+  [data-theme="light"] .topbar{background:rgba(255,255,255,.85)}
+  [data-theme="light"] .panel{background:#ffffff}
+  [data-theme="light"] .stage{background:radial-gradient(circle at 50% 32%,#f4f9ff 0,#e7eff8 56%,#dbe6f2 100%)}
+  [data-theme="light"] .segmented{background:#eef3f9;border-color:#d8e1ec}
+  [data-theme="light"] .segmented button:hover{background:#e1e9f3}
+  [data-theme="light"] .btn-wide{background:#eef3f9;border-color:#d8e1ec}
+  [data-theme="light"] .btn-wide[aria-pressed="false"]{background:#f1f4f9}
+  [data-theme="light"] .btn-wide:hover{background:#e1e9f3}
+  [data-theme="light"] .step-value{background:#eef3f9;border-color:#d8e1ec}
+  [data-theme="light"] .step-btn{background:#eef3f9;border-color:#d2dce7}
+  [data-theme="light"] .step-btn:hover:not(:disabled){background:#e1e9f3}
+  [data-theme="light"] .result-badge{background:rgba(255,255,255,.9)}
+  [data-theme="light"] .icon-btn{background:rgba(255,255,255,.9)}
+  [data-theme="light"] .metric{background:#f4f7fb}
+  [data-theme="light"] .formula{background:linear-gradient(145deg,#f3f8ff,#eaf1fa)}
+  [data-theme="light"] .callout{color:#33465a}
+  [data-theme="light"] .hint{background:rgba(255,255,255,.82);color:#44586c}
+  [data-theme="light"] .interaction{background:rgba(255,255,255,.9)}
+  [data-theme="light"] .section-info{background:rgba(255,255,255,.96)}
+  [data-theme="light"] .theme-toggle{background:rgba(255,255,255,.7)}
 </style>
 </head>
 <body>
@@ -145,7 +174,7 @@
       </div>
       <div><h1>Laboratorio de secciones planas</h1><p>Cuerpos redondos · exploración tridimensional</p></div>
     </div>
-    <div class="status"><i></i><span>Geometría en tiempo real</span></div>
+    <div class="status"><button id="themeToggle" class="theme-toggle" type="button" aria-label="Cambiar entre tema claro y oscuro" title="Tema claro / oscuro"><svg class="ic-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="4.4" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.2V4.6M12 19.4V21.8M2.2 12H4.6M19.4 12H21.8M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="ic-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20.5 14.3A8 8 0 1 1 9.7 3.5a6.3 6.3 0 0 0 10.8 10.8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button><i></i><span>Geometría en tiempo real</span></div>
   </header>
 
   <main class="workspace">
@@ -315,11 +344,12 @@ async function start(){
 
   const state={shape:"cylinder",radius:2,height:5,orientation:"horizontal",angle:42,azimuth:0,offset:0,cut:false,viz:"transparent",planeVisible:true};
   const clipPlane=new THREE.Plane(new THREE.Vector3(0,1,0),0);
-  let solid=null,solidEdges=null,section=null,sectionEdge=null,planeMesh=null,planeEdge=null,planeHandle=null;
+  let solid=null,solidEdges=null,solidWire=null,section=null,sectionEdge=null,planeMesh=null,planeEdge=null,planeHandle=null;
   let hull2=[],sectionArea=0,sectionPerimeter=0,bound=3.2;
 
   const solidMaterial=new THREE.MeshPhysicalMaterial({color:0xe6b765,roughness:.42,metalness:.02,clearcoat:.16,transparent:true,opacity:.93,side:THREE.DoubleSide,clippingPlanes:[clipPlane]});
   const edgeMaterial=new THREE.LineBasicMaterial({color:0x4b3720,transparent:true,opacity:.34,clippingPlanes:[clipPlane]});
+  const wireMaterial=new THREE.LineBasicMaterial({color:0xe6b765,transparent:true,opacity:.45,clippingPlanes:[clipPlane]});
   const sectionMaterial=new THREE.MeshStandardMaterial({color:0x34d399,emissive:0x0a5d43,emissiveIntensity:.55,roughness:.38,metalness:.02,side:THREE.DoubleSide,depthWrite:true,transparent:true});
   const sectionLineMaterial=new THREE.LineBasicMaterial({color:0xef4444,transparent:true,opacity:1,depthTest:false});
   const planeMaterial=new THREE.MeshBasicMaterial({color:0x67e8f9,transparent:true,opacity:.105,side:THREE.DoubleSide,depthWrite:false});
@@ -334,10 +364,11 @@ async function start(){
 
   function clearObject(obj){if(obj){root.remove(obj);obj.geometry?.dispose();}}
   function rebuildSolid(){
-    clearObject(solid);clearObject(solidEdges);
+    clearObject(solid);clearObject(solidEdges);clearObject(solidWire);
     const geometry=makeGeometry();geometry.computeVertexNormals();
     solid=new THREE.Mesh(geometry,solidMaterial);root.add(solid);
     solidEdges=new THREE.LineSegments(new THREE.EdgesGeometry(geometry,22),edgeMaterial);root.add(solidEdges);
+    solidWire=new THREE.LineSegments(new THREE.WireframeGeometry(geometry),wireMaterial);solidWire.visible=false;root.add(solidWire);
     bound=state.shape==="sphere"?state.radius:Math.hypot(state.radius,state.height/2);
     const offset=$("offset");offset.min=(-bound*.98).toFixed(2);offset.max=(bound*.98).toFixed(2);offset.step=(bound/120).toFixed(3);
     state.offset=Math.max(-bound*.96,Math.min(bound*.96,state.offset));offset.value=state.offset;
@@ -390,7 +421,7 @@ async function start(){
     const n=planeNormal(),origin=n.clone().multiplyScalar(state.offset);
     // Conserva la mitad opuesta a la vista inicial para dejar expuesta la sección.
     clipPlane.normal.copy(n).multiplyScalar(-1);clipPlane.constant=state.offset;
-    solidMaterial.clippingPlanes=state.cut?[clipPlane]:[];edgeMaterial.clippingPlanes=state.cut?[clipPlane]:[];
+    solidMaterial.clippingPlanes=state.cut?[clipPlane]:[];edgeMaterial.clippingPlanes=state.cut?[clipPlane]:[];wireMaterial.clippingPlanes=state.cut?[clipPlane]:[];
     applyVisualization();
     sectionMaterial.depthTest=state.cut;sectionMaterial.depthWrite=state.cut;sectionMaterial.opacity=state.cut?1:.84;
 
@@ -421,11 +452,9 @@ async function start(){
   function applyVisualization(){
     if(!solid)return;
     if(state.viz==="structure"){
-      solid.visible=false;if(solidEdges)solidEdges.visible=true;
-      edgeMaterial.color.setHex(0xf0d49a);edgeMaterial.opacity=1;
+      solid.visible=false;if(solidEdges)solidEdges.visible=false;if(solidWire)solidWire.visible=true;
     }else{
-      solid.visible=true;if(solidEdges)solidEdges.visible=true;
-      edgeMaterial.color.setHex(0x4b3720);
+      solid.visible=true;if(solidEdges)solidEdges.visible=true;if(solidWire)solidWire.visible=false;
       if(state.viz==="normal"){solidMaterial.opacity=state.cut?1:.97;edgeMaterial.opacity=state.cut?.34:.42;}
       else{solidMaterial.opacity=state.cut?.9:.55;edgeMaterial.opacity=state.cut?.34:.5;}
     }
@@ -526,6 +555,14 @@ async function start(){
   $("displayButtons").addEventListener("click",e=>{const b=e.target.closest("button[data-display]");if(b)setDisplay(b.dataset.display)});
   $("vizButtons").addEventListener("click",e=>{const b=e.target.closest("button[data-viz]");if(b)setViz(b.dataset.viz)});
   $("planeToggle").addEventListener("click",togglePlane);
+  function applyTheme(t){
+    const light=t==="light";
+    if(light)document.documentElement.setAttribute("data-theme","light");else document.documentElement.removeAttribute("data-theme");
+    if(floor){floor.material.vertexColors=!light;floor.material.color.setHex(light?0xaab9c9:0xffffff);floor.material.opacity=light?.6:.42;floor.material.needsUpdate=true;}
+    try{localStorage.setItem("secc-theme",light?"light":"dark");}catch(e){}
+  }
+  $("themeToggle").addEventListener("click",()=>applyTheme(document.documentElement.getAttribute("data-theme")==="light"?"dark":"light"));
+  try{if(localStorage.getItem("secc-theme")==="light")applyTheme("light");}catch(e){}
   $("orientationButtons").addEventListener("click",e=>{const b=e.target.closest("button[data-orientation]");if(b)setOrientation(b.dataset.orientation)});
   const DIM={radius:{min:1,max:5,get:()=>state.radius,set:v=>{state.radius=v}},height:{min:2,max:8,get:()=>state.height,set:v=>{state.height=v}}};
   function setStepperDisabled(id,disabled){const st=$(id);if(!st)return;st.classList.toggle("disabled",disabled);st.querySelectorAll(".step-btn").forEach(b=>{b.disabled=disabled});}
