@@ -42,6 +42,10 @@
   .segmented button:active{transform:scale(.97)}
   .segmented button.on{background:var(--accent);color:#052017;box-shadow:0 5px 18px rgba(52,211,153,.16)}
   .segmented.display-switch{grid-template-columns:1fr 1.25fr}
+  .btn-wide{width:100%;min-height:40px;margin-top:8px;border:1px solid #1e2d40;border-radius:10px;background:#0b1522;color:var(--ink);font-weight:650;font-size:.8rem;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+  .btn-wide:hover{background:#15283c;border-color:var(--accent)}
+  .btn-wide[aria-pressed="false"]{color:var(--muted);background:#0a131f}
+  .btn-wide:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   input[type="range"]{width:100%;height:5px;margin:8px 0 0;appearance:none;border-radius:99px;background:linear-gradient(90deg,var(--accent) 0 var(--fill,50%),#2b3a4d var(--fill,50%) 100%);cursor:pointer}
   input[type="range"]::-webkit-slider-thumb{appearance:none;width:18px;height:18px;border-radius:50%;background:#e9fff7;border:4px solid var(--accent-2);box-shadow:0 2px 8px rgba(0,0,0,.35)}
   input[type="range"]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#e9fff7;border:4px solid var(--accent-2)}
@@ -192,6 +196,15 @@
         <p class="helper">Primero observa el plano atravesando el cuerpo completo; luego revela el resultado.</p>
       </div>
       <div class="field">
+        <div class="field-head"><span class="field-label">Visualización</span></div>
+        <div class="segmented" id="vizButtons" role="group" aria-label="Estilo de visualización del sólido">
+          <button data-viz="normal" aria-pressed="false">Normal</button>
+          <button class="on" data-viz="transparent" aria-pressed="true">Transparente</button>
+          <button data-viz="structure" aria-pressed="false">Estructura</button>
+        </div>
+        <button class="btn-wide on" id="planeToggle" type="button" aria-pressed="true">Ocultar plano</button>
+      </div>
+      <div class="field">
         <div class="field-head"><span class="field-label">Orientación del plano</span></div>
         <div class="segmented" id="orientationButtons" role="group" aria-label="Orientación del plano">
           <button class="on" data-orientation="horizontal" aria-pressed="true">Horizontal</button>
@@ -300,7 +313,7 @@ async function start(){
   const baseDot=new THREE.Mesh(new THREE.SphereGeometry(1,20,16),new THREE.MeshBasicMaterial({color:0x0b0b0b,depthTest:false}));
   baseDot.renderOrder=6;scene.add(baseDot);
 
-  const state={shape:"cylinder",radius:2,height:5,orientation:"horizontal",angle:42,azimuth:0,offset:0,cut:false};
+  const state={shape:"cylinder",radius:2,height:5,orientation:"horizontal",angle:42,azimuth:0,offset:0,cut:false,viz:"transparent",planeVisible:true};
   const clipPlane=new THREE.Plane(new THREE.Vector3(0,1,0),0);
   let solid=null,solidEdges=null,section=null,sectionEdge=null,planeMesh=null,planeEdge=null,planeHandle=null;
   let hull2=[],sectionArea=0,sectionPerimeter=0,bound=3.2;
@@ -378,7 +391,7 @@ async function start(){
     // Conserva la mitad opuesta a la vista inicial para dejar expuesta la sección.
     clipPlane.normal.copy(n).multiplyScalar(-1);clipPlane.constant=state.offset;
     solidMaterial.clippingPlanes=state.cut?[clipPlane]:[];edgeMaterial.clippingPlanes=state.cut?[clipPlane]:[];
-    solidMaterial.opacity=state.cut?.93:.58;edgeMaterial.opacity=state.cut?.34:.5;
+    applyVisualization();
     sectionMaterial.depthTest=state.cut;sectionMaterial.depthWrite=state.cut;sectionMaterial.opacity=state.cut?1:.84;
 
     const planeSize=Math.max(7,bound*2.65),pg=new THREE.PlaneGeometry(planeSize,planeSize);
@@ -401,8 +414,34 @@ async function start(){
       section=new THREE.Mesh(sg,sectionMaterial);section.renderOrder=3;root.add(section);
       sectionEdge=new THREE.LineSegments(new THREE.EdgesGeometry(sg),sectionLineMaterial);sectionEdge.renderOrder=4;root.add(sectionEdge);
     }else{sectionArea=0;sectionPerimeter=0;}
+    applyPlaneVisibility();
     updateReadouts();
     if(!$("sectionInfo").hidden)showSectionInfo();
+  }
+  function applyVisualization(){
+    if(!solid)return;
+    if(state.viz==="structure"){
+      solid.visible=false;if(solidEdges)solidEdges.visible=true;
+      edgeMaterial.color.setHex(0xf0d49a);edgeMaterial.opacity=1;
+    }else{
+      solid.visible=true;if(solidEdges)solidEdges.visible=true;
+      edgeMaterial.color.setHex(0x4b3720);
+      if(state.viz==="normal"){solidMaterial.opacity=state.cut?1:.97;edgeMaterial.opacity=state.cut?.34:.42;}
+      else{solidMaterial.opacity=state.cut?.9:.55;edgeMaterial.opacity=state.cut?.34:.5;}
+    }
+  }
+  function applyPlaneVisibility(){
+    const v=state.planeVisible;
+    if(planeMesh)planeMesh.visible=v;if(planeEdge)planeEdge.visible=v;if(planeHandle)planeHandle.visible=v;
+  }
+  function setViz(v){
+    state.viz=v;document.querySelectorAll("#vizButtons button").forEach(b=>{const on=b.dataset.viz===v;b.classList.toggle("on",on);b.setAttribute("aria-pressed",on)});
+    applyVisualization();
+  }
+  function togglePlane(){
+    state.planeVisible=!state.planeVisible;
+    const btn=$("planeToggle");btn.textContent=state.planeVisible?"Ocultar plano":"Ver plano";btn.setAttribute("aria-pressed",state.planeVisible?"true":"false");btn.classList.toggle("on",state.planeVisible);
+    applyPlaneVisibility();
   }
 
   function sectionType(){
@@ -485,6 +524,8 @@ async function start(){
 
   $("shapeButtons").addEventListener("click",e=>{const b=e.target.closest("button[data-shape]");if(b)setShape(b.dataset.shape)});
   $("displayButtons").addEventListener("click",e=>{const b=e.target.closest("button[data-display]");if(b)setDisplay(b.dataset.display)});
+  $("vizButtons").addEventListener("click",e=>{const b=e.target.closest("button[data-viz]");if(b)setViz(b.dataset.viz)});
+  $("planeToggle").addEventListener("click",togglePlane);
   $("orientationButtons").addEventListener("click",e=>{const b=e.target.closest("button[data-orientation]");if(b)setOrientation(b.dataset.orientation)});
   const DIM={radius:{min:1,max:5,get:()=>state.radius,set:v=>{state.radius=v}},height:{min:2,max:8,get:()=>state.height,set:v=>{state.height=v}}};
   function setStepperDisabled(id,disabled){const st=$(id);if(!st)return;st.classList.toggle("disabled",disabled);st.querySelectorAll(".step-btn").forEach(b=>{b.disabled=disabled});}
@@ -525,7 +566,7 @@ async function start(){
   function hitsObject(e,obj){
     if(!obj)return false;const r=canvas.getBoundingClientRect();pointerNdc.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);raycaster.setFromCamera(pointerNdc,camera);obj.updateMatrixWorld(true);return raycaster.intersectObject(obj,false).length>0;
   }
-  const overPlaneHandle=e=>hitsObject(e,planeHandle),overSection=e=>hitsObject(e,section);
+  const overPlaneHandle=e=>state.planeVisible&&hitsObject(e,planeHandle),overSection=e=>hitsObject(e,section);
   const pointers=new Map();let pinch=0,draggingPlane=false,dragDistance=0;
   canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});dragDistance=0;draggingPlane=overPlaneHandle(e);canvas.classList.toggle("plane-control",draggingPlane);canvas.classList.add("dragging");if(pointers.size===2){draggingPlane=false;const a=[...pointers.values()];pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
   canvas.addEventListener("pointermove",e=>{
