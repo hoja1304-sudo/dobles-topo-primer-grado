@@ -288,7 +288,7 @@ async function start(){
   renderer.outputColorSpace=THREE.SRGBColorSpace;
   renderer.localClippingEnabled=true;
   const scene=new THREE.Scene();
-  const camera=new THREE.PerspectiveCamera(30,1,.05,200);
+  const camera=new THREE.OrthographicCamera(-1,1,1,-1,.01,400);
   scene.add(new THREE.HemisphereLight(0xcde7ff,0x1a2634,1.65));
   const key=new THREE.DirectionalLight(0xffffff,2.35);key.position.set(5,8,6);scene.add(key);
   const rim=new THREE.DirectionalLight(0x67e8f9,1.05);rim.position.set(-5,2,-5);scene.add(rim);
@@ -297,6 +297,8 @@ async function start(){
   const root=new THREE.Group();scene.add(root);
   const floor=new THREE.GridHelper(16,32,0x36506b,0x24384e);floor.position.y=-3.52;
   floor.material.opacity=.42;floor.material.transparent=true;scene.add(floor);
+  const baseDot=new THREE.Mesh(new THREE.SphereGeometry(1,20,16),new THREE.MeshBasicMaterial({color:0x0b0b0b,depthTest:false}));
+  baseDot.renderOrder=6;scene.add(baseDot);
 
   const state={shape:"cylinder",radius:2,height:5,orientation:"horizontal",angle:42,azimuth:0,offset:0,cut:false};
   const clipPlane=new THREE.Plane(new THREE.Vector3(0,1,0),0);
@@ -327,6 +329,7 @@ async function start(){
     const offset=$("offset");offset.min=(-bound*.98).toFixed(2);offset.max=(bound*.98).toFixed(2);offset.step=(bound/120).toFixed(3);
     state.offset=Math.max(-bound*.96,Math.min(bound*.96,state.offset));offset.value=state.offset;
     floor.position.y=-(state.shape==="sphere"?state.radius:state.height/2)-.52;
+    const baseY=-(state.shape==="sphere"?state.radius:state.height/2);baseDot.position.set(0,baseY,0);baseDot.scale.setScalar(Math.max(.05,solidBoundRadius()*.03));
     frameSolid();rebuildPlaneAndSection();updateReadouts();
   }
 
@@ -498,16 +501,14 @@ async function start(){
   $("offset").addEventListener("input",e=>{state.offset=+e.target.value;rebuildPlaneAndSection()});
   $("closeSectionInfo").addEventListener("click",hideSectionInfo);document.addEventListener("keydown",e=>{if(e.key==="Escape")hideSectionInfo()});
 
-  const cam={theta:.72,phi:1.18,radius:11,target:new THREE.Vector3(0,0,0)};
-  let fitDist=11;
+  const cam={theta:.72,phi:1.18,target:new THREE.Vector3(0,0,0)};
+  const ORBIT=40;
+  let viewSize=4,viewAspect=1;
   function solidBoundRadius(){return state.shape==="sphere"?state.radius:Math.hypot(state.radius,state.height/2);}
-  function computeFitDist(){
-    const br=solidBoundRadius(),vFov=THREE.MathUtils.degToRad(camera.fov);
-    const hFov=2*Math.atan(Math.tan(vFov/2)*Math.max(camera.aspect,.0001)),fov=Math.min(vFov,hFov);
-    return br/Math.sin(fov/2)*1.16;
-  }
-  function frameSolid(){fitDist=computeFitDist();cam.radius=fitDist;}
-  function clampZoom(v){return Math.max(fitDist*.45,Math.min(fitDist*2.4,v));}
+  function computeFitView(){return solidBoundRadius()*1.18;}
+  function applyFrustum(){camera.left=-viewSize*viewAspect;camera.right=viewSize*viewAspect;camera.top=viewSize;camera.bottom=-viewSize;camera.updateProjectionMatrix();}
+  function frameSolid(){viewSize=computeFitView();applyFrustum();}
+  function clampZoom(v){const f=computeFitView();return Math.max(f*.45,Math.min(f*2.4,v));}
   function resetCamera(){cam.theta=.72;cam.phi=1.18;cam.target.set(0,0,0);frameSolid();}
   $("resetView").addEventListener("click",resetCamera);
 
@@ -529,7 +530,7 @@ async function start(){
   canvas.addEventListener("pointerdown",e=>{canvas.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});dragDistance=0;draggingPlane=overPlaneHandle(e);canvas.classList.toggle("plane-control",draggingPlane);canvas.classList.add("dragging");if(pointers.size===2){draggingPlane=false;const a=[...pointers.values()];pinch=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}});
   canvas.addEventListener("pointermove",e=>{
     if(!pointers.has(e.pointerId)){const handle=overPlaneHandle(e);canvas.classList.toggle("plane-control",handle);canvas.classList.toggle("section-hover",!handle&&overSection(e));return}const prev=pointers.get(e.pointerId),dx=e.clientX-prev.x,dy=e.clientY-prev.y;dragDistance+=Math.hypot(dx,dy);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
-    if(pointers.size===2){const a=[...pointers.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(pinch)cam.radius=clampZoom(cam.radius*pinch/d);pinch=d;return}
+    if(pointers.size===2){const a=[...pointers.values()],d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);if(pinch){viewSize=clampZoom(viewSize*pinch/d);applyFrustum();}pinch=d;return}
     if(draggingPlane){
       state.offset=Math.max(-bound*.98,Math.min(bound*.98,state.offset-dy*bound*.0048));$("offset").value=state.offset;
       if(state.orientation==="inclined"){state.angle=Math.max(5,Math.min(90,state.angle+dx*.22));$("angle").value=state.angle}
@@ -537,12 +538,12 @@ async function start(){
     }else{cam.theta-=dx*.008;cam.phi=Math.max(.05,Math.min(Math.PI-.05,cam.phi+dy*.008))}
   });
   const endPointer=e=>{const identify=pointers.size===1&&!draggingPlane&&dragDistance<7&&overSection(e);pointers.delete(e.pointerId);if(identify)showSectionInfo();if(!pointers.size){draggingPlane=false;dragDistance=0;canvas.classList.remove("dragging","plane-control","section-hover")}};canvas.addEventListener("pointerup",endPointer);canvas.addEventListener("pointercancel",endPointer);
-  canvas.addEventListener("wheel",e=>{e.preventDefault();cam.radius=clampZoom(cam.radius*Math.exp(e.deltaY*.001))},{passive:false});
+  canvas.addEventListener("wheel",e=>{e.preventDefault();viewSize=clampZoom(viewSize*Math.exp(e.deltaY*.001));applyFrustum();},{passive:false});
 
-  function resize(){const r=stage.getBoundingClientRect(),w=Math.max(1,r.width),h=Math.max(1,r.height);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();fitDist=computeFitDist();cam.radius=clampZoom(cam.radius)}
+  function resize(){const r=stage.getBoundingClientRect(),w=Math.max(1,r.width),h=Math.max(1,r.height);renderer.setSize(w,h,false);viewAspect=w/h;viewSize=clampZoom(viewSize);applyFrustum()}
   const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(stage);resize();
   function animate(){
-    requestAnimationFrame(animate);const sp=Math.sin(cam.phi),cp=Math.cos(cam.phi);camera.position.set(cam.target.x+cam.radius*sp*Math.cos(cam.theta),cam.target.y+cam.radius*cp,cam.target.z+cam.radius*sp*Math.sin(cam.theta));camera.lookAt(cam.target);renderer.render(scene,camera);
+    requestAnimationFrame(animate);const sp=Math.sin(cam.phi),cp=Math.cos(cam.phi);camera.position.set(cam.target.x+ORBIT*sp*Math.cos(cam.theta),cam.target.y+ORBIT*cp,cam.target.z+ORBIT*sp*Math.sin(cam.theta));camera.lookAt(cam.target);renderer.render(scene,camera);
   }
   resetCamera();rebuildSolid();updateReadouts();$("loading").hidden=true;animate();
 }
