@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Secciones planas · Práctica</title>
+<link rel="stylesheet" href="katex/katex.min.css">
+<script src="katex/katex.min.js"></script>
+<script src="katex/auto-render.min.js"></script>
+<style>
+  :root{
+    --ink:#15202b;--muted:#5b6b7a;--line:#d7dee6;--bg:#eef1f5;--card:#ffffff;
+    --accent:#0f766e;--accent-soft:#e6f4f1;--ok:#15803d;--bad:#b91c1c;--warm:#b45309
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font-family:Arial,Helvetica,sans-serif;min-height:100dvh}
+  /* ---- toolbar ---- */
+  .toolbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    padding:12px 18px;background:#0e1b2b;color:#eaf1f8;border-bottom:1px solid #22354a}
+  .tbar-title{font-weight:700;font-size:1rem}
+  .tbar-spacer{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:7px;border:1px solid #2a3a4e;background:#15283c;color:#eaf1f8;
+    font-weight:650;font-size:.86rem;padding:9px 14px;border-radius:9px;cursor:pointer;font-family:inherit;transition:background .15s,border-color .15s}
+  .btn:hover{background:#1c3349;border-color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover{background:#0b5e57}
+  .btn.link{background:transparent;border-color:#2a3a4e}
+  .btn:focus-visible{outline:2px solid #5eead4;outline-offset:2px}
+  /* ---- sheet ---- */
+  .sheet{max-width:980px;margin:18px auto;background:var(--card);border:1px solid var(--line);border-radius:14px;
+    box-shadow:0 10px 30px rgba(15,32,43,.08);padding:22px 24px 26px}
+  .sheet-head{text-align:center;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:16px}
+  .sheet-head h1{margin:0;font-size:1.22rem;letter-spacing:-.01em}
+  .sheet-head p{margin:4px 0 0;color:var(--muted);font-size:.86rem}
+  .items{display:grid;grid-template-columns:1fr 1fr;gap:16px 22px}
+  .item{border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:#fcfdfe;break-inside:avoid}
+  .q{font-size:12pt;line-height:1.4}
+  .num{font-weight:700;color:var(--accent);margin-right:4px}
+  .fig{display:flex;justify-content:center;margin:8px 0}
+  .fig svg{height:92px;width:auto;display:block}
+  .fig.big svg{height:152px}
+  .opts{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
+  .opt{display:flex;align-items:flex-start;gap:8px;width:100%;text-align:left;font-family:inherit;font-size:12pt;
+    border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 10px;cursor:pointer;color:var(--ink);transition:background .12s,border-color .12s}
+  .opt:hover:not(:disabled){background:var(--accent-soft);border-color:var(--accent)}
+  .opt:disabled{cursor:default}
+  .opt .letter{font-weight:700;color:var(--accent)}
+  .opt.correct{background:#e9f9ee;border-color:var(--ok)}
+  .opt.correct .letter{color:var(--ok)}
+  .opt.wrong{background:#fdecec;border-color:var(--bad)}
+  .opt.wrong .letter{color:var(--bad)}
+  .opt .mark{margin-left:auto;font-weight:800;font-size:1.05rem;line-height:1}
+  .opt.correct .mark{color:var(--ok)}
+  .opt.wrong .mark{color:var(--bad)}
+  .fb{margin-top:10px;border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+  .fb-head{display:flex;align-items:center;gap:8px;padding:8px 11px;font-weight:700;font-size:.92rem}
+  .fb.ok .fb-head{background:#e9f9ee;color:var(--ok)}
+  .fb.bad .fb-head{background:#fdecec;color:var(--bad)}
+  .fb-head .ico{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;color:#fff;font-size:.9rem;font-weight:800}
+  .fb.ok .fb-head .ico{background:var(--ok)}
+  .fb.bad .fb-head .ico{background:var(--bad)}
+  .fb-sol{padding:10px 12px;background:#fff;font-size:11.5pt;line-height:1.5}
+  .fb-sol b{display:block;margin-bottom:4px;color:var(--accent);font-size:.82rem;text-transform:uppercase;letter-spacing:.03em}
+  @media (max-width:720px){
+    .items{grid-template-columns:1fr}
+    .sheet{margin:12px;padding:16px}
+  }
+  /* ---- print: carta, una hoja ---- */
+  @media print{
+    @page{size:Letter;margin:1cm}
+    html,body{background:#fff}
+    .toolbar{display:none !important}
+    .sheet{max-width:none;margin:0;border:0;border-radius:0;box-shadow:none;padding:0}
+    .sheet-head h1{font-size:14pt}
+    .items{gap:10px 40px}
+    .item{background:#fff;break-inside:avoid;padding:8px 10px}
+    .q{font-size:12pt}
+    .opts{gap:2px}
+    .opt{font-size:12pt;padding:1px 0;border:none !important;background:transparent !important;border-radius:0}
+    .opt:disabled{background:transparent !important}
+    .opt .letter{color:#000}
+    .opt .mark{display:none}
+    .fb{display:none !important}
+    .fig svg{height:78px}
+    .fig.big svg{height:118px}
+  }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <a class="btn link" href="index.html" aria-label="Volver al menú principal">‹ Menú</a>
+    <span class="tbar-title" id="tbarTitle">Práctica 1 de 5</span>
+    <span class="tbar-spacer"></span>
+    <button class="btn" id="btnPrint" type="button">🖨 Imprimir</button>
+    <button class="btn primary" id="btnNew" type="button">↻ Nueva práctica</button>
+  </div>
+
+  <main class="sheet">
+    <div class="sheet-head">
+      <h1 id="sheetTitle">Práctica 1 · Secciones planas</h1>
+      <p>Secciones planas de cuerpos redondos (cilindro, cono y esfera). Selecciona una opción en cada ítem.</p>
+    </div>
+    <div class="items" id="items"></div>
+  </main>
+
+  <!-- Banco de figuras SVG incrustadas (sin dependencias externas) -->
+  <div id="figbank" hidden aria-hidden="true">
+<svg data-fig='cilPerp' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='204.428605 53.799745 57.39269 75.53335'><g><path d='M261.4726 63.218751C261.4726 58.20703 248.7812 54.14844 233.124993 54.14844C217.4687 54.14844 204.7773 58.20703 204.7773 63.218751C204.7773 68.22656 217.4687 72.28906 233.124993 72.28906C248.7812 72.28906 261.4726 68.22656 261.4726 63.218751Z' stroke='#000' fill='none' stroke-width='.69739'/><path d='M204.7773 63.218751V119.9102' stroke='#000' fill='none' stroke-width='.69739'/><path d='M261.4726 63.218751V119.9102' stroke='#000' fill='none' stroke-width='.69739'/><path d='M204.7773 119.9102C204.7773 124.9219 217.4687 128.9844 233.124993 128.9844C248.7812 128.9844 261.4726 124.9219 261.4726 119.9102' stroke='#000' fill='none' stroke-width='.69739'/><path d='M261.4726 119.9102C261.4726 114.9023 248.7812 110.8398 233.124993 110.8398C217.4687 110.8398 204.7773 114.9023 204.7773 119.9102' stroke='#000' fill='none' stroke-width='.69739' stroke-dasharray='2.98883 2.98883'/><path d='M204.7773 63.218751H261.4726V119.9102H204.7773Z' fill='#e6e6e6'/><path d='M204.7773 63.218751H261.4726V119.9102H204.7773Z' stroke='#000' fill='none' stroke-width='.69739' stroke-miterlimit='10'/></g></svg>
+<svg data-fig='recipiente' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='196.495005 53.799705 73.26379 65.89269'><g><path d='M253.5351 59.8164C253.5351 56.6836 244.3984 54.1484 233.124993 54.1484C221.8555 54.1484 212.7148 56.6836 212.7148 59.8164C212.7148 62.9453 221.8555 65.4844 233.124993 65.4844C244.3984 65.4844 253.5351 62.9453 253.5351 59.8164Z' stroke='#000' fill='none' stroke-width='.69739'/><path d='M253.5351 113.6758C253.5351 110.543 244.3984 108.0039 233.124993 108.0039C221.8555 108.0039 212.7148 110.543 212.7148 113.6758C212.7148 116.8047 221.8555 119.3437 233.124993 119.3437C244.3984 119.3437 253.5351 116.8047 253.5351 113.6758Z' fill='#d9d9d9'/><path d='M253.5351 113.6758C253.5351 110.543 244.3984 108.0039 233.124993 108.0039C221.8555 108.0039 212.7148 110.543 212.7148 113.6758C212.7148 116.8047 221.8555 119.3437 233.124993 119.3437C244.3984 119.3437 253.5351 116.8047 253.5351 113.6758Z' stroke='#000' fill='none' stroke-width='.69739' stroke-miterlimit='10'/><path d='M212.7148 59.8164C196.8437 72.5703 196.8437 100.918 212.7148 113.6758' stroke='#000' fill='none' stroke-width='.69739' stroke-miterlimit='10'/><path d='M253.5351 59.8164C269.4101 72.5703 269.4101 100.918 253.5351 113.6758' stroke='#000' fill='none' stroke-width='.69739' stroke-miterlimit='10'/></g></svg>
+<svg data-fig='cilObl' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='205.424705 53.799745 55.40449 74.39665'><g><path d='M260.0547 62.652343C260.0547 57.95312 248 54.14844 233.124993 54.14844C218.2539 54.14844 206.1953 57.95312 206.1953 62.652343C206.1953 67.34766 218.2539 71.15625 233.124993 71.15625C248 71.15625 260.0547 67.34766 260.0547 62.652343Z' stroke='#000' fill='none' stroke-width='.69739'/><path d='M206.1953 62.652343V119.3437' stroke='#000' fill='none' stroke-width='.69739'/><path d='M260.0547 62.652343V119.3437' stroke='#000' fill='none' stroke-width='.69739'/><path d='M206.1953 119.3437C206.1953 124.043 218.2539 127.8477 233.124993 127.8477C248 127.8477 260.0547 124.043 260.0547 119.3437' stroke='#000' fill='none' stroke-width='.69739'/><path d='M260.0547 119.3437C260.0547 114.6484 248 110.8398 233.124993 110.8398C218.2539 110.8398 206.1953 114.6484 206.1953 119.3437' stroke='#000' fill='none' stroke-width='.69739' stroke-dasharray='2.98883 2.98883'/><path d='M258.7383 99.3203C260.4805 93.9609 250.4258 85.8867 236.28124 81.293C222.1328 76.6953 209.2578 77.3164 207.5156 82.6758S215.8281 96.1055 229.97265 100.7031C244.1172 105.3008 256.9961 104.6797 258.7383 99.3203Z' fill='#e0e0e0'/><path d='M258.7383 99.3203C260.4805 93.9609 250.4258 85.8867 236.28124 81.293C222.1328 76.6953 209.2578 77.3164 207.5156 82.6758S215.8281 96.1055 229.97265 100.7031C244.1172 105.3008 256.9961 104.6797 258.7383 99.3203Z' stroke='#000' fill='none' stroke-width='.69739' stroke-miterlimit='10'/></g></svg>
+<svg data-fig='cono' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='203.014605 53.795805 60.22469 66.46305'><g><path d='M203.3633 110.839847C203.3633 115.85157 216.6875 119.91016 233.124993 119.91016C249.5664 119.91016 262.8906 115.85157 262.8906 110.839847' stroke='#000' fill='none' stroke-width='.69739'/><path d='M262.8906 110.839847C262.8906 105.82813 249.5664 101.76953 233.124993 101.76953C216.6875 101.76953 203.3633 105.82813 203.3633 110.839847' stroke='#000' fill='none' stroke-width='.69739' stroke-dasharray='2.98883 2.98883'/><path d='M203.3633 110.839847L233.124993 54.1445L262.8906 110.839847' stroke='#000' fill='none' stroke-width='.69739' stroke-miterlimit='10'/></g></svg>
+<svg data-fig='esferaCorte' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='151.952955 57.702993 162.616663 141.089027'><defs><path id='g0-65' d='M2.032379-1.327024C1.613948-.621669 1.207472-.382565 .633624-.3467C.502117-.334745 .406476-.334745 .406476-.119552C.406476-.047821 .466252 0 .549938 0C.765131 0 1.303113-.02391 1.518306-.02391C1.865006-.02391 2.247572 0 2.582316 0C2.654047 0 2.797509 0 2.797509-.227148C2.797509-.334745 2.701868-.3467 2.630137-.3467C2.355168-.37061 2.12802-.466252 2.12802-.753176C2.12802-.920548 2.199751-1.052055 2.355168-1.315068L3.263761-2.82142H6.312329C6.324284-2.713823 6.324284-2.618182 6.336239-2.510585C6.372105-2.199751 6.515567-.956413 6.515567-.729265C6.515567-.37061 5.905853-.3467 5.71457-.3467C5.583064-.3467 5.451557-.3467 5.451557-.131507C5.451557 0 5.559153 0 5.630884 0C5.834122 0 6.073225-.02391 6.276463-.02391H6.957908C7.687173-.02391 8.2132 0 8.225156 0C8.308842 0 8.440349 0 8.440349-.227148C8.440349-.3467 8.332752-.3467 8.153425-.3467C7.49589-.3467 7.483935-.454296 7.44807-.812951L6.718804-8.272976C6.694894-8.51208 6.647073-8.53599 6.515567-8.53599C6.396015-8.53599 6.324284-8.51208 6.216687-8.332752L2.032379-1.327024ZM3.466999-3.16812L5.869988-7.185056L6.276463-3.16812H3.466999Z'/><path id='g0-66' d='M4.375592-7.352428C4.483188-7.79477 4.531009-7.81868 4.99726-7.81868H6.551432C7.902366-7.81868 7.902366-6.670984 7.902366-6.563387C7.902366-5.595019 6.933998-4.363636 5.355915-4.363636H3.634371L4.375592-7.352428ZM6.396015-4.267995C7.699128-4.507098 8.88269-5.415691 8.88269-6.515567C8.88269-7.44807 8.057783-8.16538 6.706849-8.16538H2.86924C2.642092-8.16538 2.534496-8.16538 2.534496-7.938232C2.534496-7.81868 2.642092-7.81868 2.82142-7.81868C3.550685-7.81868 3.550685-7.723039 3.550685-7.591532C3.550685-7.567621 3.550685-7.49589 3.502864-7.316563L1.888917-.884682C1.78132-.466252 1.75741-.3467 .920548-.3467C.6934-.3467 .573848-.3467 .573848-.131507C.573848 0 .645579 0 .884682 0H4.985305C6.814446 0 8.225156-1.3868 8.225156-2.594271C8.225156-3.574595 7.364384-4.172354 6.396015-4.267995ZM4.698381-.3467H3.084433C2.917061-.3467 2.893151-.3467 2.82142-.358655C2.689913-.37061 2.677958-.394521 2.677958-.490162C2.677958-.573848 2.701868-.645579 2.725778-.753176L3.56264-4.124533H5.810212C7.220922-4.124533 7.220922-2.809465 7.220922-2.713823C7.220922-1.566127 6.180822-.3467 4.698381-.3467Z'/><path id='g0-67' d='M8.930511-8.308842C8.930511-8.416438 8.846824-8.416438 8.822914-8.416438S8.751183-8.416438 8.655542-8.296887L7.830635-7.292653C7.412204-8.009963 6.75467-8.416438 5.858032-8.416438C3.275716-8.416438 .597758-5.798257 .597758-2.988792C.597758-.992279 1.996513 .251059 3.741968 .251059C4.698381 .251059 5.535243-.155417 6.228643-.74122C7.268742-1.613948 7.579577-2.773599 7.579577-2.86924C7.579577-2.976837 7.483935-2.976837 7.44807-2.976837C7.340473-2.976837 7.328518-2.905106 7.304608-2.857285C6.75467-.992279 5.140722-.095641 3.945205-.095641C2.677958-.095641 1.578082-.908593 1.578082-2.606227C1.578082-2.988792 1.697634-5.068991 3.048568-6.635118C3.706102-7.400249 4.829888-8.069738 5.965629-8.069738C7.280697-8.069738 7.866501-6.981818 7.866501-5.762391C7.866501-5.451557 7.830635-5.188543 7.830635-5.140722C7.830635-5.033126 7.950187-5.033126 7.986052-5.033126C8.117559-5.033126 8.129514-5.045081 8.177335-5.260274L8.930511-8.308842Z'/><path id='g0-75' d='M5.977584-4.829888C5.965629-4.865753 5.917808-4.961395 5.917808-4.99726C5.917808-5.009215 5.929763-5.021171 6.133001-5.176588L7.292653-6.085181C8.894645-7.328518 9.420672-7.746949 10.245579-7.81868C10.329265-7.830635 10.448817-7.830635 10.448817-8.033873C10.448817-8.105604 10.412951-8.16538 10.31731-8.16538C10.185803-8.16538 10.042341-8.141469 9.910834-8.141469H9.456538C9.085928-8.141469 8.691407-8.16538 8.332752-8.16538C8.249066-8.16538 8.105604-8.16538 8.105604-7.950187C8.105604-7.830635 8.18929-7.81868 8.261021-7.81868C8.392528-7.806725 8.547945-7.758904 8.547945-7.591532C8.547945-7.352428 8.18929-7.065504 8.093649-6.993773L3.407223-3.347447L4.399502-7.292653C4.507098-7.699128 4.531009-7.81868 5.379826-7.81868C5.606974-7.81868 5.71457-7.81868 5.71457-8.045828C5.71457-8.16538 5.595019-8.16538 5.535243-8.16538C5.32005-8.16538 5.068991-8.141469 4.841843-8.141469H3.431133C3.21594-8.141469 2.952927-8.16538 2.737733-8.16538C2.642092-8.16538 2.510585-8.16538 2.510585-7.938232C2.510585-7.81868 2.618182-7.81868 2.797509-7.81868C3.526775-7.81868 3.526775-7.723039 3.526775-7.591532C3.526775-7.567621 3.526775-7.49589 3.478954-7.316563L1.865006-.884682C1.75741-.466252 1.733499-.3467 .896638-.3467C.669489-.3467 .549938-.3467 .549938-.131507C.549938 0 .657534 0 .729265 0C.956413 0 1.195517-.02391 1.422665-.02391H2.82142C3.048568-.02391 3.299626 0 3.526775 0C3.622416 0 3.753923 0 3.753923-.227148C3.753923-.3467 3.646326-.3467 3.466999-.3467C2.737733-.3467 2.737733-.442341 2.737733-.561893C2.737733-.645579 2.809465-.944458 2.857285-1.135741L3.323537-2.988792L5.140722-4.411457C5.487422-3.646326 6.121046-2.116065 6.611208-.944458C6.647073-.872727 6.670984-.800996 6.670984-.71731C6.670984-.358655 6.192777-.3467 6.085181-.3467S5.858032-.3467 5.858032-.119552C5.858032 0 5.989539 0 6.025405 0C6.443836 0 6.886177-.02391 7.304608-.02391H7.878456C8.057783-.02391 8.261021 0 8.440349 0C8.51208 0 8.643587 0 8.643587-.227148C8.643587-.3467 8.53599-.3467 8.416438-.3467C7.974097-.358655 7.81868-.454296 7.639352-.884682L5.977584-4.829888Z'/><path id='g0-76' d='M4.387547-7.244832C4.495143-7.699128 4.531009-7.81868 5.583064-7.81868C5.905853-7.81868 5.989539-7.81868 5.989539-8.045828C5.989539-8.16538 5.858032-8.16538 5.810212-8.16538C5.571108-8.16538 5.296139-8.141469 5.057036-8.141469H3.455044C3.227895-8.141469 2.964882-8.16538 2.737733-8.16538C2.642092-8.16538 2.510585-8.16538 2.510585-7.938232C2.510585-7.81868 2.618182-7.81868 2.797509-7.81868C3.526775-7.81868 3.526775-7.723039 3.526775-7.591532C3.526775-7.567621 3.526775-7.49589 3.478954-7.316563L1.865006-.884682C1.75741-.466252 1.733499-.3467 .896638-.3467C.669489-.3467 .549938-.3467 .549938-.131507C.549938 0 .621669 0 .860772 0H6.216687C6.479701 0 6.491656-.011955 6.575342-.227148L7.49589-2.773599C7.519801-2.833375 7.543711-2.905106 7.543711-2.940971C7.543711-3.012702 7.483935-3.060523 7.424159-3.060523C7.412204-3.060523 7.352428-3.060523 7.328518-3.012702C7.304608-3.000747 7.304608-2.976837 7.208966-2.749689C6.826401-1.697634 6.288418-.3467 4.267995-.3467H3.120299C2.952927-.3467 2.929016-.3467 2.857285-.358655C2.725778-.37061 2.713823-.394521 2.713823-.490162C2.713823-.573848 2.737733-.645579 2.761644-.753176L4.387547-7.244832Z'/><path id='g0-77' d='M10.855293-7.292653C10.962889-7.699128 10.9868-7.81868 11.835616-7.81868C12.062765-7.81868 12.170361-7.81868 12.170361-8.045828C12.170361-8.16538 12.086675-8.16538 11.859527-8.16538H10.424907C10.126027-8.16538 10.114072-8.153425 9.982565-7.962142L5.618929-1.06401L4.722291-7.902366C4.686426-8.16538 4.674471-8.16538 4.363636-8.16538H2.881196C2.654047-8.16538 2.546451-8.16538 2.546451-7.938232C2.546451-7.81868 2.654047-7.81868 2.833375-7.81868C3.56264-7.81868 3.56264-7.723039 3.56264-7.591532C3.56264-7.567621 3.56264-7.49589 3.514819-7.316563L1.984558-1.219427C1.841096-.645579 1.566127-.382565 .765131-.3467C.729265-.3467 .585803-.334745 .585803-.131507C.585803 0 .6934 0 .74122 0C.980324 0 1.590037-.02391 1.829141-.02391H2.402989C2.570361-.02391 2.773599 0 2.940971 0C3.024658 0 3.156164 0 3.156164-.227148C3.156164-.334745 3.036613-.3467 2.988792-.3467C2.594271-.358655 2.211706-.430386 2.211706-.860772C2.211706-.980324 2.211706-.992279 2.259527-1.159651L3.90934-7.746949H3.921295L4.913574-.32279C4.94944-.035866 4.961395 0 5.068991 0C5.200498 0 5.260274-.095641 5.32005-.203238L10.126027-7.806725H10.137983L8.404483-.884682C8.296887-.466252 8.272976-.3467 7.436115-.3467C7.208966-.3467 7.089415-.3467 7.089415-.131507C7.089415 0 7.197011 0 7.268742 0C7.47198 0 7.711083-.02391 7.914321-.02391H9.325031C9.528269-.02391 9.779328 0 9.982565 0C10.078207 0 10.209714 0 10.209714-.227148C10.209714-.3467 10.102117-.3467 9.92279-.3467C9.193524-.3467 9.193524-.442341 9.193524-.561893C9.193524-.573848 9.193524-.657534 9.217435-.753176L10.855293-7.292653Z'/></defs><g><path d='M301.2891 130.312496C301.2891 92.7383 270.832 62.2812 233.257809 62.2812C195.6836 62.2812 165.2266 92.7383 165.2266 130.312496C165.2266 167.8867 195.6836 198.3437 233.257809 198.3437C270.832 198.3437 301.2891 167.8867 301.2891 130.312496Z' stroke='#000' fill='none' stroke-width='.89664'/><path d='M301.2891 130.312496C301.2891 138.92187 270.832 145.9023 233.257809 145.9023C195.6836 145.9023 165.2266 138.92187 165.2266 130.312496' stroke='#000' fill='none' stroke-width='.89664' stroke-miterlimit='10'/><path d='M165.2266 130.312496C165.2266 121.70312 195.6836 114.7227 233.257809 114.7227C270.832 114.7227 301.2891 121.70312 301.2891 130.312496' stroke='#000' fill='none' stroke-width='.89664' stroke-miterlimit='10' stroke-dasharray='2.98883 2.98883'/><path d='M165.2266 130.312496H301.2891' stroke='#000' fill='none' stroke-width='.89664' stroke-miterlimit='10' stroke-dasharray='2.98883 2.98883'/><path d='M298.7773 111.625C302.1406 103.6953 283.0234 88 256.0742 76.5586C229.125 65.1211 204.5508 62.2734 201.1875 70.1992S216.9414 93.8242 243.8906 105.2617C270.8398 116.7031 295.4102 119.5508 298.7773 111.625Z' stroke='#000' fill='none' stroke-width='.89664' stroke-miterlimit='10'/><path d='M233.257809 130.312496L249.9805 90.9102' stroke='#000' fill='none' stroke-width='.89664' stroke-miterlimit='10' stroke-dasharray='2.98883 2.98883'/><path d='M235.54687 130.312496C235.54687 129.04687 234.52343 128.02343 233.257809 128.02343C231.99218 128.02343 230.96484 129.04687 230.96484 130.312496C230.96484 131.57812 231.99218 132.60547 233.257809 132.60547C234.52343 132.60547 235.54687 131.57812 235.54687 130.312496Z'/><path d='M167.5156 130.312496C167.5156 129.04687 166.4922 128.02343 165.2266 128.02343C163.9609 128.02343 162.9336 129.04687 162.9336 130.312496C162.9336 131.57812 163.9609 132.60547 165.2266 132.60547C166.4922 132.60547 167.5156 131.57812 167.5156 130.312496Z'/><path d='M303.582 130.312496C303.582 129.04687 302.5547 128.02343 301.2891 128.02343C300.0234 128.02343 298.9961 129.04687 298.9961 130.312496C298.9961 131.57812 300.0234 132.60547 301.2891 132.60547C302.5547 132.60547 303.582 131.57812 303.582 130.312496Z'/><path d='M203.5156 70.2187C203.5156 68.9531 202.4922 67.9258 201.2266 67.9258C199.9609 67.9258 198.9336 68.9531 198.9336 70.2187C198.9336 71.4844 199.9609 72.5078 201.2266 72.5078C202.4922 72.5078 203.5156 71.4844 203.5156 70.2187Z'/><path d='M301.0312 111.6055C301.0312 110.3398 300.0039 109.3125 298.7383 109.3125S296.4453 110.3398 296.4453 111.6055C296.4453 112.8711 297.4727 113.8945 298.7383 113.8945S301.0312 112.8711 301.0312 111.6055Z'/><path d='M252.2734 90.9102C252.2734 89.6445 251.2461 88.6211 249.9805 88.6211C248.7148 88.6211 247.6914 89.6445 247.6914 90.9102C247.6914 92.1758 248.7148 93.2031 249.9805 93.2031C251.2461 93.2031 252.2734 92.1758 252.2734 90.9102Z'/><g transform='matrix(1 0 0 1 -4.388 12.519)'><use x='233.257107' y='130.313373' xlink:href='#g0-65'/></g><g transform='matrix(1 0 0 1 -81.878 4.085)'><use x='233.257107' y='130.313373' xlink:href='#g0-66'/></g><g transform='matrix(1 0 0 1 72.382 4.085)'><use x='233.257107' y='130.313373' xlink:href='#g0-67'/></g><g transform='matrix(1 0 0 1 -47.2 -64.445)'><use x='233.257107' y='130.313373' xlink:href='#g0-75'/></g><g transform='matrix(1 0 0 1 69.831 -14.624)'><use x='233.257107' y='130.313373' xlink:href='#g0-76'/></g><g transform='matrix(1 0 0 1 21.074 -43.752)'><use x='233.257107' y='130.313373' xlink:href='#g0-77'/></g></g></svg>
+  </div>
+
+<script>
+const PRACTICES=[
+  /* ---------- Práctica 1 ---------- */
+  [
+    {q:"Karen elaboró dos artesanías a partir de una tuca (trozo de madera) con forma de cilindro circular recto. El diámetro de una base mide $40$ cm. A la tuca se le hace un corte plano paralelo a sus bases. ¿Cuál es el área, en centímetros cuadrados, de la sección plana obtenida?",
+     opts:["$40\\pi$","$80\\pi$","$400\\pi$","$1600\\pi$"],correct:2,
+     sol:"El corte paralelo a las bases genera un círculo del mismo radio. Radio $=\\dfrac{40}{2}=20$ cm. Área $=\\pi r^2=\\pi(20)^2=400\\pi$ cm²."},
+    {q:"A un cilindro circular recto de $100$ cm de altura y $20$ cm de diámetro se le realiza un corte perpendicular a las bases, a una distancia de $6$ cm respecto del centro de la base. ¿Cuál es el área, en cm², de la sección plana obtenida?",
+     fig:"cilPerp",opts:["$2000$","$1600$","$1200$","$800$"],correct:1,
+     sol:"La sección es un rectángulo. Un lado es la altura: $100$ cm. El otro es la cuerda $2\\sqrt{r^2-d^2}=2\\sqrt{10^2-6^2}=2\\sqrt{64}=16$ cm. Área $=100\\times16=1600$ cm²."},
+    {q:"Un recipiente se fabrica con una esfera de vidrio de radio $26$ cm, haciéndole dos cortes planos paralelos del mismo tamaño (la base y la abertura). La distancia entre los centros de las secciones es $48$ cm. ¿Cuál es el radio de la abertura?",
+     fig:"recipiente",opts:["$40$ cm","$35$ cm","$22$ cm","$10$ cm"],correct:3,
+     sol:"Al ser del mismo tamaño, las secciones equidistan del centro: $d=\\dfrac{48}{2}=24$ cm. Radio de la sección $=\\sqrt{R^2-d^2}=\\sqrt{26^2-24^2}=\\sqrt{100}=10$ cm."},
+    {q:"A una varilla con forma de cilindro circular recto se le hace un corte plano oblicuo respecto a sus bases, sin intersecarlas. ¿Qué figura geométrica corresponde a la sección plana obtenida?",
+     opts:["Elipse","Parábola","Rectángulo","Circunferencia"],correct:0,
+     sol:"Un plano oblicuo a las bases que corta toda la superficie lateral, sin tocar las bases, genera una elipse."}
+  ],
+  /* ---------- Práctica 2 ---------- */
+  [
+    {q:"Una persona artesana trabaja un bloque de cera con forma de cilindro circular recto, de radio $8$ cm y altura $24$ cm. Realiza un corte plano que pasa por el centro de ambas bases y es perpendicular a ellas. ¿Cuál es el perímetro, en cm, de la sección obtenida?",
+     opts:["$32$","$64$","$80$","$192$"],correct:2,
+     sol:"La sección es un rectángulo de base igual al diámetro, $2(8)=16$ cm, y altura $24$ cm. Perímetro $=2(16+24)=80$ cm."},
+    {q:"Una esfera de centro $A$ y radio $25\\sqrt{2}$ cm recibe un corte plano cuya circunferencia tiene centro $M$, con $AM=25$ cm. ¿Cuál es el radio, en cm, de la circunferencia generada por el corte?",
+     fig:"esferaCorte",figBig:true,opts:["$25$","$50$","$\\sqrt{1250}$","$2\\sqrt{1250}$"],correct:0,
+     sol:"$r=\\sqrt{R^2-AM^2}=\\sqrt{(25\\sqrt{2})^2-25^2}=\\sqrt{1250-625}=\\sqrt{625}=25$ cm."},
+    {q:"A una pieza con forma de cono circular recto se le hace un corte plano oblicuo a su base y sin intersecarla, para obtener dos trozos. ¿A qué figura corresponde la sección plana obtenida?",
+     opts:["Elipse","Parábola","Hipérbola","Circunferencia"],correct:0,
+     sol:"Al cortar oblicuamente todas las generatrices del cono, sin tocar la base, la sección obtenida es una elipse."},
+    {q:"Un bloque de queso con forma de cilindro circular recto de $40$ cm de altura y $15$ cm de radio se corta perpendicularmente a sus bases, pasando por los centros de ambas. ¿Cuál es el área, en cm², de la superficie del corte?",
+     fig:"cilPerp",opts:["$300$","$600$","$1200$","$2400$"],correct:2,
+     sol:"La sección es un rectángulo de base igual al diámetro, $2(15)=30$ cm, y altura $40$ cm. Área $=30\\times40=1200$ cm²."}
+  ],
+  /* ---------- Práctica 3 ---------- */
+  [
+    {q:"Un artesano usa una pieza con forma de cono circular recto. Le realiza un corte plano paralelo a la base, sin pasar por el vértice. ¿Qué forma tiene la sección plana obtenida?",
+     opts:["Una parábola","Una hipérbola","Un rectángulo","Una circunferencia"],correct:3,
+     sol:"Todo corte paralelo a la base de un cono, que no pase por el vértice, produce una circunferencia."},
+    {q:"Se interseca un cono circular recto con un plano que no pasa por su vértice y es perpendicular a la base. ¿A qué corresponde la sección plana formada?",
+     fig:"cono",opts:["Elipse","Hipérbola","Circunferencia","Parábola"],correct:1,
+     sol:"Un plano perpendicular a la base que no pasa por el vértice corta la superficie generando una hipérbola."},
+    {q:"El diámetro de la base de un cono circular recto es $10$. Se le hace un corte paralelo a la base; la distancia desde la cúspide al centro de la sección es $6$ y la distancia desde el corte hasta la base es $8$. ¿Cuál es el radio de la sección generada?",
+     opts:["$\\dfrac{15}{4}$","$\\dfrac{35}{3}$","$\\dfrac{15}{7}$","$\\dfrac{35}{4}$"],correct:2,
+     sol:"La altura total es $6+8=14$ y el radio de la base es $5$. Por semejanza $\\dfrac{r}{5}=\\dfrac{6}{14}$, de donde $r=\\dfrac{30}{14}=\\dfrac{15}{7}$."},
+    {q:"Un adorno se forma con un cilindro y una esfera de radio $5$ cm a la que se le hace un corte a $3$ cm de su centro. ¿Cuál debe ser el diámetro de la base del cilindro para que el área de la sección y el área de la base sean iguales?",
+     opts:["$6$","$8$","$10$","$19$"],correct:1,
+     sol:"Radio de la sección $=\\sqrt{5^2-3^2}=\\sqrt{16}=4$ cm, con área $\\pi(4)^2=16\\pi$. En la base, $\\pi r^2=16\\pi\\Rightarrow r=4$, por lo que el diámetro es $8$ cm."}
+  ],
+  /* ---------- Práctica 4 ---------- */
+  [
+    {q:"A una varilla con forma de cilindro circular recto se le hace un corte plano oblicuo respecto a sus bases, sin intersecarlas. ¿Qué figura plana corresponde a la sección obtenida en una de las partes?",
+     fig:"cilObl",opts:["Elipse","Parábola","Rectángulo","Circunferencia"],correct:0,
+     sol:"Un corte oblicuo a las bases que no las toca corta toda la superficie lateral y produce una elipse."},
+    {q:"A una esfera de acrílico se le realiza un corte plano que pasa por su centro. ¿Qué figura plana, en la esfera, se obtuvo producto de ese corte?",
+     opts:["Circunferencia","Hipérbola","Parábola","Recta"],correct:0,
+     sol:"Todo plano que corta una esfera genera una circunferencia; si pasa por el centro, es la circunferencia máxima."},
+    {q:"Relacione cada corte con su sección. I. A un cilindro circular recto se le hace un corte oblicuo a las bases, sin intersecarlas. II. A un cono circular recto se le hace un corte oblicuo a la base y paralelo a una generatriz, sin pasar por el vértice.",
+     opts:["I. elipse — II. parábola","I. elipse — II. hipérbola","I. parábola — II. hipérbola","I. circunferencia — II. hipérbola"],correct:0,
+     sol:"I. El corte oblicuo que no toca las bases del cilindro da una elipse. II. En el cono, un plano paralelo a una generatriz da una parábola."},
+    {q:"A un estañón con forma de cilindro circular recto se le hace un corte perpendicular a las bases para fabricar una parrilla. ¿Qué figura plana se obtuvo en la parrilla producto de ese corte?",
+     opts:["Una elipse","Un rectángulo","Una circunferencia","Un cuadrado"],correct:1,
+     sol:"Un corte perpendicular a las bases del cilindro expone una cara plana con forma de rectángulo (altura por cuerda)."}
+  ],
+  /* ---------- Práctica 5 ---------- */
+  [
+    {q:"A un tubo metálico con forma de cilindro circular recto se le realiza un corte plano oblicuo respecto a sus bases, sin intersecarlas, obteniéndose dos partes. ¿A qué corresponde la sección plana de una de las partes?",
+     opts:["Una elipse","Una circunferencia","Dos segmentos paralelos","Un rectángulo"],correct:0,
+     sol:"Un corte oblicuo a las bases, sin tocarlas, produce una elipse."},
+    {q:"Un bloque con forma de cilindro circular recto de radio $9$ cm y altura $16$ cm se corta perpendicularmente a las bases, pasando por los centros de ambas. ¿Cuál es el área, en cm², de la sección obtenida?",
+     fig:"cilPerp",opts:["$144$","$288$","$72$","$432$"],correct:1,
+     sol:"La sección es un rectángulo de base igual al diámetro, $2(9)=18$ cm, y altura $16$ cm. Área $=18\\times16=288$ cm²."},
+    {q:"A una esfera de radio $10$ cm se le hace un corte plano a $6$ cm de su centro. ¿Cuál es el radio, en cm, de la circunferencia generada por el corte?",
+     opts:["$4$","$6$","$8$","$16$"],correct:2,
+     sol:"$r=\\sqrt{R^2-d^2}=\\sqrt{10^2-6^2}=\\sqrt{100-36}=\\sqrt{64}=8$ cm."},
+    {q:"A una pieza con forma de cono circular recto se le hace un corte plano paralelo a una de sus generatrices, sin pasar por el vértice. ¿Qué figura corresponde a la sección obtenida?",
+     fig:"cono",opts:["Elipse","Parábola","Hipérbola","Circunferencia"],correct:1,
+     sol:"Un plano paralelo a una generatriz del cono produce una parábola."}
+  ]
+];
+
+const LETTERS=["A","B","C","D"];
+let current=0;
+
+function renderMath(el){
+  if(typeof renderMathInElement==="function"){
+    renderMathInElement(el,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],throwOnError:false});
+  }
+}
+function esc(s){return s;}
+
+function buildPractice(idx){
+  const cont=document.getElementById("items");
+  cont.innerHTML="";
+  PRACTICES[idx].forEach((it,qi)=>{
+    const art=document.createElement("article");
+    art.className="item";
+    let html=`<div class="q"><span class="num">${qi+1}.</span><span class="enun">${it.q}</span></div>`;
+    if(it.fig) html+=`<div class="fig${it.figBig?" big":""}" data-figkey="${it.fig}" role="img" aria-label="Figura del ítem ${qi+1}"></div>`;
+    html+=`<ul class="opts">`;
+    it.opts.forEach((op,oi)=>{
+      html+=`<li><button class="opt" type="button" data-i="${oi}"><span class="letter">${LETTERS[oi]})</span><span class="otext">${op}</span><span class="mark"></span></button></li>`;
+    });
+    html+=`</ul>`;
+    html+=`<div class="fb" hidden><div class="fb-head"><span class="ico"></span><span class="fb-label"></span></div><div class="fb-sol"><b>Solución paso a paso</b><div class="fb-text">${it.sol}</div></div></div>`;
+    art.innerHTML=html;
+    const figDiv=art.querySelector(".fig[data-figkey]");
+    if(figDiv){const src=document.querySelector(`#figbank svg[data-fig="${figDiv.dataset.figkey}"]`);if(src)figDiv.appendChild(src.cloneNode(true));}
+    const opts=art.querySelectorAll(".opt");
+    opts.forEach(btn=>{
+      btn.addEventListener("click",()=>answer(art,it,+btn.dataset.i,opts));
+    });
+    cont.appendChild(art);
+  });
+  renderMath(cont);
+}
+
+function answer(art,it,chosen,opts){
+  if(art.dataset.done)return;
+  art.dataset.done="1";
+  const ok=chosen===it.correct;
+  opts.forEach((b,i)=>{
+    b.disabled=true;
+    if(i===it.correct){b.classList.add("correct");b.querySelector(".mark").textContent="✓";}
+    if(i===chosen&&!ok){b.classList.add("wrong");b.querySelector(".mark").textContent="✗";}
+  });
+  const fb=art.querySelector(".fb");
+  fb.classList.add(ok?"ok":"bad");
+  fb.querySelector(".ico").textContent=ok?"✓":"✗";
+  fb.querySelector(".fb-label").textContent=ok?"Respuesta correcta":"Respuesta incorrecta";
+  fb.hidden=false;
+}
+
+function showPractice(idx){
+  current=((idx%PRACTICES.length)+PRACTICES.length)%PRACTICES.length;
+  const n=current+1;
+  document.getElementById("tbarTitle").textContent=`Práctica ${n} de ${PRACTICES.length}`;
+  document.getElementById("sheetTitle").textContent=`Práctica ${n} · Secciones planas`;
+  buildPractice(current);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+document.getElementById("btnNew").addEventListener("click",()=>showPractice(current+1));
+document.getElementById("btnPrint").addEventListener("click",()=>window.print());
+
+showPractice(0);
+</script>
+</body>
+</html>
